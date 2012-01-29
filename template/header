@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+  <head>
+    	<title> [% title %] - [% tbihome  %] </title>
+	<script type="text/javascript" src="./javascript/input.js"></script>
+	<script type="text/javascript" src="./javascript/jquery-1.4.4.min.js"></script> 
+	<script type="text/javascript" src="./javascript/jquery.validate.min.js"></script>
+  </head>
+  <body>
+	<div align ="center">
+	<table width="100%" border="1">
+		<tr>
+		        <td rowspan="2"><img src="[% banner %]"></td>
+			<td></td>
+         		<td colspan="2"><a href="[% introduction %]"><img src="./pictures/introduction.png" alt="Introduction" border="0"></a></td>
+         		<td colspan="2"><a href="[% model_comparison %]"><img src="./pictures/compare.png" alt="Target Search" border="0"></a></td>
+			<td colspan="2"><a href="[% help %]"><img src="./pictures/help.png" alt="Help" border="0"></a></td>
+		</tr>
+		<tr>
+		        <td></td>
+		        <td></td>
+		        <td colspan="4" bgcolor="#C0C0C0"><a href="introduction.html#history">Status:</a> Development Version of cmcws online<td>
+			<td></td>
+ 		</tr>
+<!-- bgcolor="#C0C0C0" --> 
+	</table>
+	<hr>
+	</div>
