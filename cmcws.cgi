@@ -13,13 +13,22 @@ use Cwd;
 use Digest::MD5;
 use CGI::Carp qw(fatalsToBrowser);
 use File::Temp qw/tempdir tempfile/;
+######################### Webserver machine specific settings ############################################
+##########################################################################################################
 my $webserver_name = "cmcompare-webserver";
-my $server="http://rna.tbi.univie.ac.at/cmcws";
+my $server="http://localhost:800/cmcws";
 my $source_dir=cwd();
-my $temp_dir ="/srv/http/cmcws";
+#baseDIR points to the tempdir folder
+my $base_dir ="$source_dir/html";
+#sun grid engine settings
+my $qsub_location="/usr/bin/qsub";
+my $sge_queue_name="web_short_q";
+my $sge_error_dir="$source_dir/error";
+my $sge_log_output_dir="$source_dir/error";
+my $sge_root_directory="/usr/share/gridengine";
+##########################################################################################################
 #Write all Output to file at once
-$|=1 ;
-
+$|=1;
 #Control of the CGI Object remains with webserv.pl, additional functions are defined in the requirements below.
 use CGI;
 $CGI::POST_MAX=100000; #max 100kbyte posts
@@ -73,21 +82,24 @@ if($page==0){
 		#Interpolate => 1 allows simple variable reference
 		#INTERPOLATE=>1,
 		#allows use of relative include path
+		#PRE_PROCESS => './template/javascript/input.js',
 		RELATIVE=>1,
 	});
 
 	my $file = './template/input.html';
 	#if id param is set we already preset it in the appropiate input field e.g. tax_default, accession_default
 	my $vars = {
-   		title => "CMcompare - Webserver - Input form",
-   		tbihome => "http://www.tbi.univie.ac.at/",
-		banner => "./pictures/banner.png",
-		model_comparison => "cmcws.cgi",
-		introduction => "introduction.html",
-		available_genomes => "available_genomes.cgi",
-		target_search => "target_search.cgi",
-		help => "help.html",
-	   	java_script_location  => "./javascript/input.js"
+	    #define global varibales for javascript defining the current host (e.g. linse) for redirection
+	    global => "globaltest",
+	    title => "CMcompare - Webserver - Input form",
+	    tbihome => "http://www.tbi.univie.ac.at/",
+	    banner => "./pictures/banner.png",
+	    model_comparison => "cmcws.cgi",
+	    introduction => "introduction.html",
+	    available_genomes => "available_genomes.cgi",
+	    target_search => "target_search.cgi",
+	    help => "help.html",
+	    java_script_location  => "./template/javascript/input.js"
 	};
 	$template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
 
