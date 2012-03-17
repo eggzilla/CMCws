@@ -82,7 +82,7 @@ if($page==0){
 		#Interpolate => 1 allows simple variable reference
 		#INTERPOLATE=>1,
 		#allows use of relative include path
-		#PRE_PROCESS => './template/javascript/input.js',
+		#PRE_PROCESS => './javascript/input.js',
 		RELATIVE=>1,
 	});
 
@@ -90,16 +90,16 @@ if($page==0){
 	#if id param is set we already preset it in the appropiate input field e.g. tax_default, accession_default
 	my $vars = {
 	    #define global varibales for javascript defining the current host (e.g. linse) for redirection
-	    global => "globaltest",
+	    serveraddress => "$server",
 	    title => "CMcompare - Webserver - Input form",
-	    tbihome => "http://www.tbi.univie.ac.at/",
 	    banner => "./pictures/banner.png",
 	    model_comparison => "cmcws.cgi",
 	    introduction => "introduction.html",
 	    available_genomes => "available_genomes.cgi",
 	    target_search => "target_search.cgi",
 	    help => "help.html",
-	    java_script_location  => "./template/javascript/input.js"
+	    scriptfile => "inputscriptfile",
+	    stylefile => "inputstylefile"
 	};
 	$template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
 

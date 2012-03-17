@@ -1,79 +1,95 @@
-[% INCLUDE header %]
-<div align ="left">
-  <script>var global="[% global  %]"; </script>
-	<script src="[% java_script_location %]"></script>
-	[% error_script %]
-	<noscript>This page does not decay graceful :-) - Please enable your java-script </noscript>
-	<style type="text/css">
-			table {table-layout:fixed; text-align:center; overflow:auto; border:0px black solid; width:95%; word-wrap:break-word; }
-			table.borders {table-layout:fixed; text-align:center; overflow:auto; border:1px black solid; width:95%; word-wrap:break-word; }
-			table td {text-align:center; border:0px black solid; }
-			.tooltip2 {
-				position: absolute;
-				display: none;
-				background-color: #FFFFFF;
-				border-width: 1px;
-				border-style: solid;
-				border-color: #000000;
-				padding: 2px;
-			}
-			.tooltip2 .head{
-			background-color: #006666;
-			color: white;
-			font-weight: stronf;
-			padding: 2px;
-			}
-			.tooltip2 .content{
-			color: 000066;
-			font-size: 12px;
-			border-size: 4px;
-			}
-			.tooltip2 .content td{
-			width: 50%;
-			font-size: 10px;
-			text-align: center;
-			}
-	</style>
+[% PROCESS header %]
+   <div style="text-align:left">
+  [% error_script %]
+   </div>
+    <div id="1" class="tooltip2" style="width: 400px;">
+     <div class="content">
+       <div class="head">Select comparison mode:</div>
+       <ul>
+	 <li>Compare one covariance model against all<br> 
+	   covariance models in Rfam</li>
+	 <li>Compare multiple covariance models with<br>
+	   each other</li>
+	 --&gt; For more information see Help 
+       </ul>
+     </div>
+   </div>
+   </div>
+   <div id="2" class="tooltip2" style="width: 400px;">
+     <div class="content">
+       <div class="head">Upload multiple alignment or covariance model:</div>
+       <ul>
+	 <li>Multiple alignment - stockholm format</li>
+	 <li>Covariance model - x format</li>
+	 --&gt; For more information see Help 
+       </ul>
+     </div>
+   </div>
 </div>
-<div id="1" class="tooltip2" style="width: 400px;">
-  <div class="content">
-    <div class="head">Upload a multiple Alignment:</div>
-    <p>e.g.: NC_000913 for E.coli K-12<br>
-      Represent chromosomes or plasmids.
-      If it is in the database an entry will appear in the "Confirm Genome" field. Upon confirmation
-      the selected genome will be searched for interaction with the provided sRNA.
-    </p>
-  </div>
-</div>
-</div>
-<div id="2" class="tooltip2" style="width: 400px;">
-  <div class="content">
-    <div class="head">Taxonomy ID:</div>
-    <p>e.g.: 511145 for E.coli K-12 MG1655<br> 
-      Enter a Taxonomy ID(tax-id) representing a bacterial species. If<br> it is in the database
-      an entry will appear in the "Confirm Genome" field. Upon confirmation all plasmids and
-      chromosomes associated to the tax-id will be searched for interaction with
-      the provided sRNA.</p>
-  </div>
-</div>
+   <div id="3" class="tooltip2" style="width:400px;">
+     <div class="content">
+       <div class="head">Upload archive of multiple alignments or<br>
+	 covariance models</div>
+       <ul>
+	 <li>Archive: .zip or .rar or tar.gz<br>
+	   containing files:
+	   <ul>
+	     <li>Multiple alignment - stockholm format</li>
+	     <li>Covariance model - x format</li>
+	   </ul>
+	 </li>
+	 --&gt; For more information see Help 
+       </ul>
+
+     </div>
+   </div>
 </div>
 
-<div align="center">
-  <table id="input_table" bgcolor="white" class="borders" >
+   <div style="text-align:center">
+     <h3>= Compare =</h3>
+     <table id="input_table" class="borders" style="width:95%" >
     <tr>
       <td id="step1_title"><u>1. Input:</u></td>
       <td id="step2_title"><u>2. Confirm & Submit:</u></td>
-      <!--     <td id="step3_title">3. Enter sRNA-Sequence and Submit:<a href="#" onmouseover="XBT(this, {id:'3'})"><img style="vertical-align:middle" src="pictures/test2.png" border="0"></a> </td> -->
     </tr>
     <tr>		
       <td id="step1_content" >	
 	<form action="/cgi-bin/cmcws.cgi" method="post" target="Daten">
-	  <p>Select type of comparison:</p>
-	  <select id="select_operation"  onchange="step1_operation(this)"  >
-	    <option>covariance model vs Rfam</option>
-	    <option>covariance model vs covariance model</option>
-	  </select>
-</p>
+	  <p>Select type of comparison: <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle" src="pictures/info.png" border="0"></a></p>
+	  <p><select id="select_operation"  onchange="step1_operation(this)">
+	      <option>Please select</option>
+	      <option>covariance model vs Rfam</option>
+	      <option>covariance model vs covariance model</option>
+	    </select>
+	  </p>
+	</form>
+      </td>	
+      <td id="step2_content" style="vertical-align:top">
+      </td>
+      
+    </tr>	
+    <tr>
+      <td id="step1_2_content" style="vertical-align:top">
+      </td>
+      <td id="step2_2_content" style="vertical-align:top">
+      </td>
+    </tr>
+     </table>
+     
+     <table style="border-width:0">
+       <tr>
+	 <td>
+	   <div style="text-align:left">
+	     <form>
+               <p><input type="button" name="sample_button" value="Paste sample" onSelect="sample()"></p>
+             </form>
+	   </div>
+	 </td>
+       </tr>
+     </table>
+   </div>
+     [% INCLUDE footer %]
+ 
 <!--	  <p>Upload a Multiple Alignment  
 	  <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle" src="pictures/test2.png" border="0"></a><br>
 	  <input name="multiple-alignment" id="ma-upload" size="20" type="file" onchange="lock_sRNA_sequence_input(this)"><br>
@@ -83,41 +99,3 @@
   <input name="family-model" id="fm-upload" size="20" type="file" onchange="lock_sRNA_sequence_input(this)"><br>
 <p><strong>AND</strong></p>
 <input type="button" value="Proceed >>" onclick="accession_submitter(this)"> -->
-</form>
-
-</td>	
-<td id="step2_content" valign="top" >
-  
-</td>
-
-</tr>	
-<tr>
-  <td id="step1_content" valign="top">
-
-  </td>
-  <td id="step2_content" valign="top">
-  </td>
-</tr>
-</table>
-<table width="90%" border="1">
-  <tr border="1">
-    <td>
-      <div align="left">
-	<form>
-          <p><input type="button" name="sample_button" value="Paste sample" onClick="sample()"></p>
-        </form>
-      </div>
-    </td>
-  </tr>
-</table>
-<div id="confirm_species">
-  
-</div>
-
-</div>
-
-<script type="text/javascript">
-  window.onload = go();
-</script>
-
-[% INCLUDE footer %]
