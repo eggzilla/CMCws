@@ -67,13 +67,13 @@ function step1_operation(ref){
             "<div id=\"validation_message\"></div>"+
 	    "Upload a covariance model<br>"+
 	    "or a multiple alignment <a href=\"#\" onmouseover=\"XBT(this, {id:'2'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a>:<br>"+
-            "<input name=\"fasta-file\" id=\"file-upload\" size=\"30\" type=\"file\" onchange=\"lock_sRNA_sequence_input(this)\"><br>"+
+            "<input name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
             "<input id=\"page\" value=\"1\"  name=\"page\" type=\"hidden\"  maxlength=\"1\">" +
             "<div id=\"file_message\" style=\"color: red;\"></div>"+
             //"<br>Provide email-address(optional):<br>"+
             //"<input id=\"email-address\"  value=\"\" name=\"email\" type=\"text\" maxlength=\"50\"><br>"+
             //"<div id=\"email_message\"></div>"+
-            "<br><input type=\"button\" value=\"Compare\" onclick=\"compare_submitter(this)\">"+
+            "<br><input type=\"submit\" value=\"Compare\">"+
             "<input type=\"reset\" value=\"Reset\" onclick=\"reseter(this)\" >"+
             "</form>";
     }else{
@@ -81,13 +81,13 @@ function step1_operation(ref){
             "<div id=\"validation_message\"></div>"+
 	    "Upload an archive containing a group of<br>"+
 	    "multiple alignments or covariance models <a href=\"#\" onmouseover=\"XBT(this, {id:'3'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a>:<br>"+
-            "<input name=\"fasta-file\" id=\"file-upload\" size=\"30\" type=\"file\" onchange=\"lock_sRNA_sequence_input(this)\"><br>"+
+            "<input name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
             "<input id=\"page\" value=\"1\"  name=\"page\" type=\"hidden\"  maxlength=\"1\">" +
             "<div id=\"file_message\" style=\"color: red;\"></div>"+
             //"<br>Provide email-address(optional):<br>"+
             //"<input id=\"email-address\"  value=\"\" name=\"email\" type=\"text\" maxlength=\"50\"><br>"+
             //"<div id=\"email_message\"></div>"+
-            "<br><input type=\"button\" value=\"Compare\" onclick=\"compare_submitter(this)\">"+
+            "<br><input type=\"submit\" value=\"Compare\">"+
             "<input type=\"reset\" value=\"Reset\" onclick=\"reseter(this)\" >"+
             "</form>";
     }
