@@ -52,14 +52,14 @@ use Template;
 #available_genomes can call RNApredator via CGI therfore
 #$tax_id has to be taintchecked
 my @names = $query->param;
-my $model = $query->param('model') || undef;
-my $operation = $query->param('operation') || undef;
+my $mode = $query->param('mode') || undef;
 my $page = $query->param('page') || undef; 
 my $tempdir = $query->param('tempdir') || undef;
 my $email=$query->param('email-address')|| undef;
 my $input_filename=$query->param('file')|| undef;
 my $input_filehandle=$query->upload('file')||undef;
 my $input_present = undef;
+my $input_error = undef;
 
 ######TAINT-CHECKS##############################################
 #get the current page number
@@ -74,6 +74,17 @@ if(defined($page)){
     }
 }else{
     $page = 0;
+}
+
+#mode
+if(defined($mode)){
+    if($mode eq "1"){
+	$mode = 1;
+    }elsif($mode eq "2"){
+	$mode = 2;
+    }
+}else{
+    $mode = 0;
 }
 
 if(defined($input_filename)){
@@ -93,12 +104,14 @@ if(defined($input_filename)){
 	print STDERR "cmcws: Uploaded Input file is too large\n";
     }
     #check input file
-    my $check=&check_input($name);
-    print STDERR "cmcws-Inputcheck: $check\n";
+    my $check_array_reference=&check_input($name);
+    my @check_array = @$check_array_reference;
+    $input_present='true';
+    print STDERR "cmcws-Inputcheck: @check_array \n";
     #set input present to true if input is ok and include filename for further processing, return error message if not
 }else{
-    print STDERR "cmcws:No input-file provided\n";
-    print STDERR "params: @names";
+    print STDERR "cmcws:No input-file provided \n";
+    print STDERR "Params: @names \n";
 }
 
 if($page==0){
@@ -106,34 +119,44 @@ if($page==0){
     my $template = Template->new({
 	# where to find template files
 	INCLUDE_PATH => ['./template'],
-	#Interpolate => 1 allows simple variable reference
-	#INTERPOLATE=>1,
-	#allows use of relative include path
-	#PRE_PROCESS => './javascript/input.js',
-	RELATIVE=>1,
+	RELATIVE=>1
 				 });
-    #If input files have already been uploaded display error message or ask for confirmation of the query
-    if($input_present){
-	
+    my $file = './template/input.html';
+    my $input_script_file="inputscriptfile";
+    
+    #Three different states of the input page
+    if(defined($input_present)){
+	$file = './template/input2.html';
+	if($mode eq "1"){
+	    #comparison of one model vs rfam 
+	    $input_script_file="inputstep2scriptfile";
+	}elsif($mode eq "2"){
+	    #comparison of multiple models with each other 
+	    $input_script_file="inputstep2scriptfile";
+	}
+    }elsif(defined($input_error)){
+	#Input error - error.js 
+	$input_script_file="inputerrorscriptfile";
+    }else{
+	#Default input page
     }
     
-    #render page
-    my $file = './template/input.html';
     my $vars = {
 	#define global variables for javascript defining the current host (e.g. linse) for redirection
-	serveraddress => "$server",
-	title => "CMcompare - Webserver - Input form",
-	banner => "./pictures/banner.png",
-	model_comparison => "cmcws.cgi",
-	introduction => "introduction.html",
-	available_genomes => "available_genomes.cgi",
-	target_search => "target_search.cgi",
-	help => "help.html",
-	scriptfile => "inputscriptfile",
-	stylefile => "inputstylefile"
-    };
+	    serveraddress => "$server",
+	    title => "CMcompare - Webserver - Input form",
+	    banner => "./pictures/banner.png",
+	    model_comparison => "cmcws.cgi",
+	    introduction => "introduction.html",
+	    available_genomes => "available_genomes.cgi",
+	    target_search => "target_search.cgi",
+	    help => "help.html",
+	    scriptfile => "$input_script_file",
+	    stylefile => "inputstylefile",
+	    mode => "$mode"
+	};
+    #render page
     $template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
-
 }
 
 if($page==1){
@@ -157,15 +180,18 @@ sub check_input{
     my @input_elements;
     my $stockholm_alignment_detected=0;
     my $covariance_model_detected=0;
+    my $counter=0;
     while(<INPUTFILE>){
 	chomp;
 	#look for header
 	if(/\# STOCKHOLM 1\./ && $stockholm_alignment_detected==0){
 	    $stockholm_alignment_detected=1;
 	    push(@input_elements,"a");
+	    $counter++;
 	}elsif(/INFERNAL\-1 \[1/ && $covariance_model_detected==0){
 	    $covariance_model_detected=1;
 	    push(@input_elements,"c");
+	    $counter++;
 	}
 	
 	#look for name
@@ -182,7 +208,7 @@ sub check_input{
 	    my $name=$split_array[$last_element];
 	    push(@input_elements,$name);
 	}else{
-	    push(@input_elements,"cm");
+	    push(@input_elements,"Input $counter");
 	}
 	
 	#look for accession number
@@ -208,14 +234,14 @@ sub check_input{
     if(@input_elements>0){
 	#$input_element_number=(@input_elements/3);
 	#for($i..$input_element_number){
-	    
+	
 	#}
     }else{
 	print STDERR "No covariance models or alignments found in inputfile";
     }
-    my $stuff=join("",@input_elements);
+
     close INPUTFILE;
-    return $stuff;
+    return \@input_elements;
 }
 
 sub prepare_input{
