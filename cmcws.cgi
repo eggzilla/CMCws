@@ -58,8 +58,8 @@ my $tempdir = $query->param('tempdir') || undef;
 my $email=$query->param('email-address')|| undef;
 my $input_filename=$query->param('file')|| undef;
 my $input_filehandle=$query->upload('file')||undef;
-my $input_present = undef;
-my $input_error = undef;
+my $input_present;
+my @input_error;
 
 ######TAINT-CHECKS##############################################
 #get the current page number
@@ -87,6 +87,7 @@ if(defined($mode)){
     $mode = 0;
 }
 
+#input-file
 if(defined($input_filename)){
     #if the file does not meet requirements we delete it before returning to page=0 for error
     my $name = Digest::MD5::md5_base64(rand);
@@ -99,19 +100,25 @@ if(defined($input_filename)){
     my $check_size = -s "$uploaddir/$name";
     my $max_filesize =100000;
     if($check_size < 1){
-	print STDERR "cmcws: Uploaded Input file is empty\n";
+	push(@input_error,"Uploaded Input file is empty");
     }elsif($check_size > $max_filesize){
-	print STDERR "cmcws: Uploaded Input file is too large\n";
+	push(@input_error,"Uploaded Input file is too large");
+    }else{
+	#check input file
+	my $check_array_reference=&check_input($name);
+	my @check_array = @$check_array_reference;
+	#set input present to true if input is ok and include filename for further processing, set error message if not
+	if($check_array[0] eq "error"){
+	    #check_input found errors in the input file, we add them to @input_error
+	    #TODO-hier weiter remove first element and modify check_input to push errors
+	}else{
+	    $input_present='true';
+	}
     }
-    #check input file
-    my $check_array_reference=&check_input($name);
-    my @check_array = @$check_array_reference;
-    $input_present='true';
-    print STDERR "cmcws-Inputcheck: @check_array \n";
-    #set input present to true if input is ok and include filename for further processing, return error message if not
+    
 }else{
-    print STDERR "cmcws:No input-file provided \n";
-    print STDERR "Params: @names \n";
+    #Submit without file, set error message and request file
+    push(@input_error,"No input-file provided");
 }
 
 if($page==0){
@@ -123,7 +130,6 @@ if($page==0){
 				 });
     my $file = './template/input.html';
     my $input_script_file="inputscriptfile";
-    
     #Three different states of the input page
     if(defined($input_present)){
 	$file = './template/input2.html';
@@ -153,7 +159,8 @@ if($page==0){
 	    help => "help.html",
 	    scriptfile => "$input_script_file",
 	    stylefile => "inputstylefile",
-	    mode => "$mode"
+	    mode => "$mode",
+	    errormessage => "$error_message"
 	};
     #render page
     $template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
