@@ -1,3 +1,11 @@
 	<script type="text/javascript" src="./javascript/input.js"></script>
-	<script type="text/javascript" src="./javascript/input_error.js"></script>
 	<script type="text/javascript" src="./javascript/jquery-1.4.4.min.js"></script> 
+	<script type="text/javascript">
+	      $(window).load(function(){
+	      	    var code ="<p style=\"color:red;\">Following error/s occured:<br>[% error_message %]</p>";
+    	    	    var myText=document.createTextNode(code);
+	       	    //document.getElementById("select_operation").disabled=true;
+    		    //set new stuff
+    		    document.getElementById("error_message").innerHTML=code;
+  	      });		
+	 </script>

@@ -58,9 +58,10 @@ my $tempdir = $query->param('tempdir') || undef;
 my $email=$query->param('email-address')|| undef;
 my $input_filename=$query->param('file')|| undef;
 my $input_filehandle=$query->upload('file')||undef;
-my $input_present;
+my $checked_input_present;
 my @input_error;
-
+my $error_message="";
+print STDERR "Mode: $mode\n";
 ######TAINT-CHECKS##############################################
 #get the current page number
 #wenn predict submitted wurde ist page 1
@@ -107,18 +108,23 @@ if(defined($input_filename)){
 	#check input file
 	my $check_array_reference=&check_input($name);
 	my @check_array = @$check_array_reference;
+	#get first element and look for error string
+	my $error_string = $check_array[0];
 	#set input present to true if input is ok and include filename for further processing, set error message if not
-	if($check_array[0] eq "error"){
+	if($error_string =~ /^error/){
+	    my @error_string_split = split(/;/,$error_string);
+	    shift(@error_string_split);
+	    push(@input_error,@error_string_split);
 	    #check_input found errors in the input file, we add them to @input_error
 	    #TODO-hier weiter remove first element and modify check_input to push errors
 	}else{
-	    $input_present='true';
+	    $checked_input_present='true';
 	}
     }
     
 }else{
     #Submit without file, set error message and request file
-    push(@input_error,"No input-file provided");
+    push(@input_error,"No Input file provided");
 }
 
 if($page==0){
@@ -131,37 +137,42 @@ if($page==0){
     my $file = './template/input.html';
     my $input_script_file="inputscriptfile";
     #Three different states of the input page
-    if(defined($input_present)){
+    if(defined($checked_input_present)){
 	$file = './template/input2.html';
 	if($mode eq "1"){
 	    #comparison of one model vs rfam 
-	    $input_script_file="inputstep2scriptfile";
+	    $input_script_file = "inputstep2scriptfile";
+	    print STDERR "Reached Page=0 step=2 mode=1\n";
 	}elsif($mode eq "2"){
 	    #comparison of multiple models with each other 
-	    $input_script_file="inputstep2scriptfile";
+	    $input_script_file = "inputstep2scriptfile";
+	    print STDERR "Reached Page=0 step=2 mode=2\n";
 	}
-    }elsif(defined($input_error)){
-	#Input error - error.js 
-	$input_script_file="inputerrorscriptfile";
+    }elsif($mode=="0"){
+	print STDERR "Reached Page=0 step=1 mode=0\n";
     }else{
-	#Default input page
+	#Input error
+	$input_script_file = "inputerrorscriptfile";
+	$error_message=join('/n',@input_error);
+	print STDERR "Reached Page=0 step=1 mode=$mode\n";
+	print STDERR "Error: @input_error\n";
     }
     
     my $vars = {
 	#define global variables for javascript defining the current host (e.g. linse) for redirection
-	    serveraddress => "$server",
-	    title => "CMcompare - Webserver - Input form",
-	    banner => "./pictures/banner.png",
-	    model_comparison => "cmcws.cgi",
-	    introduction => "introduction.html",
-	    available_genomes => "available_genomes.cgi",
-	    target_search => "target_search.cgi",
-	    help => "help.html",
-	    scriptfile => "$input_script_file",
-	    stylefile => "inputstylefile",
-	    mode => "$mode",
-	    errormessage => "$error_message"
-	};
+	serveraddress => "$server",
+	title => "CMcompare - Webserver - Input form",
+	banner => "./pictures/banner.png",
+	model_comparison => "cmcws.cgi",
+	introduction => "introduction.html",
+	available_genomes => "available_genomes.cgi",
+	target_search => "target_search.cgi",
+	help => "help.html",
+	scriptfile => "$input_script_file",
+	stylefile => "inputstylefile",
+	mode => "$mode",
+	error_message => "$error_message"
+    };
     #render page
     $template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
 }
@@ -181,10 +192,11 @@ sub check_input{
     #End of a stockholm or cm file from rfam is denoted by: //
     my $input_filename=shift;
     open (INPUTFILE, "<$uploaddir/$input_filename") or die "Cannot open input-file";
-    
     #include taintcheck later, now we just count the number of provided alignment and cm files
     #input_elements contains the type of input, the name and the accession number
     my @input_elements;
+    #We expect a error by default and set this return value to ok if the input fits
+    push(@input_elements,"error;");
     my $stockholm_alignment_detected=0;
     my $covariance_model_detected=0;
     my $counter=0;
@@ -214,11 +226,40 @@ sub check_input{
 	    my $last_element = @split_array - 1;
 	    my $name=$split_array[$last_element];
 	    push(@input_elements,$name);
-	}else{
-	    push(@input_elements,"Input $counter");
 	}
 	
-	#look for accession number
+	if(/^\/\// && ($stockholm_alignment_detected==2 || $covariance_model_detected==2 )){
+	    $stockholm_alignment_detected=0;
+	    $covariance_model_detected=0;
+	    push(@input_elements,"//");
+	}
+	    	
+    }
+    
+    if(@input_elements>2){
+	#input 
+	if(((@input_elements-1)%3)==0){
+	    #contains models
+	    $input_elements[0]="true";
+	}
+    }else{
+	#No covariance models or alignments found in input
+	$input_elements[0]=$input_elements[0]."No covariance models or alignments found in input<br>;";
+    }
+
+    close INPUTFILE;
+    return \@input_elements;
+}
+
+sub prepare_input{
+    #my @file_lines;
+    #include taintcheck later, now we just count the number of provided alignment and cm files
+    #while(<INPUTFILE>){
+    #    push(@file_lines,$_);
+    #}
+    #my $joined_file=join("",@file_lines);
+
+    	#look for accession number
 	#=GF AC   RF00001
 	#=GF ID   5S_rRNA
 	#if(/^\#\=GF\sAC//^ACCESSION/ && $stockholm_alignment_detected==2){
@@ -236,27 +277,5 @@ sub check_input{
 	#}else{
 	#    
 	#}
-    }
-    
-    if(@input_elements>0){
-	#$input_element_number=(@input_elements/3);
-	#for($i..$input_element_number){
-	
-	#}
-    }else{
-	print STDERR "No covariance models or alignments found in inputfile";
-    }
-
-    close INPUTFILE;
-    return \@input_elements;
-}
-
-sub prepare_input{
-    #my @file_lines;
-    #include taintcheck later, now we just count the number of provided alignment and cm files
-    #while(<INPUTFILE>){
-    #    push(@file_lines,$_);
-    #}
-    #my $joined_file=join("",@file_lines);
 }
 

@@ -69,7 +69,7 @@ function step1_operation(ref){
 	    "or a multiple alignment <a href=\"#\" onmouseover=\"XBT(this, {id:'2'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a>:<br>"+
             "<br><input name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
             "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\"  maxlength=\"1\">" +
-	    "<input id=\"model\" value=\"0\"  name=\"page\" type=\"hidden\"  maxlength=\"1\">" +
+	    "<input id=\"mode\" value=\"1\"  name=\"mode\" type=\"hidden\"  maxlength=\"1\">" +
             "<div id=\"file_message\" style=\"color: red;\"></div>"+
             "<br><input type=\"submit\" value=\"Submit\">"+
             "<input type=\"reset\" value=\"Reset\" onclick=\"reseter(this)\" >"+
@@ -81,7 +81,7 @@ function step1_operation(ref){
 	    "multiple alignments or covariance models <a href=\"#\" onmouseover=\"XBT(this, {id:'3'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a>:<br>"+
             "<br><input name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
             "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\"  maxlength=\"1\">" +
-	    "<input id=\"model\" value=\"1\"  name=\"model\" type=\"hidden\"  maxlength=\"1\">" +
+	    "<input id=\"mode\" value=\"2\"  name=\"mode\" type=\"hidden\"  maxlength=\"1\">" +
             "<div id=\"file_message\" style=\"color: red;\"></div>"+
             "<br><input type=\"submit\" value=\"Submit\">"+
             "<input type=\"reset\" value=\"Reset\" onclick=\"reseter(this)\" >"+
