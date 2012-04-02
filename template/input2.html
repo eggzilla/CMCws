@@ -1,6 +1,5 @@
 [% PROCESS header %]
 <div style="text-align:left">
-  [% error_script %]
 </div>
 <div id="1" class="tooltip2" style="width: 400px;">
   <div class="content">
@@ -56,7 +55,7 @@
       <td id="step1_content" >	
 	<form action="/cgi-bin/cmcws.cgi" method="post" target="Daten">
 	  <p>Select type of comparison: <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle" src="pictures/info.png" border="0"></a></p>
-	  <p><select id="select_operation"  onchange="step1_operation(this)">
+	  <p><select disabled id="select_operation"  onchange="step1_operation(this)">
 	      <option>Please select</option>
 	      <option>covariance model vs Rfam</option>
 	      <option>covariance model vs covariance model</option>
@@ -65,13 +64,25 @@
 	</form>
       </td>	
       <td id="step2_content" style="vertical-align:top">
+	You have provided following input:<br>
+	[% provided_input %]
+	<br>
       </td>
       
     </tr>	
     <tr>
       <td id="step1_2_content" style="vertical-align:top">
+	[% PROCESS $disabled_upload_form%]
       </td>
       <td id="step2_2_content" style="vertical-align:top">
+	[% PROCESS $submit_form %]
+      </td>
+    </tr>
+      <tr>
+      <td id="step1_3_content" style="vertical-align:top">
+      </td>
+      <td id="step2_3_content" style="vertical-align:top">
+	<div id="error_message"> </div>
       </td>
     </tr>
   </table>

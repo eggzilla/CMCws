@@ -2,7 +2,17 @@
 	<script type="text/javascript" src="./javascript/jquery-1.4.4.min.js"></script> 
 	<script type="text/javascript">
 	      $(window).load(function(){
-	      	    var code ="<p style=\"color:red;\">Following error/s occured:<br>[% error_message %]</p>";
+		    var mode =[% mode %];
+		    //set selected operation value, trigger step1_operation
+		    if(mode==1){
+			document.getElementById("select_operation").value="covariance model vs Rfam";
+		    }
+		    if(mode==2){
+			document.getElementById("select_operation").value="covariance model vs covariance model";
+		    }
+		    document.getElementById("select_operation").onchange(step1_operation());
+		    //display error message
+	      	    var code ="<p style=\"color:red;\">[% error_message %]</p>";
     	    	    var myText=document.createTextNode(code);
 	       	    //document.getElementById("select_operation").disabled=true;
     		    //set new stuff

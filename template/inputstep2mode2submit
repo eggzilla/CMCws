@@ -1,0 +1,10 @@
+	<form action="cmcws.cgi" id="submit-form"  method="post" enctype="multipart/form-data">
+	Press Compare to proceed:
+	<br>
+	<br>
+        <input id="page" value="1"  name="page" type="hidden"  maxlength="1">
+	<input id="mode" value="2"  name="mode" type="hidden"  maxlength="1">
+	<input id="uploaded_file" value="[% uploaded_file %]"  name="uploaded_file" type="hidden"  maxlength="1">
+	<input type="submit" value="Compare">
+        <input type="button" value="Back" onclick="back(this)">
+        </form>

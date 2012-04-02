@@ -63,26 +63,24 @@ function step1_operation(ref){
     var search=/Rfam/g;
     var operation1_selected=search.test(selected_operation);
     if(operation1_selected==true){
-	code ="<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">" +
-            "<div id=\"validation_message\"></div>"+
+	code ="<div id=\"validation_message\"></div>"+
 	    "Upload a covariance model<br>"+
 	    "or a multiple alignment <a href=\"#\" onmouseover=\"XBT(this, {id:'2'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a>:<br>"+
+	    "<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">" +
             "<br><input name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
             "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\"  maxlength=\"1\">" +
 	    "<input id=\"mode\" value=\"1\"  name=\"mode\" type=\"hidden\"  maxlength=\"1\">" +
-            "<div id=\"file_message\" style=\"color: red;\"></div>"+
             "<br><input type=\"submit\" value=\"Submit\">"+
             "<input type=\"reset\" value=\"Reset\" onclick=\"reseter(this)\" >"+
             "</form>";
     }else{
-	code ="<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">" +
-            "<div id=\"validation_message\"></div>"+
+	code ="<div id=\"validation_message\"></div>"+
 	    "Upload an archive containing a group of<br>"+
 	    "multiple alignments or covariance models <a href=\"#\" onmouseover=\"XBT(this, {id:'3'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a>:<br>"+
+	    "<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">" +
             "<br><input name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
             "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\"  maxlength=\"1\">" +
 	    "<input id=\"mode\" value=\"2\"  name=\"mode\" type=\"hidden\"  maxlength=\"1\">" +
-            "<div id=\"file_message\" style=\"color: red;\"></div>"+
             "<br><input type=\"submit\" value=\"Submit\">"+
             "<input type=\"reset\" value=\"Reset\" onclick=\"reseter(this)\" >"+
             "</form>";

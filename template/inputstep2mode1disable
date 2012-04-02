@@ -1,0 +1,10 @@
+	<form action="cmcws.cgi" id="submit-form"  method="post" enctype="multipart/form-data">
+	Upload a covariance model<br>
+	or a multiple alignment <a href="#" onmouseover="XBT(this, {id:'2'})"><img style="vertical-align:middle" src="pictures/info.png" border="0"></a>:<br>
+        <br><input disabled name="file" id="file" size="30" type="file"><br>
+        <input id="page" value="0"  name="page" type="hidden"  maxlength="1">
+	<input id="mode" value="1"  name="mode" type="hidden"  maxlength="1">
+        <div id="file_message" style="color: red;"></div>
+        <br>
+        <br>
+        </form>

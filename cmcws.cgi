@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl 
 #Main executable of the cmsearch webserver 
 use warnings;
 use strict;
@@ -53,26 +53,32 @@ use Template;
 #$tax_id has to be taintchecked
 my @names = $query->param;
 my $mode = $query->param('mode') || undef;
-my $page = $query->param('page') || undef; 
+my $page = $query->param('page') || undef;
+my $uploaded_file= $query->param('uploaded_file') || undef; 
 my $tempdir = $query->param('tempdir') || undef;
 my $email=$query->param('email-address')|| undef;
 my $input_filename=$query->param('file')|| undef;
 my $input_filehandle=$query->upload('file')||undef;
 my $checked_input_present;
+my $provided_input="";
 my @input_error;
 my $error_message="";
-print STDERR "Mode: $mode\n";
+
+#print STDERR "cmcws: Debug-start: mode - $mode, page - $page, filename - $input_filename\n";
 ######TAINT-CHECKS##############################################
 #get the current page number
 #wenn predict submitted wurde ist page 1
 if(defined($page)){
-    if($page eq "1"){
+    if($page eq "0"){
+	$page = 0;
+    }elsif($page eq "1"){
 	$page = 1;
     }elsif($page eq "2"){
 	$page = 2;
     }elsif($page eq "3"){
 	$page = 3;
     }
+    
 }else{
     $page = 0;
 }
@@ -88,37 +94,61 @@ if(defined($mode)){
     $mode = 0;
 }
 
+#uploaded-file
+if(defined($uploaded_file)){
+    if(-e "$uploaddir/$uploaded_file"){
+	#file exists
+        }
+}else{
+    $uploaded_file = "";
+}
+
+
 #input-file
 if(defined($input_filename)){
+    print STDERR "cmcws: Found upload /n";
     #if the file does not meet requirements we delete it before returning to page=0 for error
     my $name = Digest::MD5::md5_base64(rand);
     $name =~ s/\+/_/g;
     $name =~ s/\//_/g;
+    $uploaded_file=$name;
     unless(-e "$uploaddir"){
 	mkdir("$uploaddir");
     }
     open ( UPLOADFILE, ">$uploaddir/$name" ) or die "$!"; binmode UPLOADFILE; while ( <$input_filehandle> ) { print UPLOADFILE; } close UPLOADFILE;
     my $check_size = -s "$uploaddir/$name";
-    my $max_filesize =100000;
+    my $max_filesize =1000000;
     if($check_size < 1){
+	print STDERR "Uploaded Input file is empty\n";
 	push(@input_error,"Uploaded Input file is empty");
     }elsif($check_size > $max_filesize){
+	print STDERR "Uploaded Input file is too large\n";
 	push(@input_error,"Uploaded Input file is too large");
     }else{
 	#check input file
 	my $check_array_reference=&check_input($name);
 	my @check_array = @$check_array_reference;
+	print STDERR "Array checked: @check_array\n";
 	#get first element and look for error string
-	my $error_string = $check_array[0];
+	my $error_string = shift(@check_array);
 	#set input present to true if input is ok and include filename for further processing, set error message if not
 	if($error_string =~ /^error/){
+	    print STDERR "Input error detected";
 	    my @error_string_split = split(/;/,$error_string);
 	    shift(@error_string_split);
 	    push(@input_error,@error_string_split);
 	    #check_input found errors in the input file, we add them to @input_error
-	    #TODO-hier weiter remove first element and modify check_input to push errors
 	}else{
-	    $checked_input_present='true';
+	    $checked_input_present=1;
+	    my $number_of_models=((@check_array)/2)-1;
+	    my $counter=0;
+	    for(0..$number_of_models){
+		$counter++;
+		#todo: continue here - each line should contain number, type of input, name (if present)
+		my $type=shift(@check_array);
+		my $name=shift(@check_array);
+		$provided_input=$provided_input."<p>$counter. $type"." $name </p>";
+	    }
 	}
     }
     
@@ -136,16 +166,22 @@ if($page==0){
 				 });
     my $file = './template/input.html';
     my $input_script_file="inputscriptfile";
+    my $disabled_upload_form="";
+    my $submit_form="";
     #Three different states of the input page
-    if(defined($checked_input_present)){
+    if($checked_input_present){
 	$file = './template/input2.html';
 	if($mode eq "1"){
 	    #comparison of one model vs rfam 
 	    $input_script_file = "inputstep2scriptfile";
+	    $disabled_upload_form="inputstep2mode1disable";
+	    $submit_form="inputstep2mode1submit";
 	    print STDERR "Reached Page=0 step=2 mode=1\n";
 	}elsif($mode eq "2"){
 	    #comparison of multiple models with each other 
 	    $input_script_file = "inputstep2scriptfile";
+	    $disabled_upload_form="inputstep2mode2disable";
+	    $submit_form="inputstep2mode2submit";
 	    print STDERR "Reached Page=0 step=2 mode=2\n";
 	}
     }elsif($mode=="0"){
@@ -171,8 +207,14 @@ if($page==0){
 	scriptfile => "$input_script_file",
 	stylefile => "inputstylefile",
 	mode => "$mode",
-	error_message => "$error_message"
+	error_message => "$error_message",
+	disabled_upload_form => "$disabled_upload_form",
+	submit_form => "$submit_form",
+	uploaded_file => "$uploaded_file",
+	provided_input => "$provided_input"
     };
+    #todo taintcheck $uploaded_file and hand it over to input2.html
+    #todo: hand over provided_input to input2.html
     #render page
     $template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
 }
@@ -205,15 +247,16 @@ sub check_input{
 	#look for header
 	if(/\# STOCKHOLM 1\./ && $stockholm_alignment_detected==0){
 	    $stockholm_alignment_detected=1;
-	    push(@input_elements,"a");
+	    push(@input_elements,"Stockholm alignment -");
 	    $counter++;
 	}elsif(/INFERNAL\-1 \[1/ && $covariance_model_detected==0){
 	    $covariance_model_detected=1;
-	    push(@input_elements,"c");
+	    push(@input_elements,"Covariance model -");
 	    $counter++;
 	}
 	
 	#look for name
+	#todo: set default name if we hit end of alignment/cm and do not detect name 
 	if(/^\#\=GF\sID/ && $stockholm_alignment_detected==1){
 	    $stockholm_alignment_detected=2;
 	    my @split_array = split(/\s+/,$_);
@@ -227,21 +270,25 @@ sub check_input{
 	    my $name=$split_array[$last_element];
 	    push(@input_elements,$name);
 	}
-	
+	#todo: error if we detected a header or a name but no end (//)
 	if(/^\/\// && ($stockholm_alignment_detected==2 || $covariance_model_detected==2 )){
 	    $stockholm_alignment_detected=0;
 	    $covariance_model_detected=0;
-	    push(@input_elements,"//");
+	    #todo we should not push this at all, but throw an error
 	}
 	    	
     }
     
     if(@input_elements>2){
 	#input 
-	if(((@input_elements-1)%3)==0){
+	my $input_element_count=@input_elements;
+	my $unexpected_number_of_input_elements=($input_element_count-1)%2;
+	print STDERR "cmcws: Anzahl der Input-Elemente: $input_element_count, Erwartete Anzahl an Elementen gefunden: 	$unexpected_number_of_input_elements";
+	if((($input_element_count-1)%2)==0){
 	    #contains models
 	    $input_elements[0]="true";
 	}
+	print STDERR "cmcws: contains models\n";
     }else{
 	#No covariance models or alignments found in input
 	$input_elements[0]=$input_elements[0]."No covariance models or alignments found in input<br>;";
