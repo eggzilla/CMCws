@@ -8,7 +8,6 @@ use File::Copy;
 use Data::Dumper;
 use Pod::Usage;
 use IO::String;
-use Bio::SeqIO;
 use Cwd;
 use Digest::MD5;
 use CGI::Carp qw(fatalsToBrowser);
@@ -20,7 +19,7 @@ my $server="http://localhost:800/cmcws";
 my $source_dir=cwd();
 #baseDIR points to the tempdir folder
 my $base_dir ="$source_dir/html";
-my $uploaddir="$base_dir/upload";
+my $upload_dir="$base_dir/upload";
 #sun grid engine settings
 my $qsub_location="/usr/bin/qsub";
 my $sge_queue_name="web_short_q";
@@ -55,7 +54,7 @@ my @names = $query->param;
 my $mode = $query->param('mode') || undef;
 my $page = $query->param('page') || undef;
 my $uploaded_file= $query->param('uploaded_file') || undef; 
-my $tempdir = $query->param('tempdir') || undef;
+my $tempdir_input = $query->param('tempdir') || undef;
 my $email=$query->param('email-address')|| undef;
 my $input_filename=$query->param('file')|| undef;
 my $input_filehandle=$query->upload('file')||undef;
@@ -63,8 +62,7 @@ my $checked_input_present;
 my $provided_input="";
 my @input_error;
 my $error_message="";
-
-#print STDERR "cmcws: Debug-start: mode - $mode, page - $page, filename - $input_filename\n";
+my $tempdir;
 ######TAINT-CHECKS##############################################
 #get the current page number
 #wenn predict submitted wurde ist page 1
@@ -96,13 +94,21 @@ if(defined($mode)){
 
 #uploaded-file
 if(defined($uploaded_file)){
-    if(-e "$uploaddir/$uploaded_file"){
+    if(-e "$upload_dir/$uploaded_file"){
 	#file exists
         }
 }else{
     $uploaded_file = "";
 }
 
+#tempdir
+if(defined($tempdir_input)){
+    if(-e "$base_dir/$tempdir_input"){
+	$tempdir = $tempdir_input;    
+        }
+}else{
+    $tempdir = "";
+}
 
 #input-file
 if(defined($input_filename)){
@@ -112,11 +118,11 @@ if(defined($input_filename)){
     $name =~ s/\+/_/g;
     $name =~ s/\//_/g;
     $uploaded_file=$name;
-    unless(-e "$uploaddir"){
-	mkdir("$uploaddir");
+    unless(-e "$upload_dir"){
+	mkdir("$upload_dir");
     }
-    open ( UPLOADFILE, ">$uploaddir/$name" ) or die "$!"; binmode UPLOADFILE; while ( <$input_filehandle> ) { print UPLOADFILE; } close UPLOADFILE;
-    my $check_size = -s "$uploaddir/$name";
+    open ( UPLOADFILE, ">$upload_dir/$name" ) or die "$!"; binmode UPLOADFILE; while ( <$input_filehandle> ) { print UPLOADFILE; } close UPLOADFILE;
+    my $check_size = -s "$upload_dir/$name";
     my $max_filesize =1000000;
     if($check_size < 1){
 	print STDERR "Uploaded Input file is empty\n";
@@ -156,6 +162,8 @@ if(defined($input_filename)){
     #Submit without file, set error message and request file
     push(@input_error,"No Input file provided");
 }
+
+################ INPUT #####################################
 
 if($page==0){
     print $query->header();
@@ -199,11 +207,6 @@ if($page==0){
 	serveraddress => "$server",
 	title => "CMcompare - Webserver - Input form",
 	banner => "./pictures/banner.png",
-	model_comparison => "cmcws.cgi",
-	introduction => "introduction.html",
-	available_genomes => "available_genomes.cgi",
-	target_search => "target_search.cgi",
-	help => "help.html",
 	scriptfile => "$input_script_file",
 	stylefile => "inputstylefile",
 	mode => "$mode",
@@ -219,12 +222,108 @@ if($page==0){
     $template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
 }
 
+################ PROCESSING #####################################
+
 if($page==1){
-
+    print $query->header();
+    my $template = Template->new({
+	# where to find template files
+	INCLUDE_PATH => ['./template'],
+	RELATIVE=>1
+				 });
+    my $file = './template/processing.html';
+    my $processing_script_file="processingscriptfile";
+    my $error_message="";
+    #Check mode
+    #Prepare the input by creating a file for each model
+    
+    my $vars = {
+	#define global variables for javascript defining the current host (e.g. linse) for redirection
+	serveraddress => "$server",
+	title => "CMcompare - Webserver - Input form",
+	banner => "./pictures/banner.png",
+	scriptfile => "$processing_script_file",
+	stylefile => "inputstylefile",
+	mode => "$mode",
+	error_message => "$error_message",
+	uploaded_file => "$uploaded_file"
+    };
+    
+    $template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
+    $tempdir = tempdir ( DIR => $base_dir );
+    $tempdir =~ s/$base_dir\///;
+    chmod 0755, "$base_dir/$tempdir";
+    #add to path or taintcheck will complain
+    $ENV{PATH}="$base_dir/$tempdir/:/usr/bin/:$source_dir/:/bin/:$source_dir/executables";
+    mkdir("$base_dir/$tempdir/covariance_model",0744);
+    mkdir("$base_dir/$tempdir/stockholm_alignment",0744);
+    open (COMMANDS, ">$base_dir/$tempdir/commands.sh") or die "Could not create comments.sh";	
+    print COMMANDS "#!/bin/bash\n";
+    print COMMANDS "cp $upload_dir/$uploaded_file $base_dir/$tempdir/input_file;\n";
+    print COMMANDS "cd $base_dir/$tempdir/;\n";
+    print COMMANDS "$source_dir/executables/split_input.pl $base_dir/$tempdir/input_file $base_dir/$tempdir/;\n";
+    #FORK here
+    if (my $pid = fork) {
+	$query->delete_all();
+	#send user to result page
+	#redirect
+	print"<script type=\"text/javascript\">
+                          window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir\"\', 5000);
+                         </script>";
+	close COMMANDS; #close COMMANDS so child can reopen filehandle
+    }elsif (defined $pid){		
+	close STDOUT;
+	open (COMMANDS, ">>$base_dir/$tempdir/commands.sh") or die "Could not create commands.sh";
+	print COMMANDS "touch done;\n";
+	close COMMANDS;
+	my $ip_adress=$ENV{'REMOTE_ADDR'};
+	$ip_adress=~s/\.//g;
+	chmod (0755,"$base_dir/$tempdir/commands.sh");
+	exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /scratch2/RNApredator/error -o /scratch2/RNApredator/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "$!";
+    }
 }
+
+
+################ OUTPUT #####################################
+
 if($page==2){
-
+    #output
+    print $query->header();
+    my $template = Template->new({
+	# where to find template files
+	INCLUDE_PATH => ['./template'],
+	RELATIVE=>1
+				 });
+    my $file = './template/output.html';
+    my $processing_script_file="processingscriptfile";
+    my $error_message="";
+    #Check mode
+    #Prepare the input by creating a file for each model
+    
+    my $vars = {
+	#define global variables for javascript defining the current host (e.g. linse) for redirection
+	serveraddress => "$server",
+	title => "CMcompare - Webserver - Input form",
+	banner => "./pictures/banner.png",
+	scriptfile => "$processing_script_file",
+	stylefile => "inputstylefile",
+	mode => "$mode",
+	error_message => "$error_message",
+	uploaded_file => "$uploaded_file"
+    };
+    
+    $template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
+    if(-e "$base_dir/$tempdir/done"){
+	
+    }
 }
+
+################ POST-PROCESSING ############################
+
+if($page==3){
+    #postprocessing
+}
+
 
 sub check_input{
     #Parameter is filename
@@ -233,7 +332,7 @@ sub check_input{
     #Begin of a cm is denoted by: INFERNAL-1 [1.0]
     #End of a stockholm or cm file from rfam is denoted by: //
     my $input_filename=shift;
-    open (INPUTFILE, "<$uploaddir/$input_filename") or die "Cannot open input-file";
+    open (INPUTFILE, "<$upload_dir/$input_filename") or die "Cannot open input-file";
     #include taintcheck later, now we just count the number of provided alignment and cm files
     #input_elements contains the type of input, the name and the accession number
     my @input_elements;
@@ -276,14 +375,13 @@ sub check_input{
 	    $covariance_model_detected=0;
 	    #todo we should not push this at all, but throw an error
 	}
-	    	
     }
     
     if(@input_elements>2){
 	#input 
 	my $input_element_count=@input_elements;
 	my $unexpected_number_of_input_elements=($input_element_count-1)%2;
-	print STDERR "cmcws: Anzahl der Input-Elemente: $input_element_count, Erwartete Anzahl an Elementen gefunden: 	$unexpected_number_of_input_elements";
+	print STDERR "cmcws: Number of input element: $input_element_count, Erwartete Anzahl an Elementen gefunden: $unexpected_number_of_input_elements";
 	if((($input_element_count-1)%2)==0){
 	    #contains models
 	    $input_elements[0]="true";
@@ -292,37 +390,7 @@ sub check_input{
     }else{
 	#No covariance models or alignments found in input
 	$input_elements[0]=$input_elements[0]."No covariance models or alignments found in input<br>;";
-    }
-
+    }   
     close INPUTFILE;
     return \@input_elements;
 }
-
-sub prepare_input{
-    #my @file_lines;
-    #include taintcheck later, now we just count the number of provided alignment and cm files
-    #while(<INPUTFILE>){
-    #    push(@file_lines,$_);
-    #}
-    #my $joined_file=join("",@file_lines);
-
-    	#look for accession number
-	#=GF AC   RF00001
-	#=GF ID   5S_rRNA
-	#if(/^\#\=GF\sAC//^ACCESSION/ && $stockholm_alignment_detected==2){
-	#    $stockholm_alignment_detected=0;
-	#    my @split_array = split(/\s+/,$_);
-	#    my $last_element = @split_array - 1;
-	#    my $accession=$split_array[$last_element];
-	#    push(@input_elements,$accession);
-	#}elsif(/^ACCESSION/ && $covariance_model_detected==2){
-	#    $covariance_model_detected=0;
-	#    my @split_array = split(/\s+/,$_);
-	#    my $last_element = @split_array - 1;
-	#    my $accession=$split_array[$last_element];
-	#    push(@input_elements,$accession);
-	#}else{
-	#    
-	#}
-}
-

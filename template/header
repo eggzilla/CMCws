@@ -11,9 +11,9 @@
 	<tr>
 	  <td rowspan="2"><img alt="" src="[% banner %]"></td>
 	  <td></td>
-          <td colspan="2"><a href="[% introduction %]"><img src="./pictures/introduction.png" alt="Introduction" style="border:0"></a></td>
-          <td colspan="2"><a href="[% model_comparison %]"><img src="./pictures/compare.png" alt="Target Search" style="border:0"></a></td>
-	  <td colspan="2"><a href="[% help %]"><img src="./pictures/help.png" alt="Help"  style="border:0"></a></td>
+          <td colspan="2"><a href="introduction.html"><img src="./pictures/introduction.png" alt="Introduction" style="border:0"></a></td>
+          <td colspan="2"><a href="cmcws.cgi"><img src="./pictures/compare.png" alt="Target Search" style="border:0"></a></td>
+	  <td colspan="2"><a href="help.html"><img src="./pictures/help.png" alt="Help"  style="border:0"></a></td>
 	</tr>
 	<tr>
 	      <td></td>
