@@ -47,9 +47,8 @@ use Template;
 
 ######STATE - variables##########################################
 #determine the query state by retriving CGI variables
-#$page if=0 then input, if=1 then calculate and if=2 then output
-#available_genomes can call RNApredator via CGI therfore
-#$tax_id has to be taintchecked
+#$page 0 input, 1 process, 2 output
+
 my @names = $query->param;
 my $mode = $query->param('mode') || undef;
 my $page = $query->param('page') || undef;
@@ -139,7 +138,7 @@ if(defined($input_filename)){
 	my $error_string = shift(@check_array);
 	#set input present to true if input is ok and include filename for further processing, set error message if not
 	if($error_string =~ /^error/){
-	    print STDERR "Input error detected";
+	    print STDERR "Input error detected: $error_string";
 	    my @error_string_split = split(/;/,$error_string);
 	    shift(@error_string_split);
 	    push(@input_error,@error_string_split);
@@ -262,6 +261,13 @@ if($page==1){
     print COMMANDS "cp $upload_dir/$uploaded_file $base_dir/$tempdir/input_file;\n";
     print COMMANDS "cd $base_dir/$tempdir/;\n";
     print COMMANDS "$source_dir/executables/split_input.pl $base_dir/$tempdir/input_file $base_dir/$tempdir/;\n";
+    print COMMANDS "$source_dir/executables/convert_stockholmdir_to_cmdir.pl $base_dir/$tempdir/stockholm_alignment $source_dir;\n";
+    #print COMMANDS ";\n";
+    if($mode eq "1"){
+	#set stuff specific for mode 1
+    }elsif($mode eq "2"){
+	#set stuff specific for mode 2
+    }
     #FORK here
     if (my $pid = fork) {
 	$query->delete_all();
@@ -279,7 +285,7 @@ if($page==1){
 	my $ip_adress=$ENV{'REMOTE_ADDR'};
 	$ip_adress=~s/\.//g;
 	chmod (0755,"$base_dir/$tempdir/commands.sh");
-	exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /scratch2/RNApredator/error -o /scratch2/RNApredator/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "$!";
+	exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /scratch2/RNApredator/error -o /scratch2/RNApredator/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
     }
 }
 
@@ -325,6 +331,8 @@ if($page==3){
 }
 
 
+#############################################################
+
 sub check_input{
     #Parameter is filename
     #File can contain multiple cm or alignments in stockholm format
@@ -369,11 +377,15 @@ sub check_input{
 	    my $name=$split_array[$last_element];
 	    push(@input_elements,$name);
 	}
-	#todo: error if we detected a header or a name but no end (//)
+	#we hit end of model without finding a name
+	if(/^\/\// && ($stockholm_alignment_detected==1 || $covariance_model_detected==1 )){
+	    push(@input_elements,"unnamed");
+	    $stockholm_alignment_detected=0;
+	    $covariance_model_detected=0;
+	}
 	if(/^\/\// && ($stockholm_alignment_detected==2 || $covariance_model_detected==2 )){
 	    $stockholm_alignment_detected=0;
 	    $covariance_model_detected=0;
-	    #todo we should not push this at all, but throw an error
 	}
     }
     
@@ -382,6 +394,7 @@ sub check_input{
 	my $input_element_count=@input_elements;
 	my $unexpected_number_of_input_elements=($input_element_count-1)%2;
 	print STDERR "cmcws: Number of input element: $input_element_count, Erwartete Anzahl an Elementen gefunden: $unexpected_number_of_input_elements";
+	#todo: set default name if we do not find one or this step is problematic
 	if((($input_element_count-1)%2)==0){
 	    #contains models
 	    $input_elements[0]="true";
