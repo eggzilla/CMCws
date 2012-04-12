@@ -9,7 +9,6 @@ my $filename_input=$ARGV[0];
 my $tempdir_input=$ARGV[1];
 my $filename="";
 my $tempdir="";
-
 #tempdir
 if(defined($tempdir_input)){
     if(-e "$tempdir_input"){
@@ -49,7 +48,7 @@ sub split_input{
     my $covariance_model_detected=0;
     my @model;
     #counts number of entries
-    my $counter;
+    my $counter=0;
     while(<INPUTFILE>){
 	#look for header
 	if(/\# STOCKHOLM 1\./ && $stockholm_alignment_detected==0){
@@ -65,7 +64,7 @@ sub split_input{
 	}
 	#we have detected a complete entry and want to write it to file
 	if(/^\/\// && $stockholm_alignment_detected==1){
-	    open (OUTPUTFILE, ">$input_tempdir"."stockholm_alignment/$counter")or die "Could not create $tempdir/stockholm_alignment/$counter: $!\n";;
+	    open (OUTPUTFILE, ">$input_tempdir"."stockholm_alignment/$counter")or die "Could not create $input_tempdir/stockholm_alignment/$counter: $!\n";
 	    my $model_lines = @model-1;
 	    for(0..$model_lines){
 		my $line = shift(@model);
@@ -74,7 +73,7 @@ sub split_input{
 	    $stockholm_alignment_detected=0;
 	    close OUTPUTFILE;
 	}elsif(/^\/\// && $covariance_model_detected==1){
-	    open (OUTPUTFILE, ">$input_tempdir"."covariance_model/$counter")or die "Could not create $tempdir/covariance_model/$counter: $!\n";;
+	    open (OUTPUTFILE, ">$input_tempdir"."covariance_model/$counter")or die "Could not create $input_tempdir/covariance_model/$counter: $!\n";;
 	    my $model_lines = @model-1;
 	    for(0..$model_lines){
 		my $line = shift(@model);
@@ -86,6 +85,9 @@ sub split_input{
        #todo: error if we detected a header or a name but no end (//)
     }
     close INPUTFILE;
+    open (QUERYNUMBERFILE, ">$input_tempdir"."query_number")or die "Could not create query number:$input_tempdir/query_number: $!\n";
+    print QUERYNUMBERFILE "$counter";
+    close QUERYNUMBERFILE;
 }    
     #if(@input_elements>2){
     #input 

@@ -1,0 +1,15 @@
+ <div style="text-align:center">
+     <h3>= Processing =</h3>
+</div>
+   Wait for calculation to finish or bookmark following <a href="[% $link %]">link</a> and return later.
+   <br>
+   <br>
+   <div style="align:center">
+      <table style="border:1px solid #000; width:60%; text-align:center">
+         <tr>
+	   <td style="width:8%">Query</td>
+	   <td style="width:15%">Queueing Status</td>
+	   <td style="width:20%">Model Comparison</td>
+	   <td style="width:15%">Parsing Output</td>
+	   <td style="width:15%">Result Page Link</td>
+	 </tr>

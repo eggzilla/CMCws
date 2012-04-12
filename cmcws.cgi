@@ -95,7 +95,9 @@ if(defined($mode)){
 if(defined($uploaded_file)){
     if(-e "$upload_dir/$uploaded_file"){
 	#file exists
-        }
+    }else{
+	print STDERR "cmcws: nonexistent uploaded file has been supplied as parameter\n";
+    }
 }else{
     $uploaded_file = "";
 }
@@ -104,11 +106,11 @@ if(defined($uploaded_file)){
 if(defined($tempdir_input)){
     if(-e "$base_dir/$tempdir_input"){
 	$tempdir = $tempdir_input;    
-        }
-}else{
-    $tempdir = "";
+    }else{
+	print STDERR "cmcws: nonexistent tempdir has been supplied as parameter\n";
+    }
 }
-
+    
 #input-file
 if(defined($input_filename)){
     print STDERR "cmcws: Found upload /n";
@@ -165,7 +167,8 @@ if(defined($input_filename)){
 ################ INPUT #####################################
 
 if($page==0){
-    print $query->header();
+    #print $query->header();
+    print "Content-type: text/html; charset=utf-8\n\n";
     my $template = Template->new({
 	# where to find template files
 	INCLUDE_PATH => ['./template'],
@@ -224,7 +227,6 @@ if($page==0){
 ################ PROCESSING #####################################
 
 if($page==1){
-    print $query->header();
     my $template = Template->new({
 	# where to find template files
 	INCLUDE_PATH => ['./template'],
@@ -233,9 +235,97 @@ if($page==1){
     my $file = './template/processing.html';
     my $processing_script_file="processingscriptfile";
     my $error_message="";
+    my $query_number="";
+    my $number_of_all_rfam_models=1446;
+    my $processing_table_content="";
     #Check mode
     #Prepare the input by creating a file for each model
-    
+    unless(defined($tempdir)){
+	$tempdir = tempdir ( DIR => $base_dir );
+	$tempdir =~ s/$base_dir\///;
+	chmod 0755, "$base_dir/$tempdir";
+    }
+    if(-e "$base_dir/$tempdir/query_number"){
+	if($mode eq "1"){
+	    #each submitted model is compared against rfam
+	    open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not create $tempdir/query_number: $!\n";
+	    $query_number=<QUERYNUMBERFILE>;
+	    close QUERYNUMBERFILE;
+	    #assemble 
+	    my $counter=1;
+	    for(1..$query_number){
+		my $query_id=$counter;
+		my $queueing_status="";
+		my $model_comparison="";
+		my $parsing_output="";
+		my $result_page_link="";
+		if(-e "$base_dir/$tempdir/begin$counter"){$queueing_status="Processing..";}
+		else {$queueing_status="Queued";}
+		if(-e "$base_dir/$tempdir/results$counter"){
+		    my $result_lines=`cat $base_dir/$tempdir/results$counter | wc -l`;
+		    my $progress_percentage=($result_lines/$number_of_all_rfam_models)*100;
+		    my $rounded_progress_percentage=sprintf("%.2f",$progress_percentage);
+		    $model_comparison="Progress: $rounded_progress_percentage%";}
+		else {$model_comparison="";}
+		if(-e "$base_dir/$tempdir/output"."$counter".".html"){$parsing_output="";} 
+		else {$parsing_output="";}
+		if(-e "$base_dir/$tempdir/done$counter"){$result_page_link="<a href=\"\">Link</a>"; } 
+		else{$result_page_link=""}
+		
+		$processing_table_content=$processing_table_content."<tr><td>$query_id</td><td>$queueing_status</td><td>$model_comparison</td><td>$parsing_output</td><td>$result_page_link</td></tr>";
+		$counter++;
+	    }
+	    
+	}elsif($mode eq "2"){
+	    #the models are compared againsted each other and optionally additionally against rfam
+	    $query_number=1;
+	    
+	}
+    }else{
+	$processing_table_content=$processing_table_content."<tr><td>Loading..</td></tr>";
+    }
+    unless(-e "$base_dir/$tempdir/covariance_model"){
+	#add to path or taintcheck will complain
+	$ENV{PATH}="$base_dir/$tempdir/:/usr/bin/:$source_dir/:/bin/:$source_dir/executables";
+	mkdir("$base_dir/$tempdir/covariance_model",0744);
+	mkdir("$base_dir/$tempdir/stockholm_alignment",0744);
+	open (COMMANDS, ">$base_dir/$tempdir/commands.sh") or die "Could not create comments.sh";	
+	print COMMANDS "#!/bin/bash\n";
+	print COMMANDS "cp $upload_dir/$uploaded_file $base_dir/$tempdir/input_file;\n";
+	print COMMANDS "cd $base_dir/$tempdir/;\n";
+	print COMMANDS "$source_dir/executables/split_input.pl $base_dir/$tempdir/input_file $base_dir/$tempdir/;\n";
+	print COMMANDS "$source_dir/executables/convert_stockholmdir_to_cmdir.pl $base_dir/$tempdir $source_dir;\n";
+	print COMMANDS "$source_dir/executables/calculate.pl $base_dir/$tempdir $source_dir $mode;\n";
+	#print COMMANDS ";\n";
+	if($mode eq "1"){
+	    #set stuff specific for mode 1
+	}elsif($mode eq "2"){
+	    #set stuff specific for mode 2
+	}
+	#FORK here
+	if (my $pid = fork) {
+	    $query->delete_all();
+	    #send user to result page
+	    #redirect
+	    #print"<script type=\"text/javascript\">
+	    #                        window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=1&mode=$mode&tempdir=$tempdir\"\', 5000);
+	    #                        </script>";
+	    close COMMANDS; #close COMMANDS so child can reopen filehandle
+	}elsif (defined $pid){		
+	    close STDOUT;
+	    open (COMMANDS, ">>$base_dir/$tempdir/commands.sh") or die "Could not create commands.sh";
+	    print COMMANDS "touch $base_dir/$tempdir/done;\n";
+	    close COMMANDS;
+	    my $ip_adress=$ENV{'REMOTE_ADDR'};
+	    $ip_adress=~s/\.//g;
+	    chmod (0755,"$base_dir/$tempdir/commands.sh");
+	    exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /scratch2/RNApredator/error -o /scratch2/RNApredator/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
+	}
+    }
+    my $progress_redirect="<script>
+	     window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=1&mode=$mode&tempdir=$tempdir\"\', 5000);    
+          </script>";
+    my $link="$server/cmcws.cgi?"."page=1"."&tempdir=$tempdir"."&mode=$mode";
     my $vars = {
 	#define global variables for javascript defining the current host (e.g. linse) for redirection
 	serveraddress => "$server",
@@ -245,83 +335,64 @@ if($page==1){
 	stylefile => "inputstylefile",
 	mode => "$mode",
 	error_message => "$error_message",
-	uploaded_file => "$uploaded_file"
+	uploaded_file => "$uploaded_file",
+	processing_table_content => "$processing_table_content",
+	processing_redirect =>"$progress_redirect",
+	link => "$link"	    
     };
+    print "Content-type: text/html; charset=utf-8\n\n";
     
     $template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
-    $tempdir = tempdir ( DIR => $base_dir );
-    $tempdir =~ s/$base_dir\///;
-    chmod 0755, "$base_dir/$tempdir";
-    #add to path or taintcheck will complain
-    $ENV{PATH}="$base_dir/$tempdir/:/usr/bin/:$source_dir/:/bin/:$source_dir/executables";
-    mkdir("$base_dir/$tempdir/covariance_model",0744);
-    mkdir("$base_dir/$tempdir/stockholm_alignment",0744);
-    open (COMMANDS, ">$base_dir/$tempdir/commands.sh") or die "Could not create comments.sh";	
-    print COMMANDS "#!/bin/bash\n";
-    print COMMANDS "cp $upload_dir/$uploaded_file $base_dir/$tempdir/input_file;\n";
-    print COMMANDS "cd $base_dir/$tempdir/;\n";
-    print COMMANDS "$source_dir/executables/split_input.pl $base_dir/$tempdir/input_file $base_dir/$tempdir/;\n";
-    print COMMANDS "$source_dir/executables/convert_stockholmdir_to_cmdir.pl $base_dir/$tempdir/stockholm_alignment $source_dir;\n";
-    #print COMMANDS ";\n";
-    if($mode eq "1"){
-	#set stuff specific for mode 1
-    }elsif($mode eq "2"){
-	#set stuff specific for mode 2
-    }
-    #FORK here
-    if (my $pid = fork) {
-	$query->delete_all();
-	#send user to result page
-	#redirect
-	print"<script type=\"text/javascript\">
-                          window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir\"\', 5000);
-                         </script>";
-	close COMMANDS; #close COMMANDS so child can reopen filehandle
-    }elsif (defined $pid){		
-	close STDOUT;
-	open (COMMANDS, ">>$base_dir/$tempdir/commands.sh") or die "Could not create commands.sh";
-	print COMMANDS "touch done;\n";
-	close COMMANDS;
-	my $ip_adress=$ENV{'REMOTE_ADDR'};
-	$ip_adress=~s/\.//g;
-	chmod (0755,"$base_dir/$tempdir/commands.sh");
-	exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /scratch2/RNApredator/error -o /scratch2/RNApredator/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
-    }
 }
-
 
 ################ OUTPUT #####################################
 
 if($page==2){
     #output
-    print $query->header();
+    print "Content-type: text/html; charset=utf-8\n\n";
     my $template = Template->new({
 	# where to find template files
 	INCLUDE_PATH => ['./template'],
 	RELATIVE=>1
 				 });
-    my $file = './template/output.html';
+    my $file = './template/processing.html';
     my $processing_script_file="processingscriptfile";
     my $error_message="";
-    #Check mode
-    #Prepare the input by creating a file for each model
     
-    my $vars = {
-	#define global variables for javascript defining the current host (e.g. linse) for redirection
-	serveraddress => "$server",
-	title => "CMcompare - Webserver - Input form",
-	banner => "./pictures/banner.png",
-	scriptfile => "$processing_script_file",
-	stylefile => "inputstylefile",
-	mode => "$mode",
-	error_message => "$error_message",
-	uploaded_file => "$uploaded_file"
+    #Check mode
+    
+    if($mode eq "1"){
+	#each submitted model is compared against rfam
+    }elsif($mode eq "2"){
+	#the models are compared againsted each other and optionally additionally against rfam	
+    }
+    
+    #Prepare the input by creating a file for each model
+    my $vars;
+    my $progress_content="";
+    if(-e "$base_dir/$tempdir/done"){
+	my $file = './template/output.html';
+	my $processing_script_file="outputscriptfile";
+	my $error_message="";
+	$vars = {
+	    #define global variables for javascript defining the current host (e.g. linse) for redirection
+	    serveraddress => "$server",
+	    title => "CMcompare - Webserver - Input form",
+	    banner => "./pictures/banner.png",
+	    scriptfile => "$processing_script_file",
+	    stylefile => "inputstylefile",
+	    mode => "$mode",
+	    error_message => "$error_message",
+	    uploaded_file => "$uploaded_file",
+	};
+	#display output
+    }else{
+	 print "<script>
+	     window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=1&mode=$mode&tempdir=$tempdir\"\', 5000);    
+          </script>\n";
     };
     
     $template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
-    if(-e "$base_dir/$tempdir/done"){
-	
-    }
 }
 
 ################ POST-PROCESSING ############################
@@ -349,6 +420,7 @@ sub check_input{
     my $stockholm_alignment_detected=0;
     my $covariance_model_detected=0;
     my $counter=0;
+    
     while(<INPUTFILE>){
 	chomp;
 	#look for header

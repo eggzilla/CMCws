@@ -65,7 +65,7 @@ function step1_operation(ref){
     if(operation1_selected==true){
 	code ="<div id=\"validation_message\"></div>"+
 	    "Upload a covariance model<br>"+
-	    "or a multiple alignment <a href=\"#\" onmouseover=\"XBT(this, {id:'2'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a>:<br>"+
+	    "or a multiple alignment <a href=\"#\" onmouseover=\"XBT(this, {id:'2'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"pictures/info.png\"></a>:<br>"+
 	    "<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">" +
             "<br><input name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
             "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\"  maxlength=\"1\">" +
@@ -76,7 +76,7 @@ function step1_operation(ref){
     }else{
 	code ="<div id=\"validation_message\"></div>"+
 	    "Upload an archive containing a group of<br>"+
-	    "multiple alignments or covariance models <a href=\"#\" onmouseover=\"XBT(this, {id:'3'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a>:<br>"+
+	    "multiple alignments or covariance models <a href=\"#\" onmouseover=\"XBT(this, {id:'3'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"pictures/info.png\"></a>:<br>"+
 	    "<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">" +
             "<br><input name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
             "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\"  maxlength=\"1\">" +
