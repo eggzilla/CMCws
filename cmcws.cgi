@@ -12,6 +12,7 @@ use Cwd;
 use Digest::MD5;
 use CGI::Carp qw(fatalsToBrowser);
 use File::Temp qw/tempdir tempfile/;
+
 ######################### Webserver machine specific settings ############################################
 ##########################################################################################################
 my $webserver_name = "cmcompare-webserver";
@@ -261,8 +262,8 @@ if($page==1){
 		my $result_page_link="";
 		if(-e "$base_dir/$tempdir/begin$counter"){$queueing_status="Processing..";}
 		else {$queueing_status="Queued";}
-		if(-e "$base_dir/$tempdir/results$counter"){
-		    my $result_lines=`cat $base_dir/$tempdir/results$counter | wc -l`;
+		if(-e "$base_dir/$tempdir/result$counter"){
+		    my $result_lines=`cat $base_dir/$tempdir/result$counter | wc -l`;
 		    my $progress_percentage=($result_lines/$number_of_all_rfam_models)*100;
 		    my $rounded_progress_percentage=sprintf("%.2f",$progress_percentage);
 		    $model_comparison="Progress: $rounded_progress_percentage%";}
@@ -313,9 +314,9 @@ if($page==1){
 	    close COMMANDS; #close COMMANDS so child can reopen filehandle
 	}elsif (defined $pid){		
 	    close STDOUT;
-	    open (COMMANDS, ">>$base_dir/$tempdir/commands.sh") or die "Could not create commands.sh";
-	    print COMMANDS "touch $base_dir/$tempdir/done;\n";
-	    close COMMANDS;
+	    #open (COMMANDS, ">>$base_dir/$tempdir/commands.sh") or die "Could not create commands.sh";
+	    #print COMMANDS "touch $base_dir/$tempdir/done;\n";
+	    #close COMMANDS;
 	    my $ip_adress=$ENV{'REMOTE_ADDR'};
 	    $ip_adress=~s/\.//g;
 	    chmod (0755,"$base_dir/$tempdir/commands.sh");

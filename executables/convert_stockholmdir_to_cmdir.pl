@@ -8,7 +8,7 @@ use diagnostics;
 
 #Input is path to file that should be split
 my $input_temp_dir=$ARGV[0];
-my $input_temp_dir=$ARGV[1];
+my $input_source_dir=$ARGV[1];
 my $temp_dir="";
 my $source_dir="";
 
@@ -41,8 +41,8 @@ sub convert_stockholm_alignment_folder{
     my $executable_dir="$source_dir"."/executables";
     my $file;
     #get all filenames
-    chdir($dir);
-    opendir(DIR, $dir) or die "can't opendir $dir: $!";
+    chdir($alignment_dir);
+    opendir(DIR, $alignment_dir) or die "can't opendir $dir: $!";
     while (defined($file = readdir(DIR))) {
 	# cmbuild my.cm trna.5.sto
 	if($file=~/^\./){
