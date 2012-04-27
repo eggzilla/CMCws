@@ -16,7 +16,7 @@ use File::Temp qw/tempdir tempfile/;
 ######################### Webserver machine specific settings ############################################
 ##########################################################################################################
 my $webserver_name = "cmcompare-webserver";
-my $server="http://localhost:800/cmcws";
+my $server="http://131.130.44.243:800/cmcws";
 my $source_dir=cwd();
 #baseDIR points to the tempdir folder
 my $base_dir ="$source_dir/html";
@@ -24,7 +24,8 @@ my $upload_dir="$base_dir/upload";
 #sun grid engine settings
 my $qsub_location="/usr/bin/qsub";
 my $sge_queue_name="web_short_q";
-my $sge_error_dir="$source_dir/error";
+my $sge_error_dir="$base_dir/error";
+my $accounting_dir="$base_dir/accounting";
 my $sge_log_output_dir="$source_dir/error";
 my $sge_root_directory="/usr/share/gridengine";
 
@@ -46,6 +47,8 @@ use Template;
 #funtions for output of results
 #require "$source_dir/executables/output.pl";
 
+#TODO get rid of all usages of GET in query, e.g. javascript
+
 ######STATE - variables##########################################
 #determine the query state by retriving CGI variables
 #$page 0 input, 1 process, 2 output
@@ -57,12 +60,15 @@ my $uploaded_file= $query->param('uploaded_file') || undef;
 my $tempdir_input = $query->param('tempdir') || undef;
 my $email=$query->param('email-address')|| undef;
 my $input_filename=$query->param('file')|| undef;
+my $input_result_number=$query->param('result_number')||undef;
 my $input_filehandle=$query->upload('file')||undef;
 my $checked_input_present;
 my $provided_input="";
 my @input_error;
 my $error_message="";
 my $tempdir;
+my $result_number;
+
 ######TAINT-CHECKS##############################################
 #get the current page number
 #wenn predict submitted wurde ist page 1
@@ -111,7 +117,16 @@ if(defined($tempdir_input)){
 	print STDERR "cmcws: nonexistent tempdir has been supplied as parameter\n";
     }
 }
-    
+
+#resultnumber
+if(defined($input_result_number)){
+    if(-e "$base_dir/$tempdir_input/covariance_model/$result_number"){
+	$result_number=$input_result_number;    
+    }else{
+	print STDERR "cmcws: nonexistent result_number has been supplied as parameter\n";
+    }
+}
+
 #input-file
 if(defined($input_filename)){
     print STDERR "cmcws: Found upload /n";
@@ -237,7 +252,7 @@ if($page==1){
     my $processing_script_file="processingscriptfile";
     my $error_message="";
     my $query_number="";
-    my $number_of_all_rfam_models=1446;
+    my $number_of_all_rfam_models=1974;
     my $processing_table_content="";
     #Check mode
     #Prepare the input by creating a file for each model
@@ -261,7 +276,8 @@ if($page==1){
 		my $parsing_output="";
 		my $result_page_link="";
 		if(-e "$base_dir/$tempdir/begin$counter"){$queueing_status="Processing..";}
-		else {$queueing_status="Queued";}
+		elsif(!-e "$base_dir/$tempdir/done$counter") {$queueing_status="Queued";}
+		else{$queueing_status="Done";}
 		if(-e "$base_dir/$tempdir/result$counter"){
 		    my $result_lines=`cat $base_dir/$tempdir/result$counter | wc -l`;
 		    my $progress_percentage=($result_lines/$number_of_all_rfam_models)*100;
@@ -270,7 +286,7 @@ if($page==1){
 		else {$model_comparison="";}
 		if(-e "$base_dir/$tempdir/output"."$counter".".html"){$parsing_output="";} 
 		else {$parsing_output="";}
-		if(-e "$base_dir/$tempdir/done$counter"){$result_page_link="<a href=\"\">Link</a>"; } 
+		if(-e "$base_dir/$tempdir/done$counter"){$result_page_link="<a href=\"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir\">Link</a>"; } 
 		else{$result_page_link=""}
 		
 		$processing_table_content=$processing_table_content."<tr><td>$query_id</td><td>$queueing_status</td><td>$model_comparison</td><td>$parsing_output</td><td>$result_page_link</td></tr>";
@@ -319,6 +335,13 @@ if($page==1){
 	    #close COMMANDS;
 	    my $ip_adress=$ENV{'REMOTE_ADDR'};
 	    $ip_adress=~s/\.//g;
+	    my ($sec,$min,$hour,$day,$month,$yr19,@rest) = localtime(time);
+	    my $timestamp=(($yr19+1900)."-".sprintf("%02d",++$month)."-".sprintf("%02d",$day)."-".sprintf("%02d",$hour).":".sprintf("%02d",$min).":".sprintf("%02d",$sec));
+	    #write report to accounting file
+	    open(ACCOUNTING, ">>$base_dir/accounting/accounting") or die "Could not write to accounting file: $!/n";
+	    #ipaddress tempdir timestamp mode querynumber
+	    print ACCOUNTING "$ip_adress $tempdir $timestamp $mode $query_number\n";
+	    close ACCOUNTING;
 	    chmod (0755,"$base_dir/$tempdir/commands.sh");
 	    exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /scratch2/RNApredator/error -o /scratch2/RNApredator/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
 	}
@@ -348,6 +371,9 @@ if($page==1){
 
 ################ OUTPUT #####################################
 
+#We have 2 different output pages: overview page for the comparison of several models with each other(mode1)
+#detailed page for the comparison of one model vs rfam(mode2)
+
 if($page==2){
     #output
     print "Content-type: text/html; charset=utf-8\n\n";
@@ -356,43 +382,60 @@ if($page==2){
 	INCLUDE_PATH => ['./template'],
 	RELATIVE=>1
 				 });
-    my $file = './template/processing.html';
-    my $processing_script_file="processingscriptfile";
+    my $output_script_file="outputscriptfile";
     my $error_message="";
-    
-    #Check mode
-    
-    if($mode eq "1"){
-	#each submitted model is compared against rfam
-    }elsif($mode eq "2"){
-	#the models are compared againsted each other and optionally additionally against rfam	
-    }
-    
-    #Prepare the input by creating a file for each model
     my $vars;
-    my $progress_content="";
-    if(-e "$base_dir/$tempdir/done"){
-	my $file = './template/output.html';
-	my $processing_script_file="outputscriptfile";
-	my $error_message="";
-	$vars = {
-	    #define global variables for javascript defining the current host (e.g. linse) for redirection
-	    serveraddress => "$server",
-	    title => "CMcompare - Webserver - Input form",
-	    banner => "./pictures/banner.png",
-	    scriptfile => "$processing_script_file",
-	    stylefile => "inputstylefile",
-	    mode => "$mode",
-	    error_message => "$error_message",
-	    uploaded_file => "$uploaded_file",
-	};
-	#display output
-    }else{
-	 print "<script>
+    my $file;
+    #Check mode
+    if($mode eq "1"){
+	if(-e "$base_dir/$tempdir/done$result_number"){	
+	    #each submitted model is compared against rfam
+	    $file = './template/output.html';
+	    $output_script_file="outputscriptfile";
+	    $vars = {
+		#define global variables for javascript defining the current host (e.g. linse) for redirection
+		serveraddress => "$server",
+		title => "CMcompare - Webserver - Input form",
+		banner => "./pictures/banner.png",
+		scriptfile => "$output_script_file",
+		stylefile => "inputstylefile",
+		mode => "$mode",
+		error_message => "$error_message"
+	    };
+	    print STDERR "cmcws: Page:2 Mode:1 reached/n";
+	}else{
+	    print "<script>
 	     window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=1&mode=$mode&tempdir=$tempdir\"\', 5000);    
           </script>\n";
-    };
-    
+	    #todo add errormessage that results are not yet available
+	}
+    }elsif($mode eq "2"){
+	#the models are compared againsted each other and optionally additionally against rfam
+	#display the overview page
+	if(-e "$base_dir/$tempdir/done"){	
+	    #each submitted model is compared against rfam
+	    $file = './template/output.html';
+	    $output_script_file="outputscriptfile";
+	    $vars = {
+		#define global variables for javascript defining the current host (e.g. linse) for redirection
+		serveraddress => "$server",
+		title => "CMcompare - Webserver - Input form",
+		banner => "./pictures/banner.png",
+		scriptfile => "$output_script_file",
+		stylefile => "inputstylefile",
+		mode => "$mode",
+		error_message => "$error_message"
+	    };
+	    print STDERR "cmcws: Page:2 Mode:2 reached/n";
+	}else{
+	    print "<script>
+	     window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=1&mode=$mode&tempdir=$tempdir\"\', 5000);    
+          </script>\n";
+	    #todo add errormessage that results are not yet available
+	}
+    }else{
+	print STDERR "cmcws: Mode not set on outputpage";
+    }
     $template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
 }
 
