@@ -23,7 +23,7 @@ if(defined($filename_input)){
     if(-e "$filename_input"){
 	#file exists
 	$filename="$filename_input";
-        }
+    }
 }else{
     $filename = "";
 }
@@ -73,7 +73,7 @@ sub split_input{
 	    $stockholm_alignment_detected=0;
 	    close OUTPUTFILE;
 	}elsif(/^\/\// && $covariance_model_detected==1){
-	    open (OUTPUTFILE, ">$input_tempdir"."covariance_model/$counter")or die "Could not create $input_tempdir/covariance_model/$counter: $!\n";;
+	    open (OUTPUTFILE, ">$input_tempdir"."covariance_model/input$counter.cm")or die "Could not create $input_tempdir/covariance_model/input$counter.cm: $!\n";;
 	    my $model_lines = @model-1;
 	    for(0..$model_lines){
 		my $line = shift(@model);

@@ -60,7 +60,7 @@ if(defined($tempdir)){
     chdir($tempdir);
     opendir(DIR, $tempdir) or die "can't opendir $tempdir: $!";
     while (defined($file = readdir(DIR))) {
-	unless($file=~/^\./ or $file=~/^accounting/ or  $file=~/^error/){
+	unless($file=~/^\./ or $file=~/^accounting/ or  $file=~/^error/ or $file=~/^upload/){
 	    #check that file is older than specified number of month
 	    my $timestamp = ctime(stat($file)->mtime);
 	    my @time_elements=split(/ /,$timestamp);
@@ -76,4 +76,3 @@ if(defined($tempdir)){
     }
 }
 
-print "Hostname: $host $current_month \n";
