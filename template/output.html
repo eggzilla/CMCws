@@ -2,5 +2,55 @@
  <div style="text-align:center">
      <h3>= Output =</h3>
 </div>
-output :-)
+ <div style="text-align:center">
+<h2>Top [% filtered %] hits of [% total %] Total:</h2>
+</div>
+<div align = "left">
+<form name="filter1" action="#" method="get">
+<table class="filtertable"  cellspacing="3">
+	<tr>
+		<td>Resources:</td>
+		<td>- all predictions as <a href="[% csv_file %]">.csv-file</a> or as CMCompare <a href="[% plex_output_file %]">.output-file</a> </td>
+		<td></td>
+		<td>   - provided covariance model as <a href="[% covariance_model %]">.cm-file</a> </td>     
+	<tr>
+           	<td>Filtering (current cutoff [% cutoff %]):</td>
+		<td>- Show top	
+			<form name="filter1">
+                        <select name="topselector" id="selectorid"  size="1" onchange="select(this)" >
+                        </select>
+			hits by linkscore (enter All for All)
+                </td>
+		<td></td>
+		<td>  
+		</td>
+        </tr>
+</table>
+</form>
+<form action="target_search.cgi" id="postprocess-submit"  method="get">
+<input type="button" value="Post-Process" onClick="check_postprocess()"> Select interactions below for postprocessing <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle" src="pictures/test2.png" border="0" alt="Info"></a>
+<div id='submission-error' style="color:#FF0000"> </div>
+<table class="tablesorter" id="myTable" border="1"  cellspacing="1">             
+    <thead>
+        <tr>
+	    <th style="width: 1%">Select</th> 
+	    <th style="width: 3%">Rank</th>
+            <th style="width: 6%">Linkscore<br>[bitscore]</th> 
+            <th style="width: 4%">Input Id</th> 
+            <th style="width: 15%">Rfam Id</th> 
+	    <th style="width: 3%">Input Name</th>
+	    <th style="width: 3%">Rfam Name</th> 
+        </tr> 
+    </thead>
+<tbody>
+[% INSERT $filtered_table %]
+<input type="hidden" name="page" id="page"  value="3">
+<input type="hidden" name="sRNA" id="sRNA" value="[% sRNA %]">
+<input type="hidden" name="tempdir" id="tempdir"  value="[% tempdir %]">
+<input type="hidden" name="begincheck" value="1">
+<input type="button" value="Post-Process" onClick="check_postprocess()">
+</form>
+</div>
+<br>
+
 [% INCLUDE footer %]

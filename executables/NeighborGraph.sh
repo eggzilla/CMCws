@@ -24,12 +24,13 @@ repWithName () {
   NAME2=`cat $1/RF$NUM2.cm | grep NAME | awk '{print $2}'`
   W=`echo $4 | awk '{printf "%d", $1}'`
   echo "\"$NUM1\n$NAME1\" -- \"$NUM2\n$NAME2\" [label = \"$W\"];"
+  #echo "$1 $2 $3 $4 \n";
 }
 
 echo "graph g {"
-
 grep $2 | tail -n$3 | while read line ; do
   repWithName $1 $line
+  #echo "$1 $line\n"; 
 done | sort
 
 echo "}"

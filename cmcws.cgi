@@ -12,14 +12,29 @@ use Cwd;
 use Digest::MD5;
 use CGI::Carp qw(fatalsToBrowser);
 use File::Temp qw/tempdir tempfile/;
+use Sys::Hostname;
 
 ######################### Webserver machine specific settings ############################################
 ##########################################################################################################
+my $host = hostname;
 my $webserver_name = "cmcompare-webserver";
-my $server="http://131.130.44.243:800/cmcws";
 my $source_dir=cwd();
+my $server;
 #baseDIR points to the tempdir folder
-my $base_dir ="$source_dir/html";
+my $base_dir;
+if($host eq "erbse"){
+    $server="http://localhost:800/cmcws";
+    $base_dir ="$source_dir/html";
+}elsif($host eq "linse"){
+    $server="http://rna.tbi.univie.ac.at/cmcws2";
+    $base_dir ="/u/html/cmcws";
+}else{
+#if we are not on erbse or on linse we are propably on rna.tbi.univie.ac.at anyway
+    $server="http://rna.tbi.univie.ac.at/cmcws2";
+    $base_dir ="/u/html/cmcws";
+}
+
+my $source_dir=cwd();
 my $upload_dir="$base_dir/upload";
 #sun grid engine settings
 my $qsub_location="/usr/bin/qsub";
@@ -28,7 +43,6 @@ my $sge_error_dir="$base_dir/error";
 my $accounting_dir="$base_dir/accounting";
 my $sge_log_output_dir="$source_dir/error";
 my $sge_root_directory="/usr/share/gridengine";
-
 ##########################################################################################################
 #Write all Output to file at once
 $|=1;
@@ -61,6 +75,8 @@ my $tempdir_input = $query->param('tempdir') || undef;
 my $email=$query->param('email-address')|| undef;
 my $input_filename=$query->param('file')|| undef;
 my $input_result_number=$query->param('result_number')||undef;
+my $input_filtered_number=$query->param('filtered_number')||undef;
+my $input_cutoff=$query->param('cutoff')||undef;
 my $input_filehandle=$query->upload('file')||undef;
 my $checked_input_present;
 my $provided_input="";
@@ -68,7 +84,8 @@ my @input_error;
 my $error_message="";
 my $tempdir;
 my $result_number;
-
+my $filtered_number;
+my $cutoff;
 ######TAINT-CHECKS##############################################
 #get the current page number
 #wenn predict submitted wurde ist page 1
@@ -179,7 +196,24 @@ if(defined($input_filename)){
     #Submit without file, set error message and request file
     push(@input_error,"No Input file provided");
 }
+   
+if(defined($input_filtered_number)){
+    if($input_filtered_number =~ /^\d+/){
+	#only numbers = Taxid - preset on form in taxid field
+	$filtered_number = $input_filtered_number;
+    }#todo:else
+}else{
+    $filtered_number=10;
+}
 
+if(defined($input_cutoff)){
+    if($input_cutoff =~ /^\d+/){
+	$cutoff = $input_cutoff;
+    }#todo:else
+}else{
+    $cutoff=20;
+}
+	
 ################ INPUT #####################################
 
 if($page==0){
@@ -383,6 +417,12 @@ if($page==2){
 	RELATIVE=>1
 				 });
     my $output_script_file="outputscriptfile";
+    my $total;
+    if($mode eq "1"){
+	$total=1974+$result_number;
+    }else{
+	#todo:set for mode 2
+}
     my $error_message="";
     my $vars;
     my $file;
@@ -400,6 +440,9 @@ if($page==2){
 		scriptfile => "$output_script_file",
 		stylefile => "inputstylefile",
 		mode => "$mode",
+		filtered=> "$filtered_number",
+		total=> "$total",
+		cutoff=> "$cutoff",
 		error_message => "$error_message"
 	    };
 	    print STDERR "cmcws: Page:2 Mode:1 reached/n";
