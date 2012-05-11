@@ -34,7 +34,6 @@ if($host eq "erbse"){
     $base_dir ="/u/html/cmcws";
 }
 
-my $source_dir=cwd();
 my $upload_dir="$base_dir/upload";
 #sun grid engine settings
 my $qsub_location="/usr/bin/qsub";
@@ -137,7 +136,7 @@ if(defined($tempdir_input)){
 
 #resultnumber
 if(defined($input_result_number)){
-    if(-e "$base_dir/$tempdir_input/covariance_model/$result_number"){
+    if(-e "$base_dir/$tempdir_input/result$input_result_number"){
 	$result_number=$input_result_number;    
     }else{
 	print STDERR "cmcws: nonexistent result_number has been supplied as parameter\n";
@@ -320,7 +319,7 @@ if($page==1){
 		else {$model_comparison="";}
 		if(-e "$base_dir/$tempdir/output"."$counter".".html"){$parsing_output="";} 
 		else {$parsing_output="";}
-		if(-e "$base_dir/$tempdir/done$counter"){$result_page_link="<a href=\"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir\">Link</a>"; } 
+		if(-e "$base_dir/$tempdir/done$counter"){$result_page_link="<a href=\"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir&result_number=$counter\">Link</a>"; } 
 		else{$result_page_link=""}
 		
 		$processing_table_content=$processing_table_content."<tr><td>$query_id</td><td>$queueing_status</td><td>$model_comparison</td><td>$parsing_output</td><td>$result_page_link</td></tr>";
