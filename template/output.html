@@ -1,56 +1,109 @@
 [% PROCESS header %]
- <div style="text-align:center">
-     <h3>= Output =</h3>
+<div id="1" class="tooltip2" style="width: 400px;">
+  <div class="content">
+    <div class="head">Select comparison mode:</div>
+    <ul>
+      <li>Compare one covariance model against all<br> 
+	covariance models in Rfam</li>
+      <li>Compare multiple covariance models with<br>
+	each other</li> 
+    </ul>
+    --&gt; For more information see Help 
+  </div>
 </div>
- <div style="text-align:center">
-<h2>Top [% filtered %] hits of [% total %] Total:</h2>
+ 
+<div id="2" class="tooltip2" style="width: 400px;">
+  <div class="content">
+    <div class="head">Select comparison mode:</div>
+    <ul>
+      <li>Compare one covariance model against all<br> 
+	covariance models in Rfam</li>
+      <li>Compare multiple covariance models with<br>
+	each other</li> 
+    </ul>
+    --&gt; For more information see Help 
+  </div>
 </div>
-<div align = "left">
-<form name="filter1" action="#" method="get">
-<table class="filtertable"  cellspacing="3">
-	<tr>
-		<td>Resources:</td>
-		<td>- all predictions as <a href="[% csv_file %]">.csv-file</a> or as CMCompare <a href="[% plex_output_file %]">.output-file</a> </td>
-		<td></td>
-		<td>   - provided covariance model as <a href="[% covariance_model %]">.cm-file</a> </td>     
-	<tr>
-           	<td>Filtering (current cutoff [% cutoff %]):</td>
-		<td>- Show top	
-			<form name="filter1">
-                        <select name="topselector" id="selectorid"  size="1" onchange="select(this)" >
-                        </select>
-			hits by linkscore (enter All for All)
-                </td>
-		<td></td>
-		<td>  
-		</td>
-        </tr>
-</table>
-</form>
-<form action="target_search.cgi" id="postprocess-submit"  method="get">
-<input type="button" value="Post-Process" onClick="check_postprocess()"> Select interactions below for postprocessing <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle" src="pictures/test2.png" border="0" alt="Info"></a>
-<div id='submission-error' style="color:#FF0000"> </div>
-<table class="tablesorter" id="myTable" border="1"  cellspacing="1">             
-    <thead>
+
+<div id="3" class="tooltip2" style="width: 400px;">
+  <div class="content">
+    <div class="head">Select comparison mode:</div>
+    <ul>
+      <li>Compare one covariance model against all<br> 
+	covariance models in Rfam</li>
+      <li>Compare multiple covariance models with<br>
+	each other</li> 
+    </ul>
+    --&gt; For more information see Help 
+  </div>
+</div>
+
+<div style="text-align:left">
+  <h2>Top [% filtered %] results of [% total %] total for [% inputid %] - [% inputname %] (cutoff [% cutoff %]):</h2>
+  <form name="filter" action="cmcws.cgi" method="get">
+    <input id="page"  value="2" name="page" type="hidden">
+    <input id="mode"  value="1" name="mode" type="hidden">
+    <input id="tempdir"  value="[% tempdir %]" name="tempdir" type="hidden">
+    <input id="result_number"  value="[% result_number %]" name="result_number" type="hidden">
+    <table class="resources">
+      <tr>
+	<td style="text-align:left;">Covariance model graph: <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a></td>
+	<td colspan="2"> </td>
+	<td> </td>
+      </tr>
+      <tr>
+	<td colspan="4" style="text-align:left;border:solid 1px #000;">
+	  <table style="display:none;">
+	    <tr><td><img src="[% cm_map %]" alt="Introduction" style="text-align:left;border:0"></td></tr>
+	  </table>
+	  <p class="demo5 expIco">Show</p>
+	</td>
+      </tr>
+      <tr>
+	<td style="text-align:left;">Downloads: </td>
+	<td colspan="3"></td>
+      </tr>
+      <tr>
+	<td colspan="2" style="text-align:left;border:solid 1px #000;">-all comparisons:<a href="[% csv_file %]">.csv-file</a>,<a href="[% cm_output_file %]">.output-file</a><br>
+	  -filtered comparisons:<a href="[% csv_filtered_file %]">.csv-file</a><br>
+	  -covariance model graph:<a href="[% dot_file %]">.dot-file</a>,<a href="[% png_file %]">.png-file</a>
+	</td>  
+	<td colspan="2"> </td>
+      </tr>
+      <tr>
+	<td style="text-align:left;">Filtering: <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a> </td>
+	<td colspan="3"  style="border:solid 1px #FFF;"></td>
+      </tr>
+      <tr>
+	<td colspan="2" style="border:solid 1px #000;text-align:left;">Show up to <input name="filtered_number" id="filtered_number_field" size="4">
+	  hits with cutoff <input name="cutoff" id="cutoff_field"  size="4" onchange="select(this)"> and Rfam name containing <input name="rfamname" id="rfamname_field"  size="10" onchange="select(this)"> - <input type="submit" value="Filter">
+	</td>
+	<td colspan="2" style="border:solid 1px #FFF;"></td>
+      </tr>
+    </table>
+  </form>
+  <form action="cmcws.cgi" id="postprocess-submit"  method="get">
+    <input type="button" value="Detailed-Comparison"> Select covariance models from the list for detailed comparison <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:text-bottom;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a>
+    <div id='submission-error' style="color:#FF0000"></div>
+    <table style="width:60%;" class="tablesorter" id="myTable">             
+      <thead>
         <tr>
-	    <th style="width: 1%">Select</th> 
-	    <th style="width: 3%">Rank</th>
-            <th style="width: 6%">Linkscore<br>[bitscore]</th> 
-            <th style="width: 4%">Input Id</th> 
-            <th style="width: 15%">Rfam Id</th> 
-	    <th style="width: 3%">Input Name</th>
-	    <th style="width: 3%">Rfam Name</th> 
+	  <th style="width:1%;"></th> 
+	  <th style="width:2%;">Rank</th>
+          <th style="width:4%;">Link score</th>  
+          <th style="width:4%;">Rfam Id</th> 
+ 	  <th style="width:4%;">Rfam Name</th>
+	  <th style="width:4%;">Input score</th>
+	  <th style="width:4%;">Rfam score</th>
         </tr> 
-    </thead>
-<tbody>
-[% INSERT $filtered_table %]
-<input type="hidden" name="page" id="page"  value="3">
-<input type="hidden" name="sRNA" id="sRNA" value="[% sRNA %]">
-<input type="hidden" name="tempdir" id="tempdir"  value="[% tempdir %]">
-<input type="hidden" name="begincheck" value="1">
-<input type="button" value="Post-Process" onClick="check_postprocess()">
-</form>
+      </thead>
+      <tbody>
+	[% INSERT $filtered_table %]
+      </tbody>
+    </table>
+    <input type="button" value="Detailed-Comparison">
+  </form>
+  <br>
 </div>
-<br>
 
 [% INCLUDE footer %]

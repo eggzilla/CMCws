@@ -8,9 +8,9 @@
 	</select>
 	<br>
 	<br>
-        <input id="page" value="1"  name="page" type="hidden"  maxlength="1">
-	<input id="mode" value="1"  name="mode" type="hidden"  maxlength="1">
-	<input id="uploaded_file" value="[% uploaded_file %]"  name="uploaded_file" type="hidden"  maxlength="1">
+        <input id="page" value="1"  name="page" type="hidden">
+	<input id="mode" value="1"  name="mode" type="hidden">
+	<input id="uploaded_file" value="[% uploaded_file %]"  name="uploaded_file" type="hidden">
 	<input type="submit" value="Compare">
         <input type="button" value="Back" onclick="back(this)">
         </form>

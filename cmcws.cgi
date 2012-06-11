@@ -23,7 +23,8 @@ my $server;
 #baseDIR points to the tempdir folder
 my $base_dir;
 if($host eq "erbse"){
-    $server="http://localhost:800/cmcws";
+    #$server="http://localhost:800/cmcws";
+    $server="http://131.130.44.243:800/cmcws";
     $base_dir ="$source_dir/html";
 }elsif($host eq "linse"){
     $server="http://rna.tbi.univie.ac.at/cmcws2";
@@ -47,7 +48,7 @@ my $sge_root_directory="/usr/share/gridengine";
 $|=1;
 #Control of the CGI Object remains with webserv.pl, additional functions are defined in the requirements below.
 use CGI;
-$CGI::POST_MAX=100000; #max 100kbyte posts
+$CGI::POST_MAX=1000000; #max 100kbyte posts
 my $query = CGI->new;
 #using template toolkit to keep static stuff and logic in seperate files
 use Template;
@@ -76,6 +77,7 @@ my $input_filename=$query->param('file')|| undef;
 my $input_result_number=$query->param('result_number')||undef;
 my $input_filtered_number=$query->param('filtered_number')||undef;
 my $input_cutoff=$query->param('cutoff')||undef;
+my $input_rfam_name=$query->param('rfamname')||undef;
 my $input_filehandle=$query->upload('file')||undef;
 my $checked_input_present;
 my $provided_input="";
@@ -85,6 +87,8 @@ my $tempdir;
 my $result_number;
 my $filtered_number;
 my $cutoff;
+
+print STDERR "cmcws-query: mode: $mode,page: $page,uploaded_file: $uploaded_file ,tempdir_input: $tempdir_input,input_filename: $input_filename";
 ######TAINT-CHECKS##############################################
 #get the current page number
 #wenn predict submitted wurde ist page 1
@@ -418,13 +422,28 @@ if($page==2){
     my $output_script_file="outputscriptfile";
     my $total;
     if($mode eq "1"){
-	$total=1974+$result_number;
+	$total=1974;
     }else{
 	#todo:set for mode 2
-}
+    }
     my $error_message="";
     my $vars;
     my $file;
+    my $inputid;
+    my $inputname;
+    #get input id and name
+ 
+    if(-e "$base_dir/$tempdir/inputidname$result_number"){
+	open (INPUTIDNAME, "<$base_dir/$tempdir/inputidname$result_number")or die "Could not create $tempdir/query_number: $!\n";
+	my $input_id_name_string=<INPUTIDNAME>;
+	close INPUTIDNAME;
+	my @input_id_name_array=split(/;/,$input_id_name_string);
+	$inputid=$input_id_name_array[0];
+	$inputname=$input_id_name_array[1];
+    }else{
+	print  STDERR "cmcws: Error inputidname$result_number does not exist in tempdir $base_dir/$tempdir";
+    }
+    `executables/output_to_html.pl $base_dir/$tempdir $result_number $mode $filtered_number $cutoff` or die print STDERR "cmcws: could not execute\n";
     #Check mode
     if($mode eq "1"){
 	if(-e "$base_dir/$tempdir/done$result_number"){	
@@ -437,11 +456,22 @@ if($page==2){
 		title => "CMcompare - Webserver - Input form",
 		banner => "./pictures/banner.png",
 		scriptfile => "$output_script_file",
-		stylefile => "inputstylefile",
+		stylefile => "outputstylefile",
 		mode => "$mode",
-		filtered=> "$filtered_number",
-		total=> "$total",
-		cutoff=> "$cutoff",
+		inputid => "$inputid",
+		inputname => "$inputname",
+		filtered => "$filtered_number",
+		filtered_table => "./html/$tempdir/filtered_table$result_number",
+		cm_map=> "./html/$tempdir/graph$result_number.png",
+		cm_output_file => "./html/$tempdir/result$result_number",
+		csv_file => "./html/$tempdir/csv$result_number",
+		csv_filtered_file => "./html/$tempdir/csv_filtered$result_number",
+		dot_file => "./html/$tempdir/graph_out$result_number.dot",
+		png_file => "./html/$tempdir/graph$result_number.png",
+		result_number =>"$result_number",
+		tempdir => "$tempdir",
+		total => "$total",
+		cutoff => "$cutoff",
 		error_message => "$error_message"
 	    };
 	    print STDERR "cmcws: Page:2 Mode:1 reached/n";
@@ -485,6 +515,7 @@ if($page==2){
 
 if($page==3){
     #postprocessing
+
 }
 
 
