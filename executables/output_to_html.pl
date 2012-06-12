@@ -64,8 +64,7 @@ unless(-e "$tempdir_input/csv$result_file_number"){
     }
     close(INPUTFILE);
     #sort hash of array by maximin-score
-    @sorted_entries = sort { $a->[0] <=> $b->[0] } @entries;
-    
+    @sorted_entries = sort { $b->[0] <=> $a->[0] } @entries;
     #write csv-file only if not present
     open(CSVOUTPUT,">$tempdir_input/csv$result_file_number") or die "Can't write $tempdir_input/csv$result_file_number: $!";
     print CSVOUTPUT "linkscore;id1;id2;name1;name2;score1;score2;secondary_structure_1;secondary_structure_2;matching_nodes_1;matching_nodes_2;link_sequence\n";
@@ -133,12 +132,24 @@ foreach(@filtered_sorted_entries){
     my $secondary_structure2=$filtered_sorted_entry[8];
     my $link_sequence=$filtered_sorted_entry[11];
     my $rounded_link_score=nearest(1, $link_score);
-    #my $output_line ="\<tr id\=\"t"."$counter\"\>"."<td style=\"border:solid 1px #000;\">"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td style=\"border:solid 1px #000;\">"."$counter."."</td>"."<td style=\"border:solid 1px #000;\">"."$link_score"."</td>"."<td style=\"border:solid 1px #000;\">"."$id1_truncated"."</td>"."<td style=\"border:solid 1px #000;\">"."$id2_truncated"."</td>"."<td style=\"border:solid 1px #000;\">"."$name1"."</td>"."<td style=\"border:solid 1px #000;\">"."$name2"."</td>"."<td style=\"border:solid 1px #000;\">"."$secondary_structure1"."</td>"."<td style=\"border:solid 1px #000;\">"."$secondary_structure2"."</td>"."<td style=\"border:solid 1px #000;\">"."$link_sequence"."</td>"."</tr>\n";
-    my $output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
-    print FILTEREDTABLE "$output_line";
-    $counter++;
-    #construct result graph
-    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label = \"$rounded_link_score\"];\n";
+    #Filter 3 show only hit containing rfamname in rfam name
+    if(defined($rfam_name_string)){
+	#we push matching entries on new array
+	if($name2=~/$rfam_name_string/g){
+	    print STDERR "cmcws: matched - $name2 with $rfam_name_string\n";
+	    my $output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+	    print FILTEREDTABLE "$output_line";
+	    $counter++;
+	    #construct result graph
+	    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label = \"$rounded_link_score\"];\n"; 
+	}
+    }else{
+	my $output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+	print FILTEREDTABLE "$output_line";
+	$counter++;
+	#construct result graph
+	$graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label = \"$rounded_link_score\"];\n";
+    }
 }
 close FILTEREDTABLE;
 close FILTEREDCSV;

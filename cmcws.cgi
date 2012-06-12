@@ -87,6 +87,7 @@ my $tempdir;
 my $result_number;
 my $filtered_number;
 my $cutoff;
+my $rfam_name;
 
 print STDERR "cmcws-query: mode: $mode,page: $page,uploaded_file: $uploaded_file ,tempdir_input: $tempdir_input,input_filename: $input_filename";
 ######TAINT-CHECKS##############################################
@@ -146,7 +147,14 @@ if(defined($input_result_number)){
 	print STDERR "cmcws: nonexistent result_number has been supplied as parameter\n";
     }
 }
-
+#inputrfamname
+if(defined($input_rfam_name)){
+    if($input_rfam_name=~/\w+/){
+	$rfam_name=$input_rfam_name;    
+    }else{
+	print STDERR "cmcws: rfam_name_invalid\n";
+    }
+}
 #input-file
 if(defined($input_filename)){
     print STDERR "cmcws: Found upload /n";
@@ -199,7 +207,7 @@ if(defined($input_filename)){
     #Submit without file, set error message and request file
     push(@input_error,"No Input file provided");
 }
-   
+#filtered_number   
 if(defined($input_filtered_number)){
     if($input_filtered_number =~ /^\d+/){
 	#only numbers = Taxid - preset on form in taxid field
@@ -208,7 +216,7 @@ if(defined($input_filtered_number)){
 }else{
     $filtered_number=10;
 }
-
+#cutoff
 if(defined($input_cutoff)){
     if($input_cutoff =~ /^\d+/){
 	$cutoff = $input_cutoff;
@@ -317,11 +325,12 @@ if($page==1){
 		else{$queueing_status="Done";}
 		if(-e "$base_dir/$tempdir/result$counter"){
 		    my $result_lines=`cat $base_dir/$tempdir/result$counter | wc -l`;
-		    my $progress_percentage=($result_lines/$number_of_all_rfam_models)*100;
+		    my $progress_percentage=($result_lines/($number_of_all_rfam_models-1))*100;
 		    my $rounded_progress_percentage=sprintf("%.2f",$progress_percentage);
 		    $model_comparison="Progress: $rounded_progress_percentage%";}
 		else {$model_comparison="";}
-		if(-e "$base_dir/$tempdir/output"."$counter".".html"){$parsing_output="";} 
+		if(-e "$base_dir/$tempdir/graph$counter.png"){$parsing_output="done";}
+		elsif(-e "$base_dir/$tempdir/filtered_table$counter"){$parsing_output="processing..";}
 		else {$parsing_output="";}
 		if(-e "$base_dir/$tempdir/done$counter"){$result_page_link="<a href=\"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir&result_number=$counter\">Link</a>"; } 
 		else{$result_page_link=""}
@@ -443,7 +452,7 @@ if($page==2){
     }else{
 	print  STDERR "cmcws: Error inputidname$result_number does not exist in tempdir $base_dir/$tempdir";
     }
-    `executables/output_to_html.pl $base_dir/$tempdir $result_number $mode $filtered_number $cutoff` or die print STDERR "cmcws: could not execute\n";
+    `executables/output_to_html.pl $base_dir/$tempdir $result_number $mode $filtered_number $cutoff $rfam_name` or die print STDERR "cmcws: could not execute\n";
     #Check mode
     if($mode eq "1"){
 	if(-e "$base_dir/$tempdir/done$result_number"){	
