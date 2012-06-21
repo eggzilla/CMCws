@@ -39,13 +39,14 @@
 </div>
 
 <div style="text-align:left">
-  <h2>Top [% filtered %] results of [% total %] total for [% inputid %] - [% inputname %] (cutoff [% cutoff %]):</h2>
+  <h2>[% output_title %]</h2>
   <form name="filter" action="cmcws.cgi" method="get">
     <input id="page"  value="2" name="page" type="hidden">
-    <input id="mode"  value="1" name="mode" type="hidden">
+    <input id="mode"  value="[% mode %]" name="mode" type="hidden">
     <input id="tempdir"  value="[% tempdir %]" name="tempdir" type="hidden">
     <input id="result_number"  value="[% result_number %]" name="result_number" type="hidden">
     <table class="resources">
+       [% INSERT $result_matrix %]
       <tr>
 	<td style="text-align:left;">Covariance model graph: <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a></td>
 	<td colspan="2"> </td>
@@ -75,10 +76,7 @@
 	<td colspan="3"  style="border:solid 1px #FFF;"></td>
       </tr>
       <tr>
-	<td colspan="2" style="border:solid 1px #000;text-align:left;">Show up to <input name="filtered_number" id="filtered_number_field" size="4">
-	  hits with cutoff <input name="cutoff" id="cutoff_field"  size="4" onchange="select(this)"> and Rfam name containing <input name="rfamname" id="rfamname_field"  size="10" onchange="select(this)"> - <input type="submit" value="Filter">
-	</td>
-	<td colspan="2" style="border:solid 1px #FFF;"></td>
+	[% INSERT $filter_fields %]
       </tr>
     </table>
   </form>
@@ -88,13 +86,7 @@
     <table style="width:60%;" class="tablesorter" id="myTable">             
       <thead>
         <tr>
-	  <th style="width:1%;"></th> 
-	  <th style="width:2%;">Rank</th>
-          <th style="width:4%;">Link score</th>  
-          <th style="width:4%;">Rfam Id</th> 
- 	  <th style="width:4%;">Rfam Name</th>
-	  <th style="width:4%;">Input score</th>
-	  <th style="width:4%;">Rfam score</th>
+	  [% INSERT $table_header %]
         </tr> 
       </thead>
       <tbody>

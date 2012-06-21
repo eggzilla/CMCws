@@ -23,8 +23,8 @@ my $server;
 #baseDIR points to the tempdir folder
 my $base_dir;
 if($host eq "erbse"){
-    #$server="http://localhost:800/cmcws";
-    $server="http://131.130.44.243:800/cmcws";
+    $server="http://localhost:800/cmcws";
+    #$server="http://131.130.44.243:800/cmcws";
     $base_dir ="$source_dir/html";
 }elsif($host eq "linse"){
     $server="http://rna.tbi.univie.ac.at/cmcws2";
@@ -52,16 +52,13 @@ $CGI::POST_MAX=1000000; #max 100kbyte posts
 my $query = CGI->new;
 #using template toolkit to keep static stuff and logic in seperate files
 use Template;
-#print STDERR "got here 1";
 #Reset these absolut paths when changing the location of the requirements
 #functions for gathering user input
 #require "$source_dir/executables/input.pl";
 #functions for calculating of results
 #require "$source_dir/executables/calculate.pl";
-#funtions for output of results
+#functions for output of results
 #require "$source_dir/executables/output.pl";
-
-#TODO get rid of all usages of GET in query, e.g. javascript
 
 ######STATE - variables##########################################
 #determine the query state by retriving CGI variables
@@ -76,8 +73,9 @@ my $email=$query->param('email-address')|| undef;
 my $input_filename=$query->param('file')|| undef;
 my $input_result_number=$query->param('result_number')||undef;
 my $input_filtered_number=$query->param('filtered_number')||undef;
-my $input_cutoff=$query->param('cutoff')||undef;
-my $input_rfam_name=$query->param('rfamname')||undef;
+my $input_cutoff=$query->param('cutoff');
+my $input_model_1_name=$query->param('model_1_name')||undef;
+my $input_model_2_name=$query->param('model_2_name')||undef;
 my $input_filehandle=$query->upload('file')||undef;
 my $checked_input_present;
 my $provided_input="";
@@ -87,9 +85,10 @@ my $tempdir;
 my $result_number;
 my $filtered_number;
 my $cutoff;
-my $rfam_name;
+my $model_1_name;
+my $model_2_name;
 
-print STDERR "cmcws-query: mode: $mode,page: $page,uploaded_file: $uploaded_file ,tempdir_input: $tempdir_input,input_filename: $input_filename";
+#print STDERR "cmcws-query: mode: $mode,page: $page,uploaded_file: $uploaded_file ,tempdir_input: $tempdir_input,input_filename: $input_filename";
 ######TAINT-CHECKS##############################################
 #get the current page number
 #wenn predict submitted wurde ist page 1
@@ -147,13 +146,30 @@ if(defined($input_result_number)){
 	print STDERR "cmcws: nonexistent result_number has been supplied as parameter\n";
     }
 }
-#inputrfamname
-if(defined($input_rfam_name)){
-    if($input_rfam_name=~/\w+/){
-	$rfam_name=$input_rfam_name;    
+#input_model_1_name
+if(defined($input_model_1_name)){
+    if($input_model_1_name=~/\w+/){
+	$model_1_name=$input_model_1_name;    
     }else{
-	print STDERR "cmcws: rfam_name_invalid\n";
+	#todo : return rfam error message
+	$model_1_name="none";
+	print STDERR "cmcws: model_1_name_invalid\n";
     }
+}else{
+    $model_1_name="none";
+}
+
+#input_model_2_name
+if(defined($input_model_2_name)){
+    if($input_model_2_name=~/\w+/){
+	$model_2_name=$input_model_2_name;    
+    }else{
+	$model_2_name="none";
+	#todo : return rfam error message
+	print STDERR "cmcws: model_2_name_invalid\n";
+    }
+}else{
+    $model_2_name="none";
 }
 #input-file
 if(defined($input_filename)){
@@ -193,13 +209,20 @@ if(defined($input_filename)){
 	    $checked_input_present=1;
 	    my $number_of_models=((@check_array)/2)-1;
 	    my $counter=0;
-	    for(0..$number_of_models){
-		$counter++;
-		#todo: continue here - each line should contain number, type of input, name (if present)
-		my $type=shift(@check_array);
-		my $name=shift(@check_array);
-		$provided_input=$provided_input."<p>$counter. $type"." $name </p>";
+	    $provided_input.="<br>";
+	    if($number_of_models>5){
+		$provided_input.="$number_of_models models"
+	    }else{
+		for(0..$number_of_models){
+		    $counter++;
+		    #todo: continue here - each line should contain number, type of input, name (if present)
+		    my $type=shift(@check_array);
+		    my $name=shift(@check_array);
+		    $provided_input=$provided_input."$counter. $type"." $name<br>";
+		}
 	    }
+	    $provided_input.="<br>";
+	    
 	}
     }
     
@@ -217,12 +240,23 @@ if(defined($input_filtered_number)){
     $filtered_number=10;
 }
 #cutoff
+print STDERR "cmcws - cutoff input: $input_cutoff \n";
 if(defined($input_cutoff)){
-    if($input_cutoff =~ /^\d+/){
+    if($input_cutoff =~ /^[0-9]+$/){
 	$cutoff = $input_cutoff;
-    }#todo:else
+    }elsif($input_cutoff=~/^-[0-9]+$/){
+	$cutoff = $input_cutoff;
+    }elsif($input_cutoff=~/^[0-9]+.[0-9]+$/){
+	$cutoff = $input_cutoff;
+    }elsif($input_cutoff=~/^-[0-9]+.[0-9]+$/){
+	$cutoff = $input_cutoff;
+    }else{
+	$cutoff="none";
+    }
+#}elsif($input_cutoff eq ""){
+#    $cutoff="none";
 }else{
-    $cutoff=20;
+    $cutoff="none";
 }
 	
 ################ INPUT #####################################
@@ -309,10 +343,10 @@ if($page==1){
     if(-e "$base_dir/$tempdir/query_number"){
 	if($mode eq "1"){
 	    #each submitted model is compared against rfam
-	    open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not create $tempdir/query_number: $!\n";
+	    open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
 	    $query_number=<QUERYNUMBERFILE>;
 	    close QUERYNUMBERFILE;
-	    #assemble 
+	    #assemble output
 	    my $counter=1;
 	    for(1..$query_number){
 		my $query_id=$counter;
@@ -340,9 +374,33 @@ if($page==1){
 	    }
 	    
 	}elsif($mode eq "2"){
-	    #the models are compared againsted each other and optionally additionally against rfam
-	    $query_number=1;
-	    
+	    #the models are compared againsted each other
+	    open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
+	    $query_number=<QUERYNUMBERFILE>;
+	    close QUERYNUMBERFILE;
+	    my $counter=1;
+	    my $query_id=1;
+	    my $queueing_status="";
+	    my $model_comparison="";
+	    my $parsing_output="";
+	    my $result_page_link="";
+	    #to fill the necessary fields of the result matrix we need (query_number)*(query_number)-query_number comparisons
+	    my $number_of_comparisons=(($query_number*$query_number)-$query_number)/2;
+	    if(-e "$base_dir/$tempdir/begin$counter"){$queueing_status="Processing..";}
+	    elsif(!-e "$base_dir/$tempdir/done$counter") {$queueing_status="Queued";}
+	    else{$queueing_status="Done";}
+	    if(-e "$base_dir/$tempdir/result$counter"){
+		my $result_lines=`cat $base_dir/$tempdir/result$counter | wc -l`;
+		my $progress_percentage=($result_lines/($number_of_comparisons))*100;
+		my $rounded_progress_percentage=sprintf("%.2f",$progress_percentage);
+		$model_comparison="Progress: $rounded_progress_percentage%";}
+		else {$model_comparison="";}
+	    if(-e "$base_dir/$tempdir/graph$counter.png"){$parsing_output="done";}
+	    elsif(-e "$base_dir/$tempdir/filtered_table$counter"){$parsing_output="processing..";}
+	    else {$parsing_output="";}
+	    if(-e "$base_dir/$tempdir/done$counter"){$result_page_link="<a href=\"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir&result_number=$counter\">Link</a>"; } 
+	    else{$result_page_link=""}
+	    $processing_table_content=$processing_table_content."<tr><td>$query_id</td><td>$queueing_status</td><td>$model_comparison</td><td>$parsing_output</td><td>$result_page_link</td></tr>";	    
 	}
     }else{
 	$processing_table_content=$processing_table_content."<tr><td>Loading..</td></tr>";
@@ -399,7 +457,7 @@ if($page==1){
     my $vars = {
 	#define global variables for javascript defining the current host (e.g. linse) for redirection
 	serveraddress => "$server",
-	title => "CMcompare - Webserver - Input form",
+	title => "CMcompare - Webserver - Processing",
 	banner => "./pictures/banner.png",
 	scriptfile => "$processing_script_file",
 	stylefile => "inputstylefile",
@@ -433,7 +491,9 @@ if($page==2){
     if($mode eq "1"){
 	$total=1974;
     }else{
-	#todo:set for mode 2
+	 open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
+	 $total=<QUERYNUMBERFILE>;
+	 close QUERYNUMBERFILE;
     }
     my $error_message="";
     my $vars;
@@ -443,7 +503,7 @@ if($page==2){
     #get input id and name
  
     if(-e "$base_dir/$tempdir/inputidname$result_number"){
-	open (INPUTIDNAME, "<$base_dir/$tempdir/inputidname$result_number")or die "Could not create $tempdir/query_number: $!\n";
+	open (INPUTIDNAME, "<$base_dir/$tempdir/inputidname$result_number")or die "Could not open $base_dir/$tempdir/inputidname$result_number: $!\n";
 	my $input_id_name_string=<INPUTIDNAME>;
 	close INPUTIDNAME;
 	my @input_id_name_array=split(/;/,$input_id_name_string);
@@ -452,7 +512,12 @@ if($page==2){
     }else{
 	print  STDERR "cmcws: Error inputidname$result_number does not exist in tempdir $base_dir/$tempdir";
     }
-    `executables/output_to_html.pl $base_dir/$tempdir $result_number $mode $filtered_number $cutoff $rfam_name` or die print STDERR "cmcws: could not execute\n";
+    `executables/output_to_html.pl $base_dir/$tempdir $result_number $mode $filtered_number $cutoff $model_1_name $model_2_name`==0 or die print STDERR "cmcws: could not execute\n";
+    #if(defined($model_1_name)){
+#	`executables/output_to_html.pl $base_dir/$tempdir $result_number $mode $filtered_number $cutoff $model_1_name`==0 or die print STDERR "cmcws: could not execute\n";
+ #   }else{
+#	`executables/output_to_html.pl $base_dir/$tempdir $result_number $mode $filtered_number $cutoff`==0 or die print STDERR "cmcws: could not execute\n";
+ #   }
     #Check mode
     if($mode eq "1"){
 	if(-e "$base_dir/$tempdir/done$result_number"){	
@@ -462,14 +527,14 @@ if($page==2){
 	    $vars = {
 		#define global variables for javascript defining the current host (e.g. linse) for redirection
 		serveraddress => "$server",
-		title => "CMcompare - Webserver - Input form",
+		title => "CMcompare - Webserver - Output - Comparison vs Rfam",
 		banner => "./pictures/banner.png",
 		scriptfile => "$output_script_file",
 		stylefile => "outputstylefile",
 		mode => "$mode",
-		inputid => "$inputid",
-		inputname => "$inputname",
-		filtered => "$filtered_number",
+		filter_fields=>"output_filter_fields1",
+		table_header=> "output_table_header1",
+		output_title=>"Top $filtered_number results of $total total for $inputid - $inputname (cutoff = $cutoff):",	
 		filtered_table => "./html/$tempdir/filtered_table$result_number",
 		cm_map=> "./html/$tempdir/graph$result_number.png",
 		cm_output_file => "./html/$tempdir/result$result_number",
@@ -477,10 +542,9 @@ if($page==2){
 		csv_filtered_file => "./html/$tempdir/csv_filtered$result_number",
 		dot_file => "./html/$tempdir/graph_out$result_number.dot",
 		png_file => "./html/$tempdir/graph$result_number.png",
+		result_matrix =>"output_result_matrix1",
 		result_number =>"$result_number",
 		tempdir => "$tempdir",
-		total => "$total",
-		cutoff => "$cutoff",
 		error_message => "$error_message"
 	    };
 	    print STDERR "cmcws: Page:2 Mode:1 reached/n";
@@ -493,18 +557,34 @@ if($page==2){
     }elsif($mode eq "2"){
 	#the models are compared againsted each other and optionally additionally against rfam
 	#display the overview page
-	if(-e "$base_dir/$tempdir/done"){	
+	if(-e "$base_dir/$tempdir/done$result_number"){	
 	    #each submitted model is compared against rfam
 	    $file = './template/output.html';
 	    $output_script_file="outputscriptfile";
+	    open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
+	    my $query_number=<QUERYNUMBERFILE>;
+	    close QUERYNUMBERFILE;
 	    $vars = {
 		#define global variables for javascript defining the current host (e.g. linse) for redirection
 		serveraddress => "$server",
-		title => "CMcompare - Webserver - Input form",
+		title => "CMcompare - Webserver - Output - Comparison of a model set",
 		banner => "./pictures/banner.png",
 		scriptfile => "$output_script_file",
-		stylefile => "inputstylefile",
+		stylefile => "outputstylefile",
 		mode => "$mode",
+		output_title=> "Top $filtered_number results of total $total (cutoff = $cutoff):",
+		filter_fields=>"output_filter_fields2",
+		table_header=> "output_table_header2",
+		filtered_table => "./html/$tempdir/filtered_table$result_number",
+		cm_map=> "./html/$tempdir/graph$result_number.png",
+		cm_output_file => "./html/$tempdir/result$result_number",
+		csv_file => "./html/$tempdir/csv$result_number",
+		csv_filtered_file => "./html/$tempdir/csv_filtered$result_number",
+		dot_file => "./html/$tempdir/graph_out$result_number.dot",
+		png_file => "./html/$tempdir/graph$result_number.png",
+		result_matrix =>"./html/$tempdir/result_matrix",
+		result_number =>"$result_number",
+		tempdir => "$tempdir",
 		error_message => "$error_message"
 	    };
 	    print STDERR "cmcws: Page:2 Mode:2 reached/n";
@@ -524,7 +604,7 @@ if($page==2){
 
 if($page==3){
     #postprocessing
-
+    
 }
 
 

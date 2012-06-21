@@ -17,10 +17,10 @@ my $source_dir;
 
 if(defined($input_source_dir)){
     if(-e "$input_source_dir"){
-	$source_dir = $input_source_dir;    
+	$source_dir = $input_source_dir;
     }
 }else{
-
+    print STDERR "cmcws: error - calculate.ps has been called without specifing source_dir parameter";
 }
 
 if(defined($tempdir_input)){
@@ -28,14 +28,14 @@ if(defined($tempdir_input)){
 	$tempdir = $tempdir_input;    
     }
 }else{
-
+    print STDERR "cmcws: error - calculate.ps has been called without specifing tempdir parameter";
 }
 
 #mode
 if(defined($mode_input)){
-    if($mode eq "1"){
+    if($mode_input eq "1"){
 	$mode = 1;
-    }elsif($mode eq "2"){
+    }elsif($mode_input eq "2"){
 	$mode = 2;
     }
 }else{
@@ -53,26 +53,72 @@ if(defined($tempdir)){
     chdir($tempdir);
     opendir(DIR, $model_dir) or die "can't opendir $model_dir: $!";
     my $counter=1;
-    while (defined($file = readdir(DIR))) {
-	unless($file=~/^\./){
-	    #compute
-	    opendir(RFAMDIR, $rfam_model_dir) or die "can't opendir rfam dir - $rfam_model_dir: $!";
-	    open(BEGIN,">$tempdir/begin$counter") or die "Can't create begin$counter: $!";
-	    close(BEGIN);	    
-	    while (defined($rfam_file = readdir(RFAMDIR))) {
-		unless($rfam_file=~/^\./){  
-		    #print STDERR "cmcws: exec file $file, rfam-file $rfam_file\n";
-		    #print "$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file >>$tempdir/result$counter\n";
-		    system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
+    if($mode eq "1"){
+	while (defined($file = readdir(DIR))) {
+	    unless($file=~/^\./){
+		#compute
+		opendir(RFAMDIR, $rfam_model_dir) or die "can't opendir rfam dir - $rfam_model_dir: $!";
+		open(BEGIN,">$tempdir/begin$counter") or die "Can't create begin$counter: $!";
+		close(BEGIN);	    
+		while (defined($rfam_file = readdir(RFAMDIR))) {
+		    unless($rfam_file=~/^\./){  
+			#print STDERR "cmcws: exec file $file, rfam-file $rfam_file\n";
+			#print "$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file >>$tempdir/result$counter\n";
+			system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
+		    }
 		}
+		#compute output 
+		system("$executable_dir/output_to_html.pl $tempdir $mode $counter 20")==0 or die "cmcws: Execution failed: File $file - $!";
+		open(DONE,">$tempdir/done$counter") or die "Can't create $tempdir/done$file: $!";
+		close(DONE);
+		$counter++;
 	    }
-	    open(DONE,">$tempdir/done$counter") or die "Can't create $tempdir/done$file: $!";
-	    close(DONE);
-	    #compute output 
-	    system("$executable_dir/output_to_html.pl $tempdir $mode $counter 20")==0 or die "cmcws: Execution failed: File $file - $!";
-	    $counter++;
 	}
-    }
-    closedir(DIR);	
-    closedir(RFAMDIR);
+	closedir(DIR);	
+	closedir(RFAMDIR);
+    }elsif($mode eq "2"){
+	#CMcompare everything with everything
+	#fill model array and compare the first model with all other model but itself
+	#compare all following models with all other models but itself and all models that have already been compared
+	#always remove model from array once it has been compared with the others
+	my @model_array;
+	while (defined($file = readdir(DIR))) {
+	    unless($file=~/^\./){
+		push(@model_array,$file);
+	    }
+	}
+	open(BEGIN,">$tempdir/begin$counter") or die "Can't create begin$counter: $!";
+	close(BEGIN);
+	#read in query_number
+	open (QUERYNUMBERFILE, "<$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
+	my $query_number=<QUERYNUMBERFILE>;
+	close QUERYNUMBERFILE;
+	my $query_counter=1;
+	for(1..$query_number){
+	    my $model="input"."$query_counter".".cm";
+	    print "1Foreach: Model $model\n";
+	    my $column_counter=$query_counter+1;
+	    for($column_counter..$query_number){
+		my $compare_model="input"."$column_counter".".cm";
+		print "Foreach: 2Compare-Model $model\n";
+		#we do not increment $counter, because we only produce one result file for all comparisons
+		unless("$model" eq "$compare_model"){
+		    system("$executable_dir/CMCompare $model_dir/$model $model_dir/$compare_model \>\>$tempdir/result$counter")==0 or die print "cmcws: Execution failed: model $model with compare_model $compare_model - $!\n";
+		    print "done: $model, $compare_model\n";
+		    $column_counter++;
+		}
+		
+	    }
+	    $query_counter++;
+	    #shift(@model_array);
+	}      
+	my $number_of_displayed_comparisons=100;
+	my $cutoff="none";
+	system("$executable_dir/output_to_html.pl $tempdir $counter $mode $number_of_displayed_comparisons $cutoff")==0 or die "cmcws: Execution failed: tempdir $tempdir mode $mode error  - $!";
+	open(DONE,">$tempdir/done$counter") or die "Can't create $tempdir/done$file: $!";
+	close(DONE);
+	closedir(DIR);
+    }else{
+	print STDERR "cmcws: error - cmcws was called without specifing mode parameter";
+    }	
 }
