@@ -42,8 +42,6 @@ my @entries;
 my @sorted_entries;
 my @reverse_sorted_entries;
 my %result_matrix;
-my $highest_link_score;
-my $lowest_link_score;
 unless(-e "$tempdir_input/csv$result_file_number"){
     #define array of arrays
     print STDERR "cmcws: output_to_html.pl - Processing csv for all entries\n";
@@ -63,14 +61,6 @@ unless(-e "$tempdir_input/csv$result_file_number"){
 	#retrieve id numbers
 	#determine link score
 	my $link_score=min($split[2],$split[3]);
-	unless(defined($highest_link_score)){$highest_link_score=$link_score;}
-	unless(defined($lowest_link_score)){$lowest_link_score=$link_score;}
-	if($link_score>$highest_link_score){
-	    $highest_link_score=$link_score;
-	}
-	if($link_score<$lowest_link_score){
-	    $lowest_link_score=$link_score;
-	}
 	my $link_sequence=$split[4];
 	if($mode eq "2"){
 	    #retrieve id numbers
@@ -93,17 +83,11 @@ unless(-e "$tempdir_input/csv$result_file_number"){
 	}
 	my @entry=($link_score,$id1,$id2,$name1,$name2,$split[2],$split[3],$split[5],$split[6],$split[7],$split[8],$split[4]);
 	my $entry_reference=\@entry;
-	#remove elements that are below the cutoff
-	#if($link_score>=$cutoff){
 	push(@entries,$entry_reference);
-	#}else{
-	#print "Cutoff:@entry\n";
-	#}
     }
     close(INPUTFILE);
     #sort hash of array by maximin-score
     @sorted_entries = sort { $b->[0] <=> $a->[0] } @entries;
-    #@sorted_entries=reverse(@reverse_sorted_entries);
     #write csv-file only if not present
     open(CSVOUTPUT,">$tempdir_input/csv$result_file_number") or die "Can't write $tempdir_input/csv$result_file_number: $!";
     print CSVOUTPUT "link_score;id1;id2;name1;name2;score1;score2;secondary_structure_1;secondary_structure_2;matching_nodes_1;matching_nodes_2;link_sequence\n";
@@ -126,7 +110,6 @@ unless(-e "$tempdir_input/csv$result_file_number"){
 	my $j=$number_of_entries;
 	print STDERR "Lines i: $i , Columns j: $j\n";
 	#prepare relative link score computation in percent
-	my $link_score_difference= $highest_link_score - $lowest_link_score;
 	my $result_matrix_string="<tr>
 	<td style=\"text-align:left;\">Matrix of result linkscores for all models: <a href=\"#\" onmouseover=\"XBT(this, {id:'1'})\"><img style=\"vertical-align:middle;border:solid 0px #000;\" src=\"pictures/info.png\" alt=\"Info\"></a></td>
 	<td colspan=\"2\"> </td>
@@ -157,31 +140,21 @@ unless(-e "$tempdir_input/csv$result_file_number"){
 		if($i_counter eq $j_counter){
 		    #this equals comparsion of the model against iteself, we set value to x and background to white
 		    $result_matrix_string.="<td style=\"border:solid 1px #000;\"> x </td>";
-		    print STDERR "itself: $i_counter $j_counter\n";
+		    #print STDERR "itself: $i_counter $j_counter\n";
 		}elsif(defined($result_matrix{"$i_counter"."_"."$j_counter"})){
 		    my $current_link_score=$result_matrix{"$i_counter"."_"."$j_counter"};
 		    #compute background_color
 		    my $background_color_string;
-		    unless($link_score_difference==0){
-			my $percent=(($current_link_score-$lowest_link_score)/$link_score_difference)*100;
-			$background_color_string=&percent_to_rgb_color($percent);
-		    }else{
-			$background_color_string="";
-		    }
+		    $background_color_string=&linkscore_to_rgb_color($current_link_score);
 		    $result_matrix_string.="<td style=\"border:solid 1px #000;$background_color_string;\"> $current_link_score </td>";
-		    print STDERR "ij - $current_link_score : $i_counter"."_"."$j_counter\n";
+		    #print STDERR "ij - $current_link_score : $i_counter"."_"."$j_counter\n";
 		}else{
 		    #compute background color
 		    my $current_link_score=$result_matrix{"$j_counter"."_"."$i_counter"};
 		    my $background_color_string;
-		    unless($link_score_difference==0){
-			my $percent=(($current_link_score-$lowest_link_score)/$link_score_difference)*100;
-			$background_color_string=&percent_to_rgb_color($percent);
-		    }else{
-			$background_color_string="";
-		    }
+		    $background_color_string=&linkscore_to_rgb_color($current_link_score);
 		    $result_matrix_string.="<td style=\"border:solid 1px #000;$background_color_string;\"> $current_link_score </td>";
-		    print STDERR "ji - $current_link_score : $j_counter"."_"."$i_counter\n";
+		    #print STDERR "ji - $current_link_score : $j_counter"."_"."$i_counter\n";
 		}
 		$j_counter++;
 	    }
@@ -366,44 +339,37 @@ sub model_name{
     return $name;
 }
 
-sub percent_to_rgb_color{
-    #rgb represents the color spectrum with 3 values that can be set in percent in CSS
-    #if we go through the spectrum from blue which corresponds with the blue channel set to 100%
-    # to red, which corresponds with the red channel set to 100% we proceed as follows:
-    #first set the blue channel to 100 percent. Then increase the green channel to 100% (cyan).
-    #then lower the blue channel to 0%, this yields green. Increasing the red channel to 100% gives
-    #orange and finally decreasing the green channel to 0% gives red. 
-    my $percent_value=shift;
-    my $blue;
-    my $red;
-    my $green;
+sub linkscore_to_rgb_color{
+    #linkscore over 20 red
+    #linkscore between 10 and 20 orange
+    #linkscore between 5 and 10 yellow
+    #linkscore between 0 and 5 white
+    #linkscore below 0 blue
+    my $linkscore=shift;
     my $blue_output;
     my $red_output;
     my $green_output;
-    if($percent_value<=25){
-	#blue is 100%, red is 0% and green is being increased
-	$green=($percent_value/25)*100;
-	$green_output=printf '%3d',$green;
-	$red_output=0;
-	$blue_output=100;
-    }elsif($percent_value>25 && $percent_value<=50){
-	#blue is 100%, green is 100% red is 0% and blue is being decreased
-	$blue=100-(($percent_value/50)*100);
-	$blue_output=printf '%3d',$blue;
-	$red_output=0;
-	$green_output=100;
-    }elsif($percent_value>50 && $percent_value<=75){
-	#blue is 0%, green is 100% red is 0% and red is being increased
-	$red=($percent_value/75)*100;
-	$red_output=printf '%3d',$red;
-	$green_output=100;
-	$blue_output=0;
-    }else{
-	#blue is 0%, green is 100% red is 100% and green is being decreased
-	$green=100-($percent_value/100)*100;
-	$green_output=printf '%3d',$green;
+    if($linkscore>=20){
+	$green_output=0;
 	$red_output=100;
 	$blue_output=0;
+    }elsif($linkscore>=10 && $linkscore<20){
+	$blue_output=0;
+	$red_output=100;
+	$green_output=65;
+    }elsif($linkscore>=5 && $linkscore<10){
+	$red_output=100;
+	$green_output=100;
+	$blue_output=0;
+    }elsif($linkscore>=0 && $linkscore<5){
+	$green_output=100;
+	$red_output=100;
+	$blue_output=100;
+    }else{
+	#linkscore under 0
+	$green_output=0;
+	$red_output=0;
+	$blue_output=100;
     }
     my $return_string="background-color:rgb($red_output\%,$green_output\%,$blue_output\%)";
     return $return_string;
