@@ -1,0 +1,9 @@
+	  <th style="width:1%;"></th> 
+	  <th style="width:2%;">Rank</th>
+          <th style="width:4%;">Link score</th>
+	  <th style="width:4%;">Id Model 1</th>	 
+ 	  <th style="width:4%;">Name Model 1</th>
+          <th style="width:4%;">Id Model 2</th> 
+ 	  <th style="width:4%;">Name Model 2</th>
+	  <th style="width:4%;">Input score</th>
+	  <th style="width:4%;">Rfam score</th

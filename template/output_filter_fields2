@@ -1,0 +1,3 @@
+<td colspan="3" style="border:solid 1px #000;text-align:left;">Show up to <input name="filtered_number" id="filtered_number_field" size="4">
+	  hits with cutoff <input name="cutoff" id="cutoff_field"  size="4" onchange="select(this)"> and model 1 name containing <input name="model_1_name" id="model_1_name_field"  size="10" onchange="select(this)"> and model 2 name containing <input name="model_2_name" id="model_2_name_field"  size="10" onchange="select(this)"> - <input type="submit" value="Filter"></td>
+	<td colspan="1" style="border:solid 1px #FFF;"></td>
