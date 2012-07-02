@@ -1,0 +1,12 @@
+    <div id='submission-error' style="color:#FF0000"></div>
+    <table style="width:60%;" class="tablesorter" id="myTable">             
+      <thead>
+        <tr>
+	  [% INSERT $table_header %]
+        </tr> 
+      </thead>
+      <tbody>
+	[% INSERT $filtered_table %]
+      </tbody>
+    </table>
+    <input type="button" value="Detailed-Comparison">

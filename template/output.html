@@ -46,7 +46,7 @@
     <input id="tempdir"  value="[% tempdir %]" name="tempdir" type="hidden">
     <input id="result_number"  value="[% result_number %]" name="result_number" type="hidden">
     <table class="resources">
-       [% INSERT $result_matrix %]
+      [% INSERT $result_matrix %]
       <tr>
 	<td style="text-align:left;">Covariance model graph: <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a></td>
 	<td colspan="2"> </td>
@@ -80,21 +80,7 @@
       </tr>
     </table>
   </form>
-  <form action="cmcws.cgi" id="postprocess-submit"  method="get">
-    <input type="button" value="Detailed-Comparison"> Select covariance models from the list for detailed comparison <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:text-bottom;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a>
-    <div id='submission-error' style="color:#FF0000"></div>
-    <table style="width:60%;" class="tablesorter" id="myTable">             
-      <thead>
-        <tr>
-	  [% INSERT $table_header %]
-        </tr> 
-      </thead>
-      <tbody>
-	[% INSERT $filtered_table %]
-      </tbody>
-    </table>
-    <input type="button" value="Detailed-Comparison">
-  </form>
+  [% PROCESS $result_list_form_and_table %]
   <br>
 </div>
 

@@ -7,10 +7,14 @@ use diagnostics;
 print STDERR "cmcws: launched calculate.pl\n";
 
 #Input is path to file that should be split
-my $tempdir_input=$ARGV[0];
-my $input_source_dir=$ARGV[1];
-my $mode_input=$ARGV[2];
-my $tempdir;
+my $server=$ARGV[0];
+my $tempdir_folder=$ARGV[1];
+my $input_source_dir=$ARGV[2];
+my $mode_input=$ARGV[3];
+my $base_dir="$input_source_dir"."/html/";
+#complete path to tempdir
+my $tempdir_path_input="$base_dir"."$tempdir_folder";
+my $tempdir_path;
 my $mode;
 my $source_dir;
 #tempdir
@@ -23,9 +27,9 @@ if(defined($input_source_dir)){
     print STDERR "cmcws: error - calculate.ps has been called without specifing source_dir parameter";
 }
 
-if(defined($tempdir_input)){
-    if(-e "$tempdir_input"){
-	$tempdir = $tempdir_input;    
+if(defined($tempdir_path_input)){
+    if(-e "$tempdir_path_input"){
+	$tempdir_path = $tempdir_path_input;    
     }
 }else{
     print STDERR "cmcws: error - calculate.ps has been called without specifing tempdir parameter";
@@ -43,14 +47,14 @@ if(defined($mode_input)){
 }
 
 #todo create progress indicators
-if(defined($tempdir)){
-    my $alignment_dir="$tempdir/stockholm_alignment";
-    my $model_dir="$tempdir/covariance_model";
+if(defined($tempdir_path)){
+    my $alignment_dir="$tempdir_path/stockholm_alignment";
+    my $model_dir="$tempdir_path/covariance_model";
     my $executable_dir="$source_dir"."/executables";
     my $rfam_model_dir="$source_dir"."/data/Rfam10.1";
     my $file;
     my $rfam_file;
-    chdir($tempdir);
+    chdir($tempdir_path);
     opendir(DIR, $model_dir) or die "can't opendir $model_dir: $!";
     my $counter=1;
     if($mode eq "1"){
@@ -58,18 +62,18 @@ if(defined($tempdir)){
 	    unless($file=~/^\./){
 		#compute
 		opendir(RFAMDIR, $rfam_model_dir) or die "can't opendir rfam dir - $rfam_model_dir: $!";
-		open(BEGIN,">$tempdir/begin$counter") or die "Can't create begin$counter: $!";
+		open(BEGIN,">$tempdir_path/begin$counter") or die "Can't create begin$counter: $!";
 		close(BEGIN);	    
 		while (defined($rfam_file = readdir(RFAMDIR))) {
 		    unless($rfam_file=~/^\./){  
 			#print STDERR "cmcws: exec file $file, rfam-file $rfam_file\n";
-			#print "$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file >>$tempdir/result$counter\n";
-			system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
+			#print "$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file >>$tempdir_path/result$counter\n";
+			system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
 		    }
 		}
 		#compute output 
-		system("$executable_dir/output_to_html.pl $tempdir $mode $counter 20")==0 or die "cmcws: Execution failed: File $file - $!";
-		open(DONE,">$tempdir/done$counter") or die "Can't create $tempdir/done$file: $!";
+		system("$executable_dir/output_to_html.pl $server $base_dir $tempdir_folder $mode $counter 20")==0 or die "cmcws: Execution failed: File $file - $!";
+		open(DONE,">$tempdir_path/done$counter") or die "Can't create $tempdir_path/done$file: $!";
 		close(DONE);
 		$counter++;
 	    }
@@ -87,10 +91,10 @@ if(defined($tempdir)){
 		push(@model_array,$file);
 	    }
 	}
-	open(BEGIN,">$tempdir/begin$counter") or die "Can't create begin$counter: $!";
+	open(BEGIN,">$tempdir_path/begin$counter") or die "Can't create begin$counter: $!";
 	close(BEGIN);
 	#read in query_number
-	open (QUERYNUMBERFILE, "<$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
+	open (QUERYNUMBERFILE, "<$tempdir_path/query_number")or die "Could not open $tempdir_path/query_number: $!\n";
 	my $query_number=<QUERYNUMBERFILE>;
 	close QUERYNUMBERFILE;
 	my $query_counter=1;
@@ -103,7 +107,7 @@ if(defined($tempdir)){
 		print "Foreach: 2Compare-Model $model\n";
 		#we do not increment $counter, because we only produce one result file for all comparisons
 		unless("$model" eq "$compare_model"){
-		    system("$executable_dir/CMCompare $model_dir/$model $model_dir/$compare_model \>\>$tempdir/result$counter")==0 or die print "cmcws: Execution failed: model $model with compare_model $compare_model - $!\n";
+		    system("$executable_dir/CMCompare $model_dir/$model $model_dir/$compare_model \>\>$tempdir_path/result$counter")==0 or die print "cmcws: Execution failed: model $model with compare_model $compare_model - $!\n";
 		    print "done: $model, $compare_model\n";
 		    $column_counter++;
 		}
@@ -114,8 +118,8 @@ if(defined($tempdir)){
 	}      
 	my $number_of_displayed_comparisons=100;
 	my $cutoff="none";
-	system("$executable_dir/output_to_html.pl $tempdir $counter $mode $number_of_displayed_comparisons $cutoff")==0 or die "cmcws: Execution failed: tempdir $tempdir mode $mode error  - $!";
-	open(DONE,">$tempdir/done$counter") or die "Can't create $tempdir/done$file: $!";
+	system("$executable_dir/output_to_html.pl $server $base_dir $tempdir_folder $counter $mode $number_of_displayed_comparisons $cutoff")==0 or die "cmcws: Execution failed: tempdir $tempdir_folder mode $mode error  - $!";
+	open(DONE,">$tempdir_path/done$counter") or die "Can't create $tempdir_path/done$file: $!";
 	close(DONE);
 	closedir(DIR);
     }else{

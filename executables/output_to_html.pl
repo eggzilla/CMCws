@@ -8,23 +8,26 @@ use List::Util qw[min max];
 #use Data::Dumper;
 #invocation from tempdir: ../../executables/output_to_html.pl /srv/http/cmcws/html/J_KsXXLTAK 1 1 10 20
 #get input and assemble it into datastructure, return list of x best interactions
-my $tempdir_input=$ARGV[0];
-my $result_file_number_input=$ARGV[1];
-my $mode=$ARGV[2];
-my $number_of_hits=$ARGV[3];
-my $cutoff=$ARGV[4];
-my $model_name_1_string=$ARGV[5];
-my $model_name_2_string=$ARGV[6];
+my $server=$ARGV[0];
+my $base_dir=$ARGV[1];
+my $tempdir_folder=$ARGV[2];
+my $tempdir_path="$base_dir"."/$tempdir_folder";
+my $result_file_number_input=$ARGV[3];
+my $mode=$ARGV[4];
+my $number_of_hits=$ARGV[5];
+my $cutoff=$ARGV[6];
+my $model_name_1_string=$ARGV[7];
+my $model_name_2_string=$ARGV[8];
 my $file_input;
 my $result_file_number;
-#print STDERR "cmcws: output - parameters: tempdir: $tempdir_input, mode: $mode, number_of_hits: $number_of_hits, cutoff: $cutoff , model_name_1: $model_name_1_string , model_name_2: $model_name_2_string";
+#print STDERR "cmcws: output - parameters: tempdir: $tempdir_path, mode: $mode, number_of_hits: $number_of_hits, cutoff: $cutoff , model_name_1: $model_name_1_string , model_name_2: $model_name_2_string";
 if(defined($result_file_number_input)){
-    if(-e "$tempdir_input/result$result_file_number_input"){
+    if(-e "$tempdir_path/result$result_file_number_input"){
 	$result_file_number=$result_file_number_input;
-	$file_input = "$tempdir_input/result$result_file_number_input";    
+	$file_input = "$tempdir_path/result$result_file_number_input";    
     }
 }else{
-    print STDERR "cmcws: output_to_html.pl executed with nonexistent inputfile: $tempdir_input/result$result_file_number_input\n";
+    print STDERR "cmcws: output_to_html.pl executed with nonexistent inputfile: $tempdir_path/result$result_file_number_input\n";
 }
 
 if(defined($mode)){
@@ -42,7 +45,7 @@ my @entries;
 my @sorted_entries;
 my @reverse_sorted_entries;
 my %result_matrix;
-unless(-e "$tempdir_input/csv$result_file_number"){
+unless(-e "$tempdir_path/csv$result_file_number"){
     #define array of arrays
     print STDERR "cmcws: output_to_html.pl - Processing csv for all entries\n";
     open(INPUTFILE,"<$file_input") or die "Can't read $file_input: $!";
@@ -76,8 +79,8 @@ unless(-e "$tempdir_input/csv$result_file_number"){
 	    $result_matrix{ "$id1_number"."_"."$id2_number" } = "$link_score";
 	}
 	#link_score,id1,id2,name1,name2,score1,score2,secondary_structure_1,secondary_structure_2,matching_nodes_1,matching_nodes_2,link_sequence
-	unless(-e "tempdir_input/inputidname$result_file_number"){
-	    open(INPUTIDNAME,">$tempdir_input/inputidname$result_file_number") or die "Can't write : $!";
+	unless(-e "tempdir_path/inputidname$result_file_number"){
+	    open(INPUTIDNAME,">$tempdir_path/inputidname$result_file_number") or die "Can't write : $!";
 	    print INPUTIDNAME "$id1;$name1";
 	    close INPUTIDNAME;
 	}
@@ -89,7 +92,7 @@ unless(-e "$tempdir_input/csv$result_file_number"){
     #sort hash of array by maximin-score
     @sorted_entries = sort { $b->[0] <=> $a->[0] } @entries;
     #write csv-file only if not present
-    open(CSVOUTPUT,">$tempdir_input/csv$result_file_number") or die "Can't write $tempdir_input/csv$result_file_number: $!";
+    open(CSVOUTPUT,">$tempdir_path/csv$result_file_number") or die "Can't write $tempdir_path/csv$result_file_number: $!";
     print CSVOUTPUT "link_score;id1;id2;name1;name2;score1;score2;secondary_structure_1;secondary_structure_2;matching_nodes_1;matching_nodes_2;link_sequence\n";
     foreach(@sorted_entries){
 	my @sorted_entry=@$_;
@@ -100,7 +103,7 @@ unless(-e "$tempdir_input/csv$result_file_number"){
     
     if($mode eq "2"){
 	#get number of keys in result matrix hash
-	open (QUERYNUMBERFILE, "<$tempdir_input/query_number")or die "Could not open $tempdir_input/query_number: $!\n";
+	open (QUERYNUMBERFILE, "<$tempdir_path/query_number")or die "Could not open $tempdir_path/query_number: $!\n";
 	my $number_of_entries=<QUERYNUMBERFILE>;
 	close QUERYNUMBERFILE;
 	#my $number_of_entries += scalar keys %result_matrix;
@@ -167,14 +170,14 @@ unless(-e "$tempdir_input/csv$result_file_number"){
 	  <p class=\"demo5 expIco\">Show</p>
 	  </td>
 	</tr>";
-	open(RESULTMATRIX,">$tempdir_input/result_matrix") or die "Can't write $tempdir_input/result_matrix: $!";
+	open(RESULTMATRIX,">$tempdir_path/result_matrix") or die "Can't write $tempdir_path/result_matrix: $!";
 	print RESULTMATRIX "$result_matrix_string";
 	close RESULTMATRIX;
 	#print STDERR Dumper(%result_matrix);
     }
 }else{
     #csv is already present, we read it in
-    open(CSVINPUT,"<$tempdir_input/csv$result_file_number") or die "Can't write $tempdir_input/csv$result_file_number: $!";
+    open(CSVINPUT,"<$tempdir_path/csv$result_file_number") or die "Can't write $tempdir_path/csv$result_file_number: $!";
     while(<CSVINPUT>){
 	my @entry=split(/;/,$_);
 	my $entry_reference=\@entry;
@@ -226,8 +229,8 @@ if(defined($model_name_1_string) && $model_name_1_string ne "none" && defined($m
 
 #create output html with x-hits
 my $counter=1;
-open (FILTEREDTABLE, ">$tempdir_input/filtered_table$result_file_number") or die "Cannot open filtered_table$result_file_number: $!";
-open (FILTEREDCSV, ">$tempdir_input/csv_filtered$result_file_number") or die "Cannot open csv_filtered$result_file_number: $!";
+open (FILTEREDTABLE, ">$tempdir_path/filtered_table$result_file_number") or die "Cannot open filtered_table$result_file_number: $!";
+open (FILTEREDCSV, ">$tempdir_path/csv_filtered$result_file_number") or die "Cannot open csv_filtered$result_file_number: $!";
 my $graph_output="graph g {\n";
 foreach(@filtered_sorted_entries){
     my @filtered_sorted_entry=@$_;
@@ -237,9 +240,13 @@ foreach(@filtered_sorted_entries){
     my $id1=$filtered_sorted_entry[1];
     my $id1_truncated=$id1;
     $id1_truncated=~s/.cm//;
+    my $id1_number=$id1_truncated;
+    $id1_number=~s/input//;
     my $id2=$filtered_sorted_entry[2];
     my $id2_truncated=$id2;
     $id2_truncated=~s/.cm//;
+    my $id2_number=$id2_truncated;
+    $id2_number=~s/input//;
     my $name1=$filtered_sorted_entry[3];
     my $name2=$filtered_sorted_entry[4];
     my $score1=$filtered_sorted_entry[5];
@@ -250,14 +257,15 @@ foreach(@filtered_sorted_entries){
     my $rounded_link_score=nearest(1, $link_score);
     #Filter 3 show only hit containing rfamname in rfam name
     my $output_line;    
+    my $href="$server/cmcws.cgi?page=3&mode=$mode&tempdir=$tempdir_folder&result_number=$result_file_number_input&identifier="."$id1_number"."_"."$id2_number";
     if($model_name_filter_type eq "A"){
 	#we push matching entries on new array
 	if($name1=~/$model_name_1_string/g && $name2=~/$model_name_2_string/g){
 	    print STDERR "\n A \n";
 	    if($mode eq "1"){
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }
 	    print FILTEREDTABLE "$output_line";
 	    $counter++;
@@ -269,9 +277,9 @@ foreach(@filtered_sorted_entries){
 	#we push matching entries on new array
 	if($name1=~/$model_name_1_string/g){
 	    if($mode eq "1"){
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }
 	    print FILTEREDTABLE "$output_line";
 	    $counter++;
@@ -283,9 +291,9 @@ foreach(@filtered_sorted_entries){
 	if($name2=~/$model_name_2_string/g){
 	    print STDERR "\n cmcws: accepted name2 $name2: model_name2: $model_name_2_string\n";
 	    if($mode eq "1"){
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }
 	    print FILTEREDTABLE "$output_line";
 	    $counter++;
@@ -296,9 +304,9 @@ foreach(@filtered_sorted_entries){
 	}
     }else{
 	if($mode eq "1"){
-	    $output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+	    $output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	}else{
-	    $output_line = "\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+	    $output_line = "\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	}
 	print FILTEREDTABLE "$output_line";
 	$counter++;
@@ -309,11 +317,11 @@ foreach(@filtered_sorted_entries){
 close FILTEREDTABLE;
 close FILTEREDCSV;
 $graph_output.="}\n";
-open (GRAPHOUT, ">$tempdir_input/graph_out$result_file_number.dot") or die "Cannot open graph_out$result_file_number: $!";
+open (GRAPHOUT, ">$tempdir_path/graph_out$result_file_number.dot") or die "Cannot open graph_out$result_file_number: $!";
 print GRAPHOUT "$graph_output";
 close GRAPHOUT;
-#print STDERR "cmcws: output_to_html.pl - cat $tempdir_input/graph_out$result_file_number.dot | circo -Tpng > $tempdir_input/graph$result_file_number.png\n";
-`cat $tempdir_input/graph_out$result_file_number.dot | circo -Tpng > $tempdir_input/graph$result_file_number.png`;
+#print STDERR "cmcws: output_to_html.pl - cat $tempdir_path/graph_out$result_file_number.dot | circo -Tpng > $tempdir_path/graph$result_file_number.png\n";
+`cat $tempdir_path/graph_out$result_file_number.dot | circo -Tpng > $tempdir_path/graph$result_file_number.png`;
 #print "$graph_output";
 close GRAPHOUT;
 

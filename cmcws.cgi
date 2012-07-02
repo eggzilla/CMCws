@@ -77,6 +77,7 @@ my $input_cutoff=$query->param('cutoff');
 my $input_model_1_name=$query->param('model_1_name')||undef;
 my $input_model_2_name=$query->param('model_2_name')||undef;
 my $input_filehandle=$query->upload('file')||undef;
+my $input_identifier=$query->param('identifier')||undef;
 my $checked_input_present;
 my $provided_input="";
 my @input_error;
@@ -87,6 +88,7 @@ my $filtered_number;
 my $cutoff;
 my $model_1_name;
 my $model_2_name;
+my $identifier;
 
 #print STDERR "cmcws-query: mode: $mode,page: $page,uploaded_file: $uploaded_file ,tempdir_input: $tempdir_input,input_filename: $input_filename";
 ######TAINT-CHECKS##############################################
@@ -171,6 +173,7 @@ if(defined($input_model_2_name)){
 }else{
     $model_2_name="none";
 }
+
 #input-file
 if(defined($input_filename)){
     print STDERR "cmcws: Found upload /n";
@@ -230,7 +233,7 @@ if(defined($input_filename)){
     #Submit without file, set error message and request file
     push(@input_error,"No Input file provided");
 }
-#filtered_number   
+#filtered_number
 if(defined($input_filtered_number)){
     if($input_filtered_number =~ /^\d+/){
 	#only numbers = Taxid - preset on form in taxid field
@@ -239,8 +242,19 @@ if(defined($input_filtered_number)){
 }else{
     $filtered_number=10;
 }
+#identifier
+#todo -fix identifier taintcheck
+#if(defined($input_identifier)){
+#    if($input_identifier =~ /^\d+\_\d+/){
+#	#only numbers = Taxid - preset on form in taxid field
+#	$identifier = $input_identifier;
+#    }#todo:else
+#}else{
+#    $input_identifier=undef;
+#}
+$identifier= $input_identifier;
+
 #cutoff
-print STDERR "cmcws - cutoff input: $input_cutoff \n";
 if(defined($input_cutoff)){
     if($input_cutoff =~ /^[0-9]+$/){
 	$cutoff = $input_cutoff;
@@ -258,6 +272,20 @@ if(defined($input_cutoff)){
 }else{
     $cutoff="none";
 }
+
+#get ids of values to be compared vs each other in mode 2 from mode 1 result list
+my @postprocess_selected;
+my $postprocess_value;
+foreach my $name(@names){
+    if($name =~ m/p/){
+	#check value
+	$postprocess_value = $query->param("$name");
+	if (($postprocess_value =~ m/[0-9]+\-[0-9]+/)&&(length($postprocess_value)<250)){
+	    push(@postprocess_selected, $postprocess_value);
+	}
+    }
+}
+
 	
 ################ INPUT #####################################
 
@@ -374,6 +402,12 @@ if($page==1){
 	    }
 	    
 	}elsif($mode eq "2"){
+	    #if @postprocess_selected is filled we get the results for the comparison between input
+	    #and rfam models from the result list of the old directory and the ones between rfam models
+	    #from the tabulated list
+	    if(@postprocess_selected){
+		#create new tempdir, set old tempdir as old
+	    }else{}
 	    #the models are compared againsted each other
 	    open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
 	    $query_number=<QUERYNUMBERFILE>;
@@ -416,7 +450,7 @@ if($page==1){
 	print COMMANDS "cd $base_dir/$tempdir/;\n";
 	print COMMANDS "$source_dir/executables/split_input.pl $base_dir/$tempdir/input_file $base_dir/$tempdir/;\n";
 	print COMMANDS "$source_dir/executables/convert_stockholmdir_to_cmdir.pl $base_dir/$tempdir $source_dir;\n";
-	print COMMANDS "$source_dir/executables/calculate.pl $base_dir/$tempdir $source_dir $mode;\n";
+	print COMMANDS "$source_dir/executables/calculate.pl $server $tempdir $source_dir $mode;\n";
 	#print COMMANDS ";\n";
 	if($mode eq "1"){
 	    #set stuff specific for mode 1
@@ -512,12 +546,8 @@ if($page==2){
     }else{
 	print  STDERR "cmcws: Error inputidname$result_number does not exist in tempdir $base_dir/$tempdir";
     }
-    `executables/output_to_html.pl $base_dir/$tempdir $result_number $mode $filtered_number $cutoff $model_1_name $model_2_name`==0 or die print STDERR "cmcws: could not execute\n";
-    #if(defined($model_1_name)){
-#	`executables/output_to_html.pl $base_dir/$tempdir $result_number $mode $filtered_number $cutoff $model_1_name`==0 or die print STDERR "cmcws: could not execute\n";
- #   }else{
-#	`executables/output_to_html.pl $base_dir/$tempdir $result_number $mode $filtered_number $cutoff`==0 or die print STDERR "cmcws: could not execute\n";
- #   }
+    `executables/output_to_html.pl $server $base_dir $tempdir $result_number $mode $filtered_number $cutoff $model_1_name $model_2_name`==0 or die print STDERR "cmcws: could not execute\n";
+
     #Check mode
     if($mode eq "1"){
 	if(-e "$base_dir/$tempdir/done$result_number"){	
@@ -542,6 +572,7 @@ if($page==2){
 		csv_filtered_file => "./html/$tempdir/csv_filtered$result_number",
 		dot_file => "./html/$tempdir/graph_out$result_number.dot",
 		png_file => "./html/$tempdir/graph$result_number.png",
+		result_list_form_and_table => "output_result_list_form_table1",
 		result_matrix =>"output_result_matrix1",
 		result_number =>"$result_number",
 		tempdir => "$tempdir",
@@ -582,6 +613,7 @@ if($page==2){
 		csv_filtered_file => "./html/$tempdir/csv_filtered$result_number",
 		dot_file => "./html/$tempdir/graph_out$result_number.dot",
 		png_file => "./html/$tempdir/graph$result_number.png",
+		result_list_form_and_table => "output_result_list_form_table2",
 		result_matrix =>"./html/$tempdir/result_matrix",
 		result_number =>"$result_number",
 		tempdir => "$tempdir",
@@ -600,13 +632,41 @@ if($page==2){
     $template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
 }
 
-################ POST-PROCESSING ############################
+################ Detailed Comparison ############################
 
 if($page==3){
-    #postprocessing
-    
+    my $template = Template->new({
+	# where to find template files
+	INCLUDE_PATH => ['./template'],
+	RELATIVE=>1
+				 });
+    my $file = './template/detailed_comparison.html';
+    my $processing_script_file="processingscriptfile";
+    my $error_message="";
+    my $return_link;
+    if($mode eq "1"){
+	$return_link="$server/cmcws.cgi?"."page=2"."&tempdir=$tempdir"."&mode=$mode"."&result_number=$result_number";
+    }elsif($mode eq "2"){
+	$return_link="$server/cmcws.cgi?"."page=2"."&tempdir=$tempdir"."&mode=$mode"."&result_number=$result_number";
+    }
+    #todo: attributes missing in function call
+    my $processing_table_content=&get_comparison_results("$tempdir","csv"."$result_number",$identifier);
+    #gather content by reading appropiate result file --> need tempdir and result file, as well as models specified
+    my $vars = {
+	#define global variables for javascript defining the current host (e.g. linse) for redirection
+	serveraddress => "$server",
+	title => "CMcompare - Webserver - Detailed Comparison",
+	banner => "./pictures/banner.png",
+	scriptfile => "$processing_script_file",
+	stylefile => "inputstylefile",
+	mode => "$mode",
+	return_link => "$return_link",
+	processing_table_content => "$processing_table_content",
+	error_message => "$error_message"    
+    };
+    print "Content-type: text/html; charset=utf-8\n\n";
+    $template->process($file, $vars) || die "Template process failed: ", $template->error(), "\n";
 }
-
 
 #############################################################
 
@@ -684,4 +744,65 @@ sub check_input{
     }   
     close INPUTFILE;
     return \@input_elements;
+}
+
+sub get_comparison_results{
+    #be careful about results retrieved from the rfam result folder
+    my $tempdir=shift;
+    my $result_csv_file=shift;
+    my $identifier=shift;
+    my $attribute_table;
+    my @sorted_entries;
+    #csv is already present, we read it in
+    open(CSVINPUT,"<$base_dir/$tempdir/$result_csv_file") or die "Can't write $base_dir/$tempdir/$result_csv_file: $!";
+    while(<CSVINPUT>){
+	my @entry=split(/;/,$_);
+	my $entry_reference=\@entry;
+	push(@sorted_entries,$entry_reference);
+    }
+    #get rid of the header line
+    shift(@sorted_entries);
+    close CSVINPUT;
+    
+    #get requested entry
+    #$attribute_table.="@sorted_entries";
+    foreach(@sorted_entries){
+	my @sorted_entry=@$_;
+	my $link_score=$sorted_entry[0];
+	my $id1=$sorted_entry[1];
+	my $id1_truncated=$id1;
+	$id1_truncated=~s/.cm//;
+	my $id1_number=$id1_truncated;
+	$id1_number=~s/input//;
+	my $id2=$sorted_entry[2];
+	my $id2_truncated=$id2;
+	$id2_truncated=~s/.cm//;
+	my $id2_number=$id2_truncated;
+	$id2_number=~s/input//;
+	my $current_identifier="$id1_number"."_"."$id2_number";
+	if($identifier eq $current_identifier){
+	    #construct attribute table
+	    my $name1=$sorted_entry[3];
+	    my $name2=$sorted_entry[4];
+	    my $score1=$sorted_entry[5];
+	    my $score2=$sorted_entry[6];
+	    my $secondary_structure1=$sorted_entry[7];
+	    my $secondary_structure2=$sorted_entry[8];
+	    my $matching_nodes1=$sorted_entry[9];
+	    my $matching_nodes2=$sorted_entry[10];
+	    my $link_sequence=$sorted_entry[11];
+	    #my $rounded_link_score=nearest(1, $link_score);
+	    $attribute_table="<tr><td style=\"border:1px solid #000;width:2%;\">Id</td><td style=\"border:1px solid #000;\">$id1</td><td style=\"border:1px solid #000;\">$id2</td></tr>
+		<tr><td style=\"border:1px solid #000;width:15%;\">Name</td><td style=\"border:1px solid #000;\">$name1</td><td style=\"border:1px solid #000;\">$name2</td></tr>
+                <tr><td style=\"border:1px solid #000;width:15%;\">Score</td><td style=\"border:1px solid #000;\">$score1</td><td style=\"border:1px solid #000;\">$score2</td></tr>
+                <tr><td style=\"border:1px solid #000;width:15%;\">Secondary Structure</td><td style=\"border:1px solid #000;\">$secondary_structure1</td><td style=\"border:1px solid #000;\">$secondary_structure2</td></tr>
+                <tr><td style=\"border:1px solid #000;width:15%;\">Matching Nodes</td><td style=\"border:1px solid #000;\">$matching_nodes1</td><td style=\"border:1px solid #000;\">$matching_nodes2</td></tr>
+                <tr><td style=\"border:1px solid #000;width:15%;\">Link score</td><td colspan=\"2\" style=\"border:1px solid #000;\" > $link_score </td></tr>
+                <tr><td style=\"border:1px solid #000;width:15%;\">Link sequence</td><td colspan=\"2\" style=\"border:1px solid #000;\">$link_sequence</td></tr>";
+	}
+    }
+    unless(defined($attribute_table)){
+	$attribute_table="<tr><td></td><td colspan=\"2\">no entry found</td></tr>";
+    }
+    return $attribute_table;
 }
