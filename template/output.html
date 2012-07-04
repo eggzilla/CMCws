@@ -1,12 +1,14 @@
 [% PROCESS header %]
 <div id="1" class="tooltip2" style="width: 400px;">
   <div class="content">
-    <div class="head">Select comparison mode:</div>
+    <div class="head">Matrix of link scores:</div>
+    Color-code emphasizes high scoring pairs:
     <ul>
-      <li>Compare one covariance model against all<br> 
-	covariance models in Rfam</li>
-      <li>Compare multiple covariance models with<br>
-	each other</li> 
+      <li>link score &gt;20: red </li>
+      <li>link score &lt;20 &gt;10: orange</li>
+      <li>link score &lt;10 &gt;5: yellow <li>
+      <li>link score &lt;5 &gt;0: white<li>
+      <li>link score &lt;0: blue<li>
     </ul>
     --&gt; For more information see Help 
   </div>

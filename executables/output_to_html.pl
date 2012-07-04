@@ -75,8 +75,9 @@ unless(-e "$tempdir_path/csv$result_file_number"){
 	    $id2_truncated=~s/.cm//;
 	    my $id2_number= $id2_truncated;
 	    $id2_number=~s/input//;
+	    my $identifier="$id1_truncated"."_"."$id2_truncated";
 	    #add entry to result matrix hash
-	    $result_matrix{ "$id1_number"."_"."$id2_number" } = "$link_score";
+	    $result_matrix{ "$id1_number"."_"."$id2_number" } = "$link_score".";"."$identifier";
 	}
 	#link_score,id1,id2,name1,name2,score1,score2,secondary_structure_1,secondary_structure_2,matching_nodes_1,matching_nodes_2,link_sequence
 	unless(-e "tempdir_path/inputidname$result_file_number"){
@@ -145,18 +146,26 @@ unless(-e "$tempdir_path/csv$result_file_number"){
 		    $result_matrix_string.="<td style=\"border:solid 1px #000;\"> x </td>";
 		    #print STDERR "itself: $i_counter $j_counter\n";
 		}elsif(defined($result_matrix{"$i_counter"."_"."$j_counter"})){
-		    my $current_link_score=$result_matrix{"$i_counter"."_"."$j_counter"};
+		    my $field=$result_matrix{"$i_counter"."_"."$j_counter"};
+		    my @field_array=split(/;/,$field);
+		    my $current_link_score=$field_array[0];
+		    my $identifier=$field_array[1];
 		    #compute background_color
 		    my $background_color_string;
 		    $background_color_string=&linkscore_to_rgb_color($current_link_score);
-		    $result_matrix_string.="<td style=\"border:solid 1px #000;$background_color_string;\"> $current_link_score </td>";
+		    my $href="$server/cmcws.cgi?page=3&mode=$mode&tempdir=$tempdir_folder&result_number=$result_file_number_input&identifier="."$identifier";
+		    $result_matrix_string.="<td style=\"border:solid 1px #000;$background_color_string;\"><a href=\"$href\">$current_link_score</a></td>";
 		    #print STDERR "ij - $current_link_score : $i_counter"."_"."$j_counter\n";
 		}else{
 		    #compute background color
-		    my $current_link_score=$result_matrix{"$j_counter"."_"."$i_counter"};
+		    my $field=$result_matrix{"$j_counter"."_"."$i_counter"};
+		    my @field_array=split(/;/,$field);
+		    my $current_link_score=$field_array[0];
+		    my $identifier=$field_array[1];
 		    my $background_color_string;
 		    $background_color_string=&linkscore_to_rgb_color($current_link_score);
-		    $result_matrix_string.="<td style=\"border:solid 1px #000;$background_color_string;\"> $current_link_score </td>";
+		    my $href="$server/cmcws.cgi?page=3&mode=$mode&tempdir=$tempdir_folder&result_number=$result_file_number_input&identifier="."$identifier";
+		    $result_matrix_string.="<td style=\"border:solid 1px #000;$background_color_string;\"><a href=\"$href\">$current_link_score</a></td>";
 		    #print STDERR "ji - $current_link_score : $j_counter"."_"."$i_counter\n";
 		}
 		$j_counter++;
@@ -257,7 +266,7 @@ foreach(@filtered_sorted_entries){
     my $rounded_link_score=nearest(1, $link_score);
     #Filter 3 show only hit containing rfamname in rfam name
     my $output_line;    
-    my $href="$server/cmcws.cgi?page=3&mode=$mode&tempdir=$tempdir_folder&result_number=$result_file_number_input&identifier="."$id1_number"."_"."$id2_number";
+    my $href="$server/cmcws.cgi?page=3&mode=$mode&tempdir=$tempdir_folder&result_number=$result_file_number_input&identifier="."$id1_truncated"."_"."$id2_truncated";
     if($model_name_filter_type eq "A"){
 	#we push matching entries on new array
 	if($name1=~/$model_name_1_string/g && $name2=~/$model_name_2_string/g){

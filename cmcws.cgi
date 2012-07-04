@@ -779,7 +779,7 @@ sub get_comparison_results{
 	$id2_truncated=~s/.cm//;
 	my $id2_number=$id2_truncated;
 	$id2_number=~s/input//;
-	my $current_identifier="$id1_number"."_"."$id2_number";
+	my $current_identifier="$id1_truncated"."_"."$id2_truncated";
 	if($identifier eq $current_identifier){
 	    #construct attribute table
 	    my $name1=$sorted_entry[3];
