@@ -481,7 +481,7 @@ if($page==1){
 	    print ACCOUNTING "$ip_adress $tempdir $timestamp $mode $query_number\n";
 	    close ACCOUNTING;
 	    chmod (0755,"$base_dir/$tempdir/commands.sh");
-	    exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /scratch2/RNApredator/error -o /scratch2/RNApredator/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
+	    exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /$basedir/$tempdir/error -o /$basedir/$tempdir/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
 	}
     }
     my $progress_redirect="<script>
