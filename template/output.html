@@ -2,13 +2,14 @@
 <div id="1" class="tooltip2" style="width: 400px;">
   <div class="content">
     <div class="head">Matrix of link scores:</div>
+    The matrix considers all submitted models.<br>
     Color-code emphasizes high scoring pairs:
     <ul>
       <li>link score &gt;20: red </li>
       <li>link score &lt;20 &gt;10: orange</li>
-      <li>link score &lt;10 &gt;5: yellow <li>
-      <li>link score &lt;5 &gt;0: white<li>
-      <li>link score &lt;0: blue<li>
+      <li>link score &lt;10 &gt;5: yellow </li>
+      <li>link score &lt;5 &gt;0: white</li>
+      <li>link score &lt;0: blue</li>
     </ul>
     --&gt; For more information see Help 
   </div>
@@ -16,25 +17,27 @@
  
 <div id="2" class="tooltip2" style="width: 400px;">
   <div class="content">
-    <div class="head">Select comparison mode:</div>
-    <ul>
-      <li>Compare one covariance model against all<br> 
-	covariance models in Rfam</li>
-      <li>Compare multiple covariance models with<br>
-	each other</li> 
-    </ul>
+    <div class="head">Covariance model graph</div>
+    The graph contains the models from the list below<br>
+    and shows their link scores. If the list is manipulated<br>
+    with the filtering options, this changes the graph.<br>
     --&gt; For more information see Help 
   </div>
 </div>
 
 <div id="3" class="tooltip2" style="width: 400px;">
   <div class="content">
-    <div class="head">Select comparison mode:</div>
+    <div class="head">Filtering:</div>
+    The list of models below can be filtered or expanded
+    with these options.
     <ul>
-      <li>Compare one covariance model against all<br> 
-	covariance models in Rfam</li>
-      <li>Compare multiple covariance models with<br>
-	each other</li> 
+      <li>Number of hits displayed even<br>
+	if more would fulfill the other criteria.<br>
+	Only numbers allowed.</li>
+      <li>Cutoff sets the minimal linkscore for hits
+      to be displayed. Only numbers allowed.</li>
+      <li>Model name, if set, shows only hits containing
+      this string. Only numbers or letters allowed.</li>
     </ul>
     --&gt; For more information see Help 
   </div>
@@ -50,7 +53,7 @@
     <table class="resources">
       [% INSERT $result_matrix %]
       <tr>
-	<td style="text-align:left;">Covariance model graph: <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a></td>
+	<td style="text-align:left;">Covariance model graph: <a href="#" onmouseover="XBT(this, {id:'2'})"><img style="vertical-align:middle;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a></td>
 	<td colspan="2"> </td>
 	<td> </td>
       </tr>
@@ -74,7 +77,7 @@
 	<td colspan="2"> </td>
       </tr>
       <tr>
-	<td style="text-align:left;">Filtering: <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a> </td>
+	<td style="text-align:left;">Filtering: <a href="#" onmouseover="XBT(this, {id:'3'})"><img style="vertical-align:middle;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a> </td>
 	<td colspan="3"  style="border:solid 1px #FFF;"></td>
       </tr>
       <tr>
