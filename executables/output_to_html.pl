@@ -279,7 +279,7 @@ foreach(@filtered_sorted_entries){
 	    print FILTEREDTABLE "$output_line";
 	    $counter++;
 	    #construct result graph
-	    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label = \"$rounded_link_score\"];\n"; 
+	    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label=\"$rounded_link_score\",URL=\"$href\",fontcolor=\"blue\",target=\"_graphviz\"];\n"; 
 	}
     }elsif($model_name_filter_type eq "B"){
 	print STDERR "\n B \n";
@@ -293,7 +293,7 @@ foreach(@filtered_sorted_entries){
 	    print FILTEREDTABLE "$output_line";
 	    $counter++;
 	    #construct result graph
-	    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label = \"$rounded_link_score\"];\n"; 
+	    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label=\"$rounded_link_score\",URL=\"$href\",fontcolor=\"blue\",target=\"_graphviz\"];\n"; 
 	}
     }elsif($model_name_filter_type eq "C"){
 	print STDERR "\n C \n";
@@ -307,7 +307,7 @@ foreach(@filtered_sorted_entries){
 	    print FILTEREDTABLE "$output_line";
 	    $counter++;
 	    #construct result graph
-	    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label = \"$rounded_link_score\"];\n"; 
+	    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label=\"$rounded_link_score\",URL=\"$href\",fontcolor=\"blue\",target=\"_graphviz\"];\n"; 
 	}else{
 	    print STDERR "\n cmcws: rejected name2 $name2: model_name2: $model_name_2_string\n";
 	}
@@ -320,7 +320,7 @@ foreach(@filtered_sorted_entries){
 	print FILTEREDTABLE "$output_line";
 	$counter++;
 	#construct result graph
-	$graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label = \"$rounded_link_score\"];\n";
+	$graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\" [label=\"$rounded_link_score\",URL=\"$href\",fontcolor=\"blue\",target=\"_graphviz\"];\n";
     }
 }
 close FILTEREDTABLE;
@@ -330,7 +330,7 @@ open (GRAPHOUT, ">$tempdir_path/graph_out$result_file_number.dot") or die "Canno
 print GRAPHOUT "$graph_output";
 close GRAPHOUT;
 #print STDERR "cmcws: output_to_html.pl - cat $tempdir_path/graph_out$result_file_number.dot | circo -Tpng > $tempdir_path/graph$result_file_number.png\n";
-`cat $tempdir_path/graph_out$result_file_number.dot | circo -Tpng > $tempdir_path/graph$result_file_number.png`;
+`cat $tempdir_path/graph_out$result_file_number.dot | circo -Tsvg > $tempdir_path/graph$result_file_number.svg`;
 #print "$graph_output";
 close GRAPHOUT;
 
