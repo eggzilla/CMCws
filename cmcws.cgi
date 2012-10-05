@@ -23,7 +23,7 @@ my $server;
 #baseDIR points to the tempdir folder
 my $base_dir;
 if($host eq "erbse"){
-    $server="http://localhost:800/cmcws";
+    $server="http://localhost/cmcws";
     #$server="http://131.130.44.243:800/cmcws";
     $base_dir ="$source_dir/html";
 }elsif($host eq "linse"){
@@ -566,12 +566,12 @@ if($page==2){
 		table_header=> "output_table_header1",
 		output_title=>"Top $filtered_number results of $total total for $inputid - $inputname (cutoff = $cutoff):",	
 		filtered_table => "./html/$tempdir/filtered_table$result_number",
-		cm_map=> "./html/$tempdir/graph$result_number.png",
+		cm_map=> "./html/$tempdir/graph"."$result_number".".svg",
 		cm_output_file => "./html/$tempdir/result$result_number",
 		csv_file => "./html/$tempdir/csv$result_number",
 		csv_filtered_file => "./html/$tempdir/csv_filtered$result_number",
 		dot_file => "./html/$tempdir/graph_out$result_number.dot",
-		png_file => "./html/$tempdir/graph$result_number.png",
+		svg_file => "./html/$tempdir/graph"."$result_number".".svg",
 		result_list_form_and_table => "output_result_list_form_table1",
 		result_matrix =>"output_result_matrix1",
 		result_number =>"$result_number",
@@ -607,12 +607,12 @@ if($page==2){
 		filter_fields=>"output_filter_fields2",
 		table_header=> "output_table_header2",
 		filtered_table => "./html/$tempdir/filtered_table$result_number",
-		cm_map=> "./html/$tempdir/graph$result_number.png",
+		cm_map=> "./html/$tempdir/graph$result_number.svg",
 		cm_output_file => "./html/$tempdir/result$result_number",
 		csv_file => "./html/$tempdir/csv$result_number",
 		csv_filtered_file => "./html/$tempdir/csv_filtered$result_number",
 		dot_file => "./html/$tempdir/graph_out$result_number.dot",
-		png_file => "./html/$tempdir/graph$result_number.png",
+		svg_file => "./html/$tempdir/graph$result_number.svg",
 		result_list_form_and_table => "output_result_list_form_table2",
 		result_matrix =>"./html/$tempdir/result_matrix",
 		result_number =>"$result_number",
