@@ -51,11 +51,11 @@ sub split_input{
     my $counter=0;
     while(<INPUTFILE>){
 	#look for header
-	if(/\# STOCKHOLM 1\./ && $stockholm_alignment_detected==0){
+	if(/\# STOCKHOLM/ && $stockholm_alignment_detected==0){
 	    $stockholm_alignment_detected=1;
 	    $counter++;
 	    push(@model,$_);
-	}elsif(/INFERNAL\-1 \[1/ && $covariance_model_detected==0){
+	}elsif(/INFERNAL/ && $covariance_model_detected==0){
 	    $covariance_model_detected=1;
 	    $counter++;
 	    push(@model,$_);

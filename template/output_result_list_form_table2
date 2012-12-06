@@ -9,4 +9,4 @@
 	[% INSERT $filtered_table %]
       </tbody>
     </table>
-    <input type="button" value="Detailed-Comparison">
+
