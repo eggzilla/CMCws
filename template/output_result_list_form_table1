@@ -1,5 +1,5 @@
 <form action="cmcws.cgi" id="postprocess-submit"  method="get">
-    <input type="button" value="Detailed-Comparison"> Select covariance models from the list for detailed comparison <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:text-bottom;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a>
+    <input type="button" value="Detailed-Comparison"> Select covariance models from the list for detailed comparison <a href="#" onmouseover="XBT(this, {id:'4'})"><img style="vertical-align:text-bottom;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a>
     <div id='submission-error' style="color:#FF0000"></div>
     <table style="width:60%;" class="tablesorter" id="myTable">             
       <thead>

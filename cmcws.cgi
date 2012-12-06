@@ -23,8 +23,8 @@ my $server;
 #baseDIR points to the tempdir folder
 my $base_dir;
 if($host eq "erbse"){
-    $server="http://localhost/cmcws";
-    #$server="http://131.130.44.243:800/cmcws";
+    #$server="http://localhost/cmcws";
+    $server="http://131.130.44.243/cmcws";
     $base_dir ="$source_dir/html";
 }elsif($host eq "linse"){
     $server="http://rna.tbi.univie.ac.at/cmcws2";
@@ -359,7 +359,7 @@ if($page==1){
     my $processing_script_file="processingscriptfile";
     my $error_message="";
     my $query_number="";
-    my $number_of_all_rfam_models=1974;
+    my $number_of_all_rfam_models=2209;
     my $processing_table_content="";
     #Check mode
     #Prepare the input by creating a file for each model
@@ -690,11 +690,11 @@ sub check_input{
     while(<INPUTFILE>){
 	chomp;
 	#look for header
-	if(/\# STOCKHOLM 1\./ && $stockholm_alignment_detected==0){
+	if(/\# STOCKHOLM/ && $stockholm_alignment_detected==0){
 	    $stockholm_alignment_detected=1;
 	    push(@input_elements,"Stockholm alignment -");
 	    $counter++;
-	}elsif(/INFERNAL\-1 \[1/ && $covariance_model_detected==0){
+	}elsif(/INFERNAL/ && $covariance_model_detected==0){
 	    $covariance_model_detected=1;
 	    push(@input_elements,"Covariance model -");
 	    $counter++;
@@ -739,7 +739,7 @@ sub check_input{
 	}
 	print STDERR "cmcws: contains models\n";
     }else{
-	#No covariance models or alignments found in input
+	#No compatible covariance models or alignments found in input
 	$input_elements[0]=$input_elements[0]."No covariance models or alignments found in input<br>;";
     }   
     close INPUTFILE;

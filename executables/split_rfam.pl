@@ -1,5 +1,7 @@
 #!/usr/bin/perl 
-#Splits files containing 1 or more covariance models and/or stockholm alignments into one file per model/alignment  
+#Splits files containing 1 or more covariance models and names them according to rfam id  
+# executables/split_rfam.pl /srv/http/cmcws_data/Rfam.cm.1_1 /srv/http/cmcws_data/Rfam11/
+#./split_rfam.pl Rfam.cm.1_1 /scratch/egg/projects/cm_compare_webserver/Rfam_matrix/
 use warnings;
 use strict;
 use diagnostics;
@@ -30,6 +32,7 @@ if(defined($filename_input)){
 
 #print  "cmcws: called split_input with arg1:$filename, arg2:$tempdir\n";
 #create a new subfolder for the splits in the tempdir
+print "Calling splitinput\n";
 split_input($filename,$tempdir);
 #Array with split
 sub split_input{
@@ -49,33 +52,31 @@ sub split_input{
     my @model;
     #counts number of entries
     my $counter=0;
+    my $Rfam_id="";
     while(<INPUTFILE>){
 	#look for header
-	if(/\# STOCKHOLM 1\./ && $stockholm_alignment_detected==0){
-	    $stockholm_alignment_detected=1;
-	    $counter++;
-	    push(@model,$_);
-	}elsif(/INFERNAL\-1 \[1/ && $covariance_model_detected==0){
+	if(/^INFERNAL/ && $covariance_model_detected==0){
 	    $covariance_model_detected=1;
 	    $counter++;
 	    push(@model,$_);
-	}elsif($covariance_model_detected==1 || $stockholm_alignment_detected==1){
-	    push(@model,$_);
+	    print "Counter: $counter - Step1\n";
+	}elsif($covariance_model_detected==1 || $covariance_model_detected==2){
+            push(@model,$_);
+        }
+	
+	#we look for the RFAM id
+	if(/^ACC/ && $covariance_model_detected==1){
+	    $covariance_model_detected=2;
+	    my @split_array = split(/\s+/,$_);
+	    my $last_element = @split_array - 1;
+	    $Rfam_id=$split_array[$last_element];
+	    print "Counter: $counter - Step2 - $Rfam_id\n";
 	}
+	
 	#we have detected a complete entry and want to write it to file
-	if(/^\/\// && $stockholm_alignment_detected==1){
-	    my $output_number=printf '<%05s>', $counter;
-	    open (OUTPUTFILE, ">$input_tempdir"."stockholm_alignment/$counter")or die "Could not create $input_tempdir/stockholm_alignment/$counter: $!\n";
-	    my $model_lines = @model-1;
-	    for(0..$model_lines){
-		my $line = shift(@model);
-		print OUTPUTFILE "$line";
-	    }
-	    $stockholm_alignment_detected=0;
-	    close OUTPUTFILE;
-	}elsif(/^\/\// && $covariance_model_detected==1){
-	    my $output_number=sprintf ("%05d", $counter);
-	    open (OUTPUTFILE, ">$input_tempdir"."covariance_model/RF$output_number.cm")or die "Could not create $input_tempdir/covariance_model/RF$output_number.cm: $!\n";;
+	if(/^\/\// && $covariance_model_detected==2){
+	    open (OUTPUTFILE, ">$input_tempdir"."cm/$Rfam_id.cm")or die "Could not create $input_tempdir/cm/$Rfam_id.cm: $!\n";
+	    print "Counter: $counter - Step3 - writing $Rfam_id\n";
 	    my $model_lines = @model-1;
 	    for(0..$model_lines){
 		my $line = shift(@model);
@@ -83,6 +84,7 @@ sub split_input{
 	    }
 	    $covariance_model_detected=0;
 	    close OUTPUTFILE;
+	    $Rfam_id="";
 	}
        #todo: error if we detected a header or a name but no end (//)
     }
@@ -91,49 +93,3 @@ sub split_input{
     print QUERYNUMBERFILE "$counter";
     close QUERYNUMBERFILE;
 }    
-    #if(@input_elements>2){
-    #input 
-#	my $input_element_count=@input_elements;
-#	my $unexpected_number_of_input_elements=($input_element_count-1)%2;
-#	print STDERR "cmcws: Number of input element: $input_element_count, Erwartete Anzahl an Elementen gefunden: $unexpected_number_of_input_elements";
-#	if((($input_element_count-1)%2)==0){
-#	    #contains models
-#	    $input_elements[0]="true";
-#	}
-#	print STDERR "cmcws: contains models\n";
-    #   }else{
-#	#No covariance models or alignments found in input
-#	$input_elements[0]=$input_elements[0]."No covariance models or alignments found in input<br>;";
-#    }   
-#    close INPUTFILE;
-#    return \@input_elements;
-
-
-#sub prepare_input{
-    #my @file_lines;
-    #include taintcheck later, now we just count the number of provided alignment and cm files
-    #while(<INPUTFILE>){
-    #    push(@file_lines,$_);
-    #}
-    #my $joined_file=join("",@file_lines);
-
-    #look for accession number
-    #=GF AC   RF00001
-    #=GF ID   5S_rRNA
-    #if(/^\#\=GF\sAC//^ACCESSION/ && $stockholm_alignment_detected==2){
-    #    $stockholm_alignment_detected=0;
-    #    my @split_array = split(/\s+/,$_);
-    #    my $last_element = @split_array - 1;
-    #    my $accession=$split_array[$last_element];
-    #    push(@input_elements,$accession);
-    #}elsif(/^ACCESSION/ && $covariance_model_detected==2){
-    #    $covariance_model_detected=0;
-    #    my @split_array = split(/\s+/,$_);
-    #    my $last_element = @split_array - 1;
-    #    my $accession=$split_array[$last_element];
-    #    push(@input_elements,$accession);
-    #}else{
-    #    
-    #}
-#}
-

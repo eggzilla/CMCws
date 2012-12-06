@@ -32,7 +32,7 @@ if(defined($tempdir_path_input)){
 	$tempdir_path = $tempdir_path_input;    
     }
 }else{
-    print STDERR "cmcws: error - calculate.ps has been called without specifing tempdir parameter";
+    print STDERR "cmcws: error - calculate.pl has been called without specifing tempdir parameter";
 }
 
 #mode
@@ -51,23 +51,27 @@ if(defined($tempdir_path)){
     my $alignment_dir="$tempdir_path/stockholm_alignment";
     my $model_dir="$tempdir_path/covariance_model";
     my $executable_dir="$source_dir"."/executables";
-    my $rfam_model_dir="$source_dir"."/data/Rfam10.1";
+    my $rfam_model_dir="$source_dir"."/data/Rfam11";
+    print "rfam_model_dir: $rfam_model_dir\n";
     my $file;
     my $rfam_file;
     chdir($tempdir_path);
     opendir(DIR, $model_dir) or die "can't opendir $model_dir: $!";
     my $counter=1;
     if($mode eq "1"){
+	print "Calculate with mode 1\n";
 	while (defined($file = readdir(DIR))) {
+	    #print "While loop $file \n";
 	    unless($file=~/^\./){
 		#compute
-		opendir(RFAMDIR, $rfam_model_dir) or die "can't opendir rfam dir - $rfam_model_dir: $!";
+		opendir(RFAMDIR, $rfam_model_dir) or die "Can't opendir rfam dir - $rfam_model_dir: $!";
 		open(BEGIN,">$tempdir_path/begin$counter") or die "Can't create begin$counter: $!";
-		close(BEGIN);	    
+		close(BEGIN);
+		#print "Written begin\n";
 		while (defined($rfam_file = readdir(RFAMDIR))) {
 		    unless($rfam_file=~/^\./){  
-			#print STDERR "cmcws: exec file $file, rfam-file $rfam_file\n";
-			#print "$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file >>$tempdir_path/result$counter\n";
+			#print "cmcws: exec file $file, rfam-file $rfam_file\n";
+			#print "$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter/n";
 			system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
 		    }
 		}
@@ -107,6 +111,7 @@ if(defined($tempdir_path)){
 		print "Foreach: 2Compare-Model $model\n";
 		#we do not increment $counter, because we only produce one result file for all comparisons
 		unless("$model" eq "$compare_model"){
+		    print STDERR "$executable_dir/CMCompare $model_dir/$model $model_dir/$compare_model \>\>$tempdir_path/result$counter";
 		    system("$executable_dir/CMCompare $model_dir/$model $model_dir/$compare_model \>\>$tempdir_path/result$counter")==0 or die print "cmcws: Execution failed: model $model with compare_model $compare_model - $!\n";
 		    print "done: $model, $compare_model\n";
 		    $column_counter++;
