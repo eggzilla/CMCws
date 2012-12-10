@@ -91,3 +91,135 @@ function step1_operation(ref){
     //set new stuff
     document.getElementById("step1_2_content").innerHTML=code
 }
+
+////////////////////Paste sample for mode 1//////////////////////////////////////
+
+function sample_mode1(){
+    var code="<table style=\"border-width:0\">"+
+	"<tbody>"+
+	"<tr>"+
+      "<td id=\"step1_title\"><u>1. Input:</u></td>"+
+      "<td id=\"step2_title\"><u>2. Confirm & Submit:</u></td>"+
+    "</tr>"+
+    "<tr>"+		
+      "<td id=\"step1_content\" >"+
+	"<form action=\"/cgi-bin/cmcws.cgi\" method=\"post\" target=\"Daten\">"+
+	  "<p>Select type of comparison: <a href=\"#\" onmouseover=\"XBT(this, {id:'1'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a></p>"+
+	  "<p><select disabled id=\"select_operation\"  onchange=\"step1_operation(this)\">"+
+	      "<option>Please select</option>"+
+	      "<option>covariance model vs Rfam</option>"+
+	      "<option>covariance model vs covariance model</option>"+
+	    "</select>"+
+	  "</p>"+
+	"</form>"+
+      "</td>"+
+      "<td id=\"step2_content\" style=\"vertical-align:top\">"+
+	"You have provided following input:<br>"+
+	"<br>1. Covariance model - tRNA<br><br>"+
+      "</td>"+
+    "</tr>"+	
+    "<tr>"+
+      "<td id=\"step1_2_content\" style=\"vertical-align:top\">"+
+		"<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">"+
+	"Upload a covariance model<br>"+
+	"or a multiple alignment <a href=\"#\" onmouseover=\"XBT(this, {id:'2'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a>:<br>"+
+        "<br><input disabled name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
+        "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\">"+
+	"<input id=\"mode\" value=\"1\"  name=\"mode\" type=\"hidden\">"+
+        "<div id=\"file_message\" style=\"color: red;\"></div>"+
+        "<br>"+
+        "<br>"+
+        "</form>"+
+      "</td>"+
+      "<td id=\"step2_2_content\" style=\"vertical-align:top\">"+
+		"<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">"+
+	"Which part of Rfam do you want to compare against?"+
+	"<select id=\"select_rfam\">"+
+	      "<option>All</option>"+
+	"</select>"+
+	"<br>"+
+	"<br>"+
+        "<input id=\"page\" value=\"1\"  name=\"page\" type=\"hidden\">"+
+	"<input id=\"mode\" value=\"1\"  name=\"mode\" type=\"hidden\">"+
+	"<input id=\"uploaded_file\" value=\"sample_mode_1\"  name=\"uploaded_file\" type=\"hidden\">"+
+	"<input type=\"submit\" value=\"Compare\">"+
+        "<input type=\"button\" value=\"Back\" onclick=\"back(this)\">"+
+        "</form>"+
+      "</td>"+
+    "</tr>"+
+      "<tr>"+
+      "<td id=\"step1_3_content\" style=\"vertical-align:top\">"+
+      "</td>"+
+      "<td id=\"step2_3_content\" style=\"vertical-align:top\">"+
+	"<div id=\"error_message\"> </div>"+
+      "</td>"+
+    "</tr>"+
+	"</tbody>"+
+    "</table>";
+    var myText=document.createTextNode(code);
+    document.getElementById("input_table").innerHTML=code;
+}
+
+function sample_mode2(){
+    var code="<table>"+
+        "<tbody>"+
+	"<tr>"+
+    "<td id=\"step1_title\"><u>1. Input:</u></td>"+
+    "<td id=\"step2_title\"><u>2. Confirm & Submit:</u></td>"+
+    "</tr>"+
+    "<tr>"+		
+      "<td id=\"step1_content\">"+
+	"<form action=\"/cgi-bin/cmcws.cgi\" method=\"post\" target=\"Daten\">"+
+	  "<p>Select type of comparison: <a href=\"#\" onmouseover=\"XBT(this, {id:'1'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a></p>"+
+	  "<p><select disabled id=\"select_operation\"  onchange=\"step1_operation(this)\">"+
+	      "<option>Please select</option>"+
+	      "<option>covariance model vs Rfam</option>"+
+	     "<option>covariance model vs covariance model</option>"+
+	   "</select>"+
+	 "</p>"+
+	"</form>"+
+      "</td>"+	
+      "<td id=\"step2_content\" style=\"vertical-align:top\">"+
+	"You have provided following input:<br>"+
+	"<br>1. Covariance model - tRNA<br>2. Covariance model - tmRNA<br>3. Covariance model - alpha_tmRNA<br>4. Covariance model - beta_tmRNA<br>5. Covariance model - cyano_tmRNA<br>6. Covariance model - tRNA-Sec<br><br>"+
+      "</td>"+
+    "</tr>"+	
+    "<tr>"+
+      "<td id=\"step1_2_content\" style=\"vertical-align:top\">"+
+	"<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">"+
+	"Upload an archive containing a group of<br>"+
+	"multiple alignments or covariance models "+
+	"<a href=\"#\" onmouseover=\"XBT(this, {id:'3'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a>:<br>"+
+        "<br><input disabled name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
+        "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\">"+
+	"<input id=\"mode\" value=\"2\"  name=\"mode\" type=\"hidden\">"+
+        "<div id=\"file_message\" style=\"color: red;\"></div>"+
+        "<br>"+
+	"<br>"+
+        "</form>"+
+      "</td>"+
+      "<td id=\"step2_2_content\" style=\"vertical-align:top\">"+
+		"<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">"+
+	"Press Compare to proceed:"+
+	"<br>"+
+	"<br>"+
+        "<input id=\"page\" value=\"1\"  name=\"page\" type=\"hidden\">"+
+	"<input id=\"mode\" value=\"2\"  name=\"mode\" type=\"hidden\">"+
+	"<input id=\"uploaded_file\" value=\"mode2.cm\"  name=\"uploaded_file\" type=\"hidden\">"+
+	"<input type=\"submit\" value=\"Compare\">"+
+        "<input type=\"button\" value=\"Back\" onclick=\"back(this)\">"+
+        "</form>"+
+      "</td>"+
+    "</tr>"+
+      "<tr>"+
+      "<td id=\"step1_3_content\" style=\"vertical-align:top\">"+
+      "</td>"+
+      "<td id=\"step2_3_content\" style=\"vertical-align:top\">"+
+	"<div id=\"error_message\"> </div>"+
+      "</td>"
+    "</tr>"+
+    "</tbody>"+
+    "</table>";
+    var myText=document.createTextNode(code);
+    document.getElementById("input_table").innerHTML=code;
+}
