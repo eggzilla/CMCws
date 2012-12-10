@@ -384,8 +384,8 @@ sub linkscore_to_rgb_color{
 	$blue_output=100;
     }else{
 	#linkscore under 0
-	$green_output=0;
-	$red_output=0;
+	$green_output=80;
+	$red_output=55;
 	$blue_output=100;
     }
     my $return_string="background-color:rgb($red_output\%,$green_output\%,$blue_output\%)";

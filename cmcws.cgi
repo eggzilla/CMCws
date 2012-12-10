@@ -23,8 +23,8 @@ my $server;
 #baseDIR points to the tempdir folder
 my $base_dir;
 if($host eq "erbse"){
-    #$server="http://localhost/cmcws";
-    $server="http://131.130.44.243/cmcws";
+    $server="http://localhost/cmcws";
+    #$server="http://131.130.44.243/cmcws";
     $base_dir ="$source_dir/html";
 }elsif($host eq "linse"){
     $server="http://rna.tbi.univie.ac.at/cmcws2";
@@ -90,6 +90,13 @@ my $model_1_name;
 my $model_2_name;
 my $identifier;
 
+unless(-e "$upload_dir/RF00005.cm"){
+    print STDERR "CMCws: Covarinance model for demo mode 1 is missing, copy it from data/Rfam11/ to html/upload";
+}
+unless(-e "$upload_dir/mode2.cm"){
+    print STDERR "CMCws: Covarinance model for demo mode 2 is missing. It consists of RF00005 RF00023 RF01849 RF01850 RF01851 RF01852 copy it from data/ to html/upload";
+}
+
 #print STDERR "cmcws-query: mode: $mode,page: $page,uploaded_file: $uploaded_file ,tempdir_input: $tempdir_input,input_filename: $input_filename";
 ######TAINT-CHECKS##############################################
 #get the current page number
@@ -104,7 +111,6 @@ if(defined($page)){
     }elsif($page eq "3"){
 	$page = 3;
     }
-    
 }else{
     $page = 0;
 }
@@ -122,10 +128,16 @@ if(defined($mode)){
 
 #uploaded-file
 if(defined($uploaded_file)){
-    if(-e "$upload_dir/$uploaded_file"){
+    if($uploaded_file eq "sample_mode_1"){
+	#set to tRNA model 
+	$uploaded_file="RF00005.cm"
+    }elsif($uploaded_file eq "sample_mode_2"){	
+	$uploaded_file="mode2.cm"
+    }elsif(-e "$upload_dir/$uploaded_file"){
 	#file exists
     }else{
 	print STDERR "cmcws: nonexistent uploaded file has been supplied as parameter\n";
+	$uploaded_file="";
     }
 }else{
     $uploaded_file = "";
@@ -148,6 +160,7 @@ if(defined($input_result_number)){
 	print STDERR "cmcws: nonexistent result_number has been supplied as parameter\n";
     }
 }
+
 #input_model_1_name
 if(defined($input_model_1_name)){
     if($input_model_1_name=~/\w+/){
@@ -225,7 +238,6 @@ if(defined($input_filename)){
 		}
 	    }
 	    $provided_input.="<br>";
-	    
 	}
     }
     
@@ -686,7 +698,6 @@ sub check_input{
     my $stockholm_alignment_detected=0;
     my $covariance_model_detected=0;
     my $counter=0;
-    
     while(<INPUTFILE>){
 	chomp;
 	#look for header
