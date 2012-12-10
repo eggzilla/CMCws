@@ -9,12 +9,12 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="625.8208"
-   height="234.88811"
+   width="618.19055"
+   height="160.16264"
    id="svg2"
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="search_procedure_multiple_genomes.png">
+   sodipodi:docname="search_procedure_multiple_genomes.svg">
   <defs
      id="defs4">
     <marker
@@ -339,6 +339,20 @@
          transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
          inkscape:connector-curvature="0" />
     </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend-54"
+       style="overflow:visible">
+      <path
+         id="path3814-26"
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -347,9 +361,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.161167"
-     inkscape:cx="248.79555"
-     inkscape:cy="102.91162"
+     inkscape:zoom="1.6290957"
+     inkscape:cx="241.16532"
+     inkscape:cy="32.537904"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -357,11 +371,11 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="506"
-     inkscape:window-height="439"
-     inkscape:window-x="98"
-     inkscape:window-y="69"
-     inkscape:window-maximized="0"
+     inkscape:window-width="1366"
+     inkscape:window-height="709"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
      inkscape:snap-page="true" />
   <metadata
      id="metadata7">
@@ -371,7 +385,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -379,22 +393,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-43.379811,-90.476624)">
-    <text
-       xml:space="preserve"
-       style="font-size:15.7370615px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="45.855148"
-       y="295.17969"
-       id="text4614"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan4616"
-         x="45.855148"
-         y="295.17969">ATTTTGAGTAGTGATGATGATGATGA</tspan><tspan
-         sodipodi:role="line"
-         x="45.855148"
-         y="314.85101"
-         id="tspan4620">TTTGATGTAGTTGATGTGATGATGAT</tspan></text>
+     transform="translate(-51.01004,-94.82837)">
     <text
        xml:space="preserve"
        style="font-size:8px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
@@ -407,29 +406,6 @@
          id="tspan8824"
          x="280.4823"
          y="76.763023" /></text>
-    <text
-       xml:space="preserve"
-       style="font-size:10.49137497px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="45.471989"
-       y="275.60593"
-       id="text8791"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         x="45.471989"
-         y="275.60593"
-         id="tspan8799">Snail - genome</tspan></text>
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.24804462px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 179.41666,325.78924 0.36717,-0.38012"
-       id="path3255"
-       inkscape:connector-curvature="0" />
-    <rect
-       style="fill:#000000;fill-opacity:1;stroke:none"
-       id="rect4624"
-       width="274.44418"
-       height="0.37646663"
-       x="45.102215"
-       y="280.49747" />
     <path
        sodipodi:type="arc"
        style="fill:#ffffff;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
@@ -464,51 +440,6 @@
          x="380.65152"
          y="49.729557" /></text>
     <rect
-       style="fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:0.36716401999999998"
-       id="rect2985-8-4"
-       width="73.613586"
-       height="14.657268"
-       x="575.10596"
-       y="310.70746" />
-    <text
-       xml:space="preserve"
-       style="font-size:15.7370615px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="389.18408"
-       y="303.73038"
-       id="text4614-4"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan4616-3"
-         x="389.18408"
-         y="303.73038">ATTTTGAGTAGTGATGATGATGATGA</tspan><tspan
-         sodipodi:role="line"
-         x="389.18408"
-         y="323.4017"
-         id="tspan4620-6">TTTGATGTAGTTGATGTGATGATGAT</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:10.49137497px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="388.80093"
-       y="284.15662"
-       id="text8791-0"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         x="388.80093"
-         y="284.15662"
-         id="tspan8799-8">Bear - genome</tspan></text>
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.24804462px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 522.7456,334.33993 0.36717,-0.38012"
-       id="path3255-3"
-       inkscape:connector-curvature="0" />
-    <rect
-       style="fill:#000000;fill-opacity:1;stroke:none"
-       id="rect4624-0"
-       width="274.44418"
-       height="0.37646663"
-       x="388.43115"
-       y="289.04816" />
-    <rect
        style="fill:#00ff00;fill-opacity:1;stroke:#000000;stroke-width:0.36716402"
        id="rect2985-8-2"
        width="73.613586"
@@ -526,13 +457,6 @@
          x="395.12619"
          y="103.34997"
          id="tspan8799-7">Human - genome</tspan></text>
-    <rect
-       style="fill:#00ff00;fill-opacity:1;stroke:#000000;stroke-width:0.36970416"
-       id="rect2985-4"
-       width="74.635658"
-       height="14.657268"
-       x="454.5914"
-       y="109.8137" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.24804462px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 529.07086,153.53327 0.36717,-0.38012"
@@ -545,23 +469,8 @@
        height="0.37646663"
        x="394.75644"
        y="108.24151" />
-    <text
-       xml:space="preserve"
-       style="font-size:15.7370615px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="395.50937"
-       y="122.92373"
-       id="text4614-2"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan4616-5"
-         x="395.50937"
-         y="122.92373">ATTTTGAGTAGTGATGATGATGATGA</tspan><tspan
-         sodipodi:role="line"
-         x="395.50937"
-         y="142.59506"
-         id="tspan4620-0">TTTGATGTAGTTGATGTGATGATGAT</tspan></text>
     <rect
-       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:0.36716401999999998;opacity:0.8"
+       style="opacity:0.8;fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:0.36716402"
        id="rect2985-8-6"
        width="73.613586"
        height="14.657268"
@@ -579,7 +488,7 @@
          y="102.47662"
          id="tspan8799-4">Mouse - genome</tspan></text>
     <rect
-       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:0.36970416000000000;opacity:0.8"
+       style="opacity:0.8;fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:0.36970416"
        id="rect2985-85"
        width="74.635658"
        height="14.657268"
@@ -614,7 +523,7 @@
          id="tspan4620-5">TTTGATGTAGTTGATGTGATGATGAT</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:1.40126824;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none;marker-end:url(#Arrow2Lend)"
-       d="M 294.44969,195.81108 179.84235,144.56068"
+       d="M 295.67736,197.65259 179.84235,144.56068"
        id="path8171-5-9"
        inkscape:connector-type="polyline"
        inkscape:connector-curvature="0"
@@ -626,23 +535,48 @@
        inkscape:connector-type="polyline"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:15.7370615px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="395.50937"
+       y="122.92374"
+       id="text4614-2"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4616-5"
+         x="395.50937"
+         y="122.92374">ATTTTGAGTAGTGATGATGATGATGA</tspan><tspan
+         sodipodi:role="line"
+         x="395.50937"
+         y="142.59506"
+         id="tspan4620-0">TTTGATGTAGTTGATGTGATGATGAT</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="493.93655"
+       y="221.01236"
+       id="text3359"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3361"
+         x="493.93655"
+         y="221.01236"
+         style="font-size:12px">Legend:</tspan><tspan
+         sodipodi:role="line"
+         x="493.93655"
+         y="236.01236"
+         id="tspan3363"
+         style="font-size:12px">Homology search </tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:1.40126824;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none;marker-end:url(#Arrow2Lend)"
-       d="M 392.62679,222.50836 573.41192,286.6591"
-       id="path8171-5-1"
+       d="m 603.41998,231.30364 36.52416,-0.65921"
+       id="path8171-5-22-9"
        inkscape:connector-type="polyline"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1.40126824;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none;marker-end:url(#Arrow2Lend)"
-       d="m 372.81913,182.89305 63.66158,-34.88756"
-       id="path8171-5-14"
-       inkscape:connector-type="polyline"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:1.40126824;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none;marker-end:url(#Arrow2Lend)"
-       d="M 393.48799,199.25589 569.96711,153.1727"
+       d="M 388.57729,198.02821 569.96711,153.1727"
        id="path8171-5-22"
        inkscape:connector-type="polyline"
        inkscape:connector-curvature="0"
