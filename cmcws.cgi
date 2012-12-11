@@ -394,16 +394,16 @@ if($page==1){
 		my $model_comparison="";
 		my $parsing_output="";
 		my $result_page_link="";
-		if(-e "$base_dir/$tempdir/begin$counter"){$queueing_status="Processing..";}
-		elsif(!-e "$base_dir/$tempdir/done$counter") {$queueing_status="Queued";}
-		else{$queueing_status="Done";}
+		if(-e "$base_dir/$tempdir/done$counter"){$queueing_status="Done";}
+		elsif(-e "$base_dir/$tempdir/begin$counter") {$queueing_status="Processing..";}
+		else{$queueing_status="Queued";}
 		if(-e "$base_dir/$tempdir/result$counter"){
 		    my $result_lines=`cat $base_dir/$tempdir/result$counter | wc -l`;
 		    my $progress_percentage=($result_lines/($number_of_all_rfam_models-1))*100;
 		    my $rounded_progress_percentage=sprintf("%.2f",$progress_percentage);
 		    $model_comparison="Progress: $rounded_progress_percentage%";}
 		else {$model_comparison="";}
-		if(-e "$base_dir/$tempdir/graph$counter.png"){$parsing_output="done";}
+		if(-e "$base_dir/$tempdir/done$counter"){$parsing_output="done";}
 		elsif(-e "$base_dir/$tempdir/filtered_table$counter"){$parsing_output="processing..";}
 		else {$parsing_output="";}
 		if(-e "$base_dir/$tempdir/done$counter"){$result_page_link="<a href=\"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir&result_number=$counter\">Link</a>"; } 
@@ -432,16 +432,16 @@ if($page==1){
 	    my $result_page_link="";
 	    #to fill the necessary fields of the result matrix we need (query_number)*(query_number)-query_number comparisons
 	    my $number_of_comparisons=(($query_number*$query_number)-$query_number)/2;
-	    if(-e "$base_dir/$tempdir/begin$counter"){$queueing_status="Processing..";}
-	    elsif(!-e "$base_dir/$tempdir/done$counter") {$queueing_status="Queued";}
-	    else{$queueing_status="Done";}
+	    if(-e "$base_dir/$tempdir/done$counter"){$queueing_status="Done";}
+	    elsif(-e "$base_dir/$tempdir/begin$counter") {$queueing_status="Processing..";}
+	    else{$queueing_status="Queued";}
 	    if(-e "$base_dir/$tempdir/result$counter"){
 		my $result_lines=`cat $base_dir/$tempdir/result$counter | wc -l`;
 		my $progress_percentage=($result_lines/($number_of_comparisons))*100;
 		my $rounded_progress_percentage=sprintf("%.2f",$progress_percentage);
 		$model_comparison="Progress: $rounded_progress_percentage%";}
 		else {$model_comparison="";}
-	    if(-e "$base_dir/$tempdir/graph$counter.png"){$parsing_output="done";}
+	    if(-e "$base_dir/$tempdir/done$counter"){$parsing_output="done";}
 	    elsif(-e "$base_dir/$tempdir/filtered_table$counter"){$parsing_output="processing..";}
 	    else {$parsing_output="";}
 	    if(-e "$base_dir/$tempdir/done$counter"){$result_page_link="<a href=\"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir&result_number=$counter\">Link</a>"; } 
