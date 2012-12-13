@@ -1,6 +1,6 @@
 	<form action="cmcws.cgi" id="submit-form"  method="post" enctype="multipart/form-data">
 	Select type of the Rfam entries you want to compare against:
-	<select id="select_rfam" size="3">
+	<select id="select_slice" name="select_slice" size="3">
 	      <option>All</option>
 	      <option>Gene</option>
 	      <option>CRISPR</option>

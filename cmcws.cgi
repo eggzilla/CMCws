@@ -78,6 +78,7 @@ my $input_model_1_name=$query->param('model_1_name')||undef;
 my $input_model_2_name=$query->param('model_2_name')||undef;
 my $input_filehandle=$query->upload('file')||undef;
 my $input_identifier=$query->param('identifier')||undef;
+my $input_select_slice=$query->param('select_slice')||undef;
 my $checked_input_present;
 my $provided_input="";
 my @input_error;
@@ -298,7 +299,20 @@ foreach my $name(@names){
     }
 }
 
-	
+#sets the slice of rfam to compare against
+my $select_slice;
+if(defined($input_select_slice)){
+    my $Rfam_types="antisense CRISPR Intron miRNA rRNA splicing antitoxin frameshift_element IRES overview scaRNA sRNA CD-box Gene leader riboswitch snoRNA thermoregulator Cis-reg HACA-box lncRNA ribozyme snRNA tRNA";
+    if($Rfam_types=~/$input_select_slice/){
+	#$input_select_slice seems valid
+    }else{
+	$select_slice="All";
+    }
+}else{
+    $select_slice="All";
+}
+
+
 ################ INPUT #####################################
 
 if($page==0){
@@ -371,7 +385,15 @@ if($page==1){
     my $processing_script_file="processingscriptfile";
     my $error_message="";
     my $query_number="";
-    my $number_of_all_rfam_models=2209;
+    my %Rfam_types_occurence;
+    open (RFAMTYPES, "<$source_dir/data/types/overview")or die "Could not open : $!\n";
+    while (<RFAMTYPES>){
+	chomp;
+	my ($key, $value) = split /\s/;
+	$Rfam_types_occurence{$key}=$value;
+    }
+    close RFAMTYPES;
+    my $number_of_rfam_models = $Rfam_types_occurence{$select_slice};
     my $processing_table_content="";
     #Check mode
     #Prepare the input by creating a file for each model
@@ -399,7 +421,7 @@ if($page==1){
 		else{$queueing_status="Queued";}
 		if(-e "$base_dir/$tempdir/result$counter"){
 		    my $result_lines=`cat $base_dir/$tempdir/result$counter | wc -l`;
-		    my $progress_percentage=($result_lines/($number_of_all_rfam_models-1))*100;
+		    my $progress_percentage=($result_lines/($number_of_rfam_models-1))*100;
 		    my $rounded_progress_percentage=sprintf("%.2f",$progress_percentage);
 		    $model_comparison="Progress: $rounded_progress_percentage%";}
 		else {$model_comparison="";}
@@ -462,7 +484,7 @@ if($page==1){
 	print COMMANDS "cd $base_dir/$tempdir/;\n";
 	print COMMANDS "$source_dir/executables/split_input.pl $base_dir/$tempdir/input_file $base_dir/$tempdir/;\n";
 	print COMMANDS "$source_dir/executables/convert_stockholmdir_to_cmdir.pl $base_dir/$tempdir $source_dir;\n";
-	print COMMANDS "$source_dir/executables/calculate.pl $server $tempdir $source_dir $mode;\n";
+	print COMMANDS "$source_dir/executables/calculate.pl $server $tempdir $source_dir $mode $select_slice;\n";
 	#print COMMANDS ";\n";
 	if($mode eq "1"){
 	    #set stuff specific for mode 1
@@ -535,7 +557,15 @@ if($page==2){
     my $output_script_file="outputscriptfile";
     my $total;
     if($mode eq "1"){
-	$total=1974;
+	my %Rfam_types_occurence;
+	open (RFAMTYPES, "<$source_dir/data/types/overview")or die "Could not open : $!\n";
+	while (<RFAMTYPES>){
+	    chomp;
+	    my ($key, $value) = split /\s/;
+	    $Rfam_types_occurence{$key}=$value;
+	}
+	close RFAMTYPES;
+	$total=$Rfam_types_occurence{$select_slice};
     }else{
 	 open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
 	 $total=<QUERYNUMBERFILE>;
@@ -604,9 +634,9 @@ if($page==2){
 	    #each submitted model is compared against rfam
 	    $file = './template/output.html';
 	    $output_script_file="outputscriptfile";
-	    open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
-	    my $query_number=<QUERYNUMBERFILE>;
-	    close QUERYNUMBERFILE;
+	    #open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
+	    #my $query_number=<QUERYNUMBERFILE>;
+	    #close QUERYNUMBERFILE;
 	    $vars = {
 		#define global variables for javascript defining the current host (e.g. linse) for redirection
 		serveraddress => "$server",

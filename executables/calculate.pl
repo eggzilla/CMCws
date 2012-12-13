@@ -11,6 +11,7 @@ my $server=$ARGV[0];
 my $tempdir_folder=$ARGV[1];
 my $input_source_dir=$ARGV[2];
 my $mode_input=$ARGV[3];
+my $select_slice=$ARGV[4];
 my $base_dir="$input_source_dir"."/html/";
 #complete path to tempdir
 my $tempdir_path_input="$base_dir"."$tempdir_folder";
@@ -60,6 +61,17 @@ if(defined($tempdir_path)){
     my $counter=1;
     if($mode eq "1"){
 	print "Calculate with mode 1\n";
+	unless($select_slice eq "all"){
+	    #load corresponding rfam type hash
+	    open (SLICEHASH, "<$source_dir/data/types/$select_slice") or die "Could not open : $!\n";
+	    my %Rfam_type_slice;
+	    while(<SLICEHASH>){
+		chomp;
+		my ($key, $value) = split /\s/;
+		$Rfam_type_slice{$key}=$value;
+	    }
+	    close SLICEHASH;
+	}
 	while (defined($file = readdir(DIR))) {
 	    #print "While loop $file \n";
 	    unless($file=~/^\./){
@@ -72,7 +84,17 @@ if(defined($tempdir_path)){
 		    unless($rfam_file=~/^\./){  
 			#print "cmcws: exec file $file, rfam-file $rfam_file\n";
 			#print "$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter/n";
-			system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
+			if($slice_select eq "all"){
+			    system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
+			}else{
+			    #a slice has been selected and we only want to compare against models with this type
+			    #we make a lookup in the type slice
+			    my $model_id=$rfam_file;
+			    $model_id=~s/.cm//;
+			    if($Rfam_type_slice{$model_id}){
+				system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
+			    }
+			}
 		    }
 		}
 		#compute output 
