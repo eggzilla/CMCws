@@ -1,10 +1,30 @@
 	<form action="cmcws.cgi" id="submit-form"  method="post" enctype="multipart/form-data">
-	Which part of Rfam do you want to compare against?
-	<select id="select_rfam">
+	Select type of the Rfam entries you want to compare against:
+	<select id="select_rfam" size="3">
 	      <option>All</option>
-	      <option>miRNA</option>
+	      <option>Gene</option>
+	      <option>CRISPR</option>
+	      <option>antisense</option>
+	      <option>antitoxin</option>
+	      <option>lncRNA</option>
+	      <option>microRNA</option>
+	      <option>rRNA</option>
+	      <option>ribozyme</option>
+	      <option>sRNA</option>
+	      <option>snRNA</option>
 	      <option>snoRNA</option>
-	      <option>usw.</option>
+	      <option>CD-box</option>
+	      <option>HACA-box</option>
+	      <option>scaRNA</option>
+	      <option>splicing</option>
+	      <option>tRNA</option>
+	      <option>Intron</option>
+	      <option>Cis-reg</option>
+	      <option>IRES</option>
+	      <option>frameshift element</option>
+	      <option>riboswitch</option>
+	      <option>thermoregulator</option>
+	      <option>leader</option>
 	</select>
 	<br>
 	<br>
