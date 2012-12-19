@@ -47,7 +47,7 @@ my @reverse_sorted_entries;
 my %result_matrix;
 unless(-e "$tempdir_path/csv$result_file_number"){
     #define array of arrays
-    print STDERR "cmcws: output_to_html.pl - Processing csv for all entries\n";
+    #print STDERR "cmcws: output_to_html.pl - Processing csv for all entries\n";
     open(INPUTFILE,"<$file_input") or die "Can't read $file_input: $!";
     while(<INPUTFILE>){
 	chomp;
@@ -112,7 +112,7 @@ unless(-e "$tempdir_path/csv$result_file_number"){
 	#we have a quadratic matrix, the number of lines determines i (lines) and j(columns)
 	my $i=$number_of_entries;
 	my $j=$number_of_entries;
-	print STDERR "Lines i: $i , Columns j: $j\n";
+	#print STDERR "Lines i: $i , Columns j: $j\n";
 	#prepare relative link score computation in percent
 	my $result_matrix_string="<tr>
 	<td style=\"text-align:left;\">Matrix of result linkscores for all models: <a href=\"#\" onmouseover=\"XBT(this, {id:'1'})\"><img style=\"vertical-align:middle;border:solid 0px #000;\" src=\"pictures/info.png\" alt=\"Info\"></a></td>
@@ -198,7 +198,7 @@ unless(-e "$tempdir_path/csv$result_file_number"){
 }
 
 #Filter 1 cutoff
-print STDERR "cmcws: output_to_html.pl - Applying filters";
+#print STDERR "cmcws: output_to_html.pl - Applying filters";
 my @filtered_sorted_entries;
 foreach (@sorted_entries){
     my @sorted_entry=@$_;
@@ -206,7 +206,7 @@ foreach (@sorted_entries){
 	push(@filtered_sorted_entries,$_);
     }else{
 	if($sorted_entry[0]>=$cutoff){
-	    print STDERR "Entry1: $sorted_entry[0] Entry2: $sorted_entry[2] Cutoff: $cutoff\n";
+	    #print STDERR "Entry1: $sorted_entry[0] Entry2: $sorted_entry[2] Cutoff: $cutoff\n";
 	    push(@filtered_sorted_entries,$_);
 	}else{
 	    #print STDERR "cmcws: Entry1: $sorted_entry[0] Entry2: $sorted_entry[2] Cutoff: $cutoff\n";
@@ -270,7 +270,7 @@ foreach(@filtered_sorted_entries){
     if($model_name_filter_type eq "A"){
 	#we push matching entries on new array
 	if($name1=~/$model_name_1_string/g && $name2=~/$model_name_2_string/g){
-	    print STDERR "\n A \n";
+	    #print STDERR "\n A \n";
 	    if($mode eq "1"){
 		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
@@ -282,7 +282,7 @@ foreach(@filtered_sorted_entries){
 	    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label=\"$rounded_link_score\",URL=\"$href\",fontcolor=\"blue\",target=\"_graphviz\"];\n"; 
 	}
     }elsif($model_name_filter_type eq "B"){
-	print STDERR "\n B \n";
+	#print STDERR "\n B \n";
 	#we push matching entries on new array
 	if($name1=~/$model_name_1_string/g){
 	    if($mode eq "1"){
@@ -296,9 +296,9 @@ foreach(@filtered_sorted_entries){
 	    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label=\"$rounded_link_score\",URL=\"$href\",fontcolor=\"blue\",target=\"_graphviz\"];\n"; 
 	}
     }elsif($model_name_filter_type eq "C"){
-	print STDERR "\n C \n";
+	#print STDERR "\n C \n";
 	if($name2=~/$model_name_2_string/g){
-	    print STDERR "\n cmcws: accepted name2 $name2: model_name2: $model_name_2_string\n";
+	    #print STDERR "\n cmcws: accepted name2 $name2: model_name2: $model_name_2_string\n";
 	    if($mode eq "1"){
 		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
@@ -333,6 +333,7 @@ close GRAPHOUT;
 `cat $tempdir_path/graph_out$result_file_number.dot | circo -Tsvg > $tempdir_path/graph$result_file_number.svg`;
 #print "$graph_output";
 close GRAPHOUT;
+print "0";
 
 #get model name
 sub model_name{

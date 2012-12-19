@@ -61,7 +61,7 @@ use Template;
 #require "$source_dir/executables/output.pl";
 
 ######STATE - variables##########################################
-#determine the query state by retriving CGI variables
+#determine the query state by retrieving CGI variables
 #$page 0 input, 1 process, 2 output
 
 my @names = $query->param;
@@ -155,7 +155,7 @@ if(defined($tempdir_input)){
 
 #resultnumber
 if(defined($input_result_number)){
-    if(-e "$base_dir/$tempdir_input/result$input_result_number"){
+    if(-e "$base_dir/$tempdir/result$input_result_number"){
 	$result_number=$input_result_number;    
     }else{
 	print STDERR "cmcws: nonexistent result_number has been supplied as parameter\n";
@@ -301,16 +301,28 @@ foreach my $name(@names){
 
 #sets the slice of rfam to compare against
 my $select_slice;
-if(defined($input_select_slice)){
-    my $Rfam_types="antisense CRISPR Intron miRNA rRNA splicing antitoxin frameshift_element IRES overview scaRNA sRNA CD-box Gene leader riboswitch snoRNA thermoregulator Cis-reg HACA-box lncRNA ribozyme snRNA tRNA";
+if(-e "$base_dir/$tempdir/slice"){
+    #read slice from file
+    open (SLICE, "<$base_dir/$tempdir/slice") or die "Could not open slice-file: $!\n";
+    $select_slice=<SLICE>;
+    close SLICE;
+}elsif(defined($input_select_slice)){
+    my $Rfam_types="All antisense CRISPR Intron miRNA rRNA splicing antitoxin frameshift_element IRES overview scaRNA sRNA CD-box Gene leader riboswitch snoRNA thermoregulator Cis-reg HACA-box lncRNA ribozyme snRNA tRNA";
+    $input_select_slice=~s/\s//;
     if($Rfam_types=~/$input_select_slice/){
-	#$input_select_slice seems valid
+	print STDERR "CMCWS - cmcws.cgi - $input_select_slice seems valid\n";
+	$select_slice=$input_select_slice;
     }else{
 	$select_slice="All";
     }
-}else{
+}elsif($mode==2){
     $select_slice="All";
+}elsif($page<1){
+    $select_slice=undef;
+    print STDERR "CMCWS - cmcws.cgi - Slice not set!";
 }
+
+
 
 
 ################ INPUT #####################################
@@ -335,21 +347,21 @@ if($page==0){
 	    $input_script_file = "inputstep2scriptfile";
 	    $disabled_upload_form="inputstep2mode1disable";
 	    $submit_form="inputstep2mode1submit";
-	    print STDERR "Reached Page=0 step=2 mode=1\n";
+	    #print STDERR "Reached Page=0 step=2 mode=1\n";
 	}elsif($mode eq "2"){
 	    #comparison of multiple models with each other 
 	    $input_script_file = "inputstep2scriptfile";
 	    $disabled_upload_form="inputstep2mode2disable";
 	    $submit_form="inputstep2mode2submit";
-	    print STDERR "Reached Page=0 step=2 mode=2\n";
+	    #print STDERR "Reached Page=0 step=2 mode=2\n";
 	}
     }elsif($mode=="0"){
-	print STDERR "Reached Page=0 step=1 mode=0\n";
+	#print STDERR "Reached Page=0 step=1 mode=0\n";
     }else{
 	#Input error
 	$input_script_file = "inputerrorscriptfile";
 	$error_message=join('/n',@input_error);
-	print STDERR "Reached Page=0 step=1 mode=$mode\n";
+	#print STDERR "Reached Page=0 step=1 mode=$mode\n";
 	print STDERR "Error: @input_error\n";
     }
     
@@ -389,11 +401,14 @@ if($page==1){
     open (RFAMTYPES, "<$source_dir/data/types/overview")or die "Could not open : $!\n";
     while (<RFAMTYPES>){
 	chomp;
-	my ($key, $value) = split /\s/;
+	my ($key,$value) = split /;/;
 	$Rfam_types_occurence{$key}=$value;
+	#print STDERR "CMCws - cmcws.cgi: Rfamtype-hash: $key : $Rfam_types_occurence{$key}\n";
     }
     close RFAMTYPES;
     my $number_of_rfam_models = $Rfam_types_occurence{$select_slice};
+    #print STDERR "CMCws - cmcws.cgi: Select_slice: $select_slice\n";
+    #print STDERR "number of Rfam-Models: $number_of_rfam_models\n";
     my $processing_table_content="";
     #Check mode
     #Prepare the input by creating a file for each model
@@ -401,6 +416,10 @@ if($page==1){
 	$tempdir = tempdir ( DIR => $base_dir );
 	$tempdir =~ s/$base_dir\///;
 	chmod 0755, "$base_dir/$tempdir";
+	#write slice file
+	open (SLICE, ">$base_dir/$tempdir/slice") or die "Could not open slice-file: $!\n";
+	print SLICE "$select_slice";
+	close SLICE;
     }
     if(-e "$base_dir/$tempdir/query_number"){
 	if($mode eq "1"){
@@ -421,7 +440,7 @@ if($page==1){
 		else{$queueing_status="Queued";}
 		if(-e "$base_dir/$tempdir/result$counter"){
 		    my $result_lines=`cat $base_dir/$tempdir/result$counter | wc -l`;
-		    my $progress_percentage=($result_lines/($number_of_rfam_models-1))*100;
+		    my $progress_percentage=($result_lines/($number_of_rfam_models))*100;
 		    my $rounded_progress_percentage=sprintf("%.2f",$progress_percentage);
 		    $model_comparison="Progress: $rounded_progress_percentage%";}
 		else {$model_comparison="";}
@@ -561,7 +580,7 @@ if($page==2){
 	open (RFAMTYPES, "<$source_dir/data/types/overview")or die "Could not open : $!\n";
 	while (<RFAMTYPES>){
 	    chomp;
-	    my ($key, $value) = split /\s/;
+	    my ($key, $value) = split /;/;
 	    $Rfam_types_occurence{$key}=$value;
 	}
 	close RFAMTYPES;
@@ -620,7 +639,7 @@ if($page==2){
 		tempdir => "$tempdir",
 		error_message => "$error_message"
 	    };
-	    print STDERR "cmcws: Page:2 Mode:1 reached/n";
+	    #print STDERR "cmcws: Page:2 Mode:1 reached/n";
 	}else{
 	    print "<script>
 	     window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=1&mode=$mode&tempdir=$tempdir\"\', 5000);    
@@ -661,7 +680,7 @@ if($page==2){
 		tempdir => "$tempdir",
 		error_message => "$error_message"
 	    };
-	    print STDERR "cmcws: Page:2 Mode:2 reached/n";
+	    #print STDERR "cmcws: Page:2 Mode:2 reached/n";
 	}else{
 	    print "<script>
 	     window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=1&mode=$mode&tempdir=$tempdir\"\', 5000);    
@@ -772,13 +791,13 @@ sub check_input{
 	#input 
 	my $input_element_count=@input_elements;
 	my $unexpected_number_of_input_elements=($input_element_count-1)%2;
-	print STDERR "cmcws: Number of input element: $input_element_count, Erwartete Anzahl an Elementen gefunden: $unexpected_number_of_input_elements";
+	#print STDERR "cmcws: Number of input element: $input_element_count, Erwartete Anzahl an Elementen gefunden: $unexpected_number_of_input_elements";
 	#todo: set default name if we do not find one or this step is problematic
 	if((($input_element_count-1)%2)==0){
 	    #contains models
 	    $input_elements[0]="true";
 	}
-	print STDERR "cmcws: contains models\n";
+	#print STDERR "cmcws: contains models\n";
     }else{
 	#No compatible covariance models or alignments found in input
 	$input_elements[0]=$input_elements[0]."No covariance models or alignments found in input<br>;";
@@ -803,8 +822,7 @@ sub get_comparison_results{
     }
     #get rid of the header line
     shift(@sorted_entries);
-    close CSVINPUT;
-    
+    close CSVINPUT;    
     #get requested entry
     #$attribute_table.="@sorted_entries";
     foreach(@sorted_entries){

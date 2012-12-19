@@ -60,15 +60,20 @@ if(defined($tempdir_path)){
     opendir(DIR, $model_dir) or die "can't opendir $model_dir: $!";
     my $counter=1;
     if($mode eq "1"){
-	print "Calculate with mode 1\n";
-	unless($select_slice eq "all"){
+	#print "Calculate with mode 1\n";
+	my %Rfam_type_slice;
+	unless($select_slice eq "All"){
 	    #load corresponding rfam type hash
 	    open (SLICEHASH, "<$source_dir/data/types/$select_slice") or die "Could not open : $!\n";
-	    my %Rfam_type_slice;
+	    #print STDERR "CMCWS - calculate.pl select_slice set to  $select_slice\n";
 	    while(<SLICEHASH>){
 		chomp;
-		my ($key, $value) = split /\s/;
+		my ($key, $value) = split /;/;
+		#print STDERR "CMCWS - before insertion in hash: $key,$value\n";
 		$Rfam_type_slice{$key}=$value;
+		my $testvalue=$Rfam_type_slice{$key};
+		#print STDERR "CMCWS - after insertion in hash: $key,$testvalue\n";
+		
 	    }
 	    close SLICEHASH;
 	}
@@ -84,14 +89,20 @@ if(defined($tempdir_path)){
 		    unless($rfam_file=~/^\./){  
 			#print "cmcws: exec file $file, rfam-file $rfam_file\n";
 			#print "$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter/n";
-			if($slice_select eq "all"){
+			if($select_slice eq "All"){
 			    system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
 			}else{
 			    #a slice has been selected and we only want to compare against models with this type
 			    #we make a lookup in the type slice
 			    my $model_id=$rfam_file;
 			    $model_id=~s/.cm//;
+			    #print  STDERR "Model_id:$model_id\n";
+			    my $check = $Rfam_type_slice{$model_id};
+			    #print STDERR "Rfam_type_slice{model_id}: $check\n";
+			    #my @test =keys %Rfam_type_slice;
+			    #print "test:\n @test\n";
 			    if($Rfam_type_slice{$model_id}){
+				print "Rfam_type_slice{model_id}: $Rfam_type_slice{$model_id}\n";
 				system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
 			    }
 			}
@@ -126,7 +137,7 @@ if(defined($tempdir_path)){
 	my $query_counter=1;
 	for(1..$query_number){
 	    my $model="input"."$query_counter".".cm";
-	    print "1Foreach: Model $model\n";
+	    #print "1Foreach: Model $model\n";
 	    my $column_counter=$query_counter+1;
 	    for($column_counter..$query_number){
 		my $compare_model="input"."$column_counter".".cm";

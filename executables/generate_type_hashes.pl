@@ -21,20 +21,25 @@ while(<INPUTFILE>){
 }
 close INPUTFILE;
 print @input;
+my $all_models_counter=0;
 foreach my $line (@input){
     chomp($line);
     my @split_array = split(/,/,$line);
     my @types=split(/;/,$split_array[3]);
     foreach my $type (@types){
+	#we exclude the csv - header line 
 	if($type=~/\w+/ && $type ne "Type"){
 	    #we push everything on the type array and flatten it with uniqe afterwards
 	    $type=~s/\s+//;
+	    $all_models_counter++;
 	    push(@multiple_Rfam_types,$type);
 	}
     }   
 }
-
 my @unique_Rfam_types = uniq @multiple_Rfam_types;
+open (OVERVIEW, ">>types/overview") or die "Cannot write output file";
+print OVERVIEW "All;$all_models_counter\n";
+close OVERVIEW;
 
 foreach my $unique_Rfam_type (@unique_Rfam_types){
     my $count=0;
@@ -44,12 +49,13 @@ foreach my $unique_Rfam_type (@unique_Rfam_types){
 	chomp($line);
 	my @split_array = split(/,/,$line);
 	my $rfam_id=$split_array[2];
+	$rfam_id=~s/\s//;
 	if($line=~/$unique_Rfam_type/){
-	    my $output="$rfam_id 1\n";
+	    my $output="$rfam_id;1\n";
 	    $count++;
 	    print OUTPUTFILE "$output";
 	}else{
-	    my $output="$rfam_id 0\n";
+	    my $output="$rfam_id;0\n";
 	    print OUTPUTFILE "$output";
 	}
 	
@@ -58,7 +64,7 @@ foreach my $unique_Rfam_type (@unique_Rfam_types){
     
     open (OVERVIEW, ">>types/overview") or die "Cannot write output file";
     #print typename and occurence number of the type to overview file
-    print OVERVIEW "$unique_Rfam_type $count\n";
+    print OVERVIEW "$unique_Rfam_type;$count\n";
     close OVERVIEW;  
 }
 
