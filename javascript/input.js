@@ -133,9 +133,32 @@ function sample_mode1(){
       "</td>"+
       "<td id=\"step2_2_content\" style=\"vertical-align:top\">"+
 		"<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">"+
-	"Which part of Rfam do you want to compare against?"+
-	"<select id=\"select_rfam\">"+
-	      "<option>All</option>"+
+	"Which part of Rfam do you want to compare against?  "+
+	"<select id=\"select_slice\" size=\"3\" name=\"select_slice\">"+
+	"<option>All</option>"+
+	"<option>Gene</option>"+
+	"<option>CRISPR</option>"+
+	"<option>antisense</option>"+
+	"<option>antitoxin</option>"+
+	"<option>lncRNA</option>"+
+	"<option>microRNA</option>"+
+	"<option>rRNA</option>"+
+	"<option>ribozyme</option>"+
+	"<option>sRNA</option>"+
+	"<option>snRNA</option>"+
+	"<option>snoRNA</option>"+
+	"<option>CD-box</option>"+
+	"<option>HACA-box</option>"+
+	"<option>scaRNA</option>"+
+	"<option>splicing</option>"+
+	"<option>tRNA</option>"+
+	"<option>Intron</option>"+
+	"<option>Cis-reg</option>"+
+	"<option>IRES</option>"+
+	"<option>frameshift element</option>"+
+	"<option>riboswitch</option>"+
+	"<option>thermoregulator</option>"+
+	"<option>leader</option>"+
 	"</select>"+
 	"<br>"+
 	"<br>"+
