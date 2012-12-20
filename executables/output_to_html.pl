@@ -42,6 +42,13 @@ if(defined($mode)){
     $mode = 0;
 }
 
+if(defined($cutoff)){
+
+}else{
+    $cutoff="none";
+}
+   
+
 #If csv file is present we read directly from there
 my @entries;
 my @sorted_entries;

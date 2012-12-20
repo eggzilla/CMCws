@@ -21,7 +21,12 @@ $(document).ready(function()
 			0: { 
 			 // disable it by setting the property sorter to false 
 			sorter: false 
+            		},
+			1: { 
+			 // disable it by setting the property sorter to false 
+			sorter: false 
             		}
+			
 		}
 							      
 	}); 
