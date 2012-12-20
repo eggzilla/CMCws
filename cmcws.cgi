@@ -60,6 +60,11 @@ use Template;
 #functions for output of results
 #require "$source_dir/executables/output.pl";
 
+################################################################
+open ( STDERR, ">>$base_dir/Log" ) or die "$!";
+my $now_string = localtime;
+
+
 ######STATE - variables##########################################
 #determine the query state by retrieving CGI variables
 #$page 0 input, 1 process, 2 output
@@ -98,7 +103,7 @@ unless(-e "$upload_dir/mode2.cm"){
     print STDERR "CMCws: Covarinance model for demo mode 2 is missing. It consists of RF00005 RF00023 RF01849 RF01850 RF01851 RF01852 copy it from data/ to html/upload";
 }
 
-#print STDERR "cmcws-query: mode: $mode,page: $page,uploaded_file: $uploaded_file ,tempdir_input: $tempdir_input,input_filename: $input_filename";
+
 ######TAINT-CHECKS##############################################
 #get the current page number
 #wenn predict submitted wurde ist page 1
@@ -301,32 +306,33 @@ foreach my $name(@names){
 
 #sets the slice of rfam to compare against
 my $select_slice;
-if(-e "$base_dir/$tempdir/slice"){
-    #read slice from file
-    open (SLICE, "<$base_dir/$tempdir/slice") or die "Could not open slice-file: $!\n";
-    $select_slice=<SLICE>;
-    close SLICE;
-}elsif(defined($input_select_slice)){
-    my $Rfam_types="All antisense CRISPR Intron miRNA rRNA splicing antitoxin frameshift_element IRES overview scaRNA sRNA CD-box Gene leader riboswitch snoRNA thermoregulator Cis-reg HACA-box lncRNA ribozyme snRNA tRNA";
-    $input_select_slice=~s/\s//;
-    if($Rfam_types=~/$input_select_slice/){
-	print STDERR "CMCWS - cmcws.cgi - $input_select_slice seems valid\n";
-	$select_slice=$input_select_slice;
-    }else{
-	$select_slice="All";
-    }
-}elsif($mode==2){
-    $select_slice="All";
-}elsif($page<1){
+if($page==0){
     $select_slice=undef;
-    print STDERR "CMCWS - cmcws.cgi - Slice not set!";
+}else{
+    if(defined($input_select_slice)){
+	my $Rfam_types="All antisense CRISPR Intron miRNA rRNA splicing antitoxin frameshift_element IRES overview scaRNA sRNA CD-box Gene leader riboswitch snoRNA thermoregulator Cis-reg HACA-box lncRNA ribozyme snRNA tRNA";
+	$input_select_slice=~s/\s//;
+	if($Rfam_types=~/$input_select_slice/){
+	    print STDERR "CMCWS - cmcws.cgi - $input_select_slice seems valid\n";
+	    $select_slice=$input_select_slice;
+	}else{
+	    $select_slice="All";
+	}
+    }elsif($mode==2){
+	$select_slice="All";
+    }elsif(-e "$base_dir/$tempdir/slice"){
+	#read slice from file
+	open (SLICE, "<$base_dir/$tempdir/slice") or die "Could not open slice-file: $!\n";
+	$select_slice=<SLICE>;
+	close SLICE;
+    }
+
+    unless($page==1){
+	print STDERR "Query - $now_string - Page $page Mode $mode\n";
+    }
 }
-
-
-
-
 ################ INPUT #####################################
-
+    
 if($page==0){
     #print $query->header();
     print "Content-type: text/html; charset=utf-8\n\n";
@@ -865,3 +871,4 @@ sub get_comparison_results{
     }
     return $attribute_table;
 }
+close STDERR;

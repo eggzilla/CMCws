@@ -3,8 +3,7 @@
 use warnings;
 use strict;
 use diagnostics;
-
-print STDERR "cmcws: launched calculate.pl\n";
+#print STDERR "cmcws: launched calculate.pl\n";
 
 #Input is path to file that should be split
 my $server=$ARGV[0];
@@ -18,6 +17,8 @@ my $tempdir_path_input="$base_dir"."$tempdir_folder";
 my $tempdir_path;
 my $mode;
 my $source_dir;
+#redirect error from httpd log to basedir
+open ( STDERR, ">>$base_dir/Log" ) or die "$!";
 #tempdir
 
 if(defined($input_source_dir)){
@@ -164,3 +165,4 @@ if(defined($tempdir_path)){
 	print STDERR "cmcws: error - cmcws was called without specifing mode parameter";
     }	
 }
+close STDERR;

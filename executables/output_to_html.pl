@@ -20,6 +20,8 @@ my $model_name_1_string=$ARGV[7];
 my $model_name_2_string=$ARGV[8];
 my $file_input;
 my $result_file_number;
+#redirect error from httpd log to basedir
+open ( STDERR, ">>$base_dir/Log" ) or die "$!";
 #print STDERR "cmcws: output - parameters: tempdir: $tempdir_path, mode: $mode, number_of_hits: $number_of_hits, cutoff: $cutoff , model_name_1: $model_name_1_string , model_name_2: $model_name_2_string";
 if(defined($result_file_number_input)){
     if(-e "$tempdir_path/result$result_file_number_input"){
@@ -392,3 +394,4 @@ sub linkscore_to_rgb_color{
     my $return_string="background-color:rgb($red_output\%,$green_output\%,$blue_output\%)";
     return $return_string;
 }
+close STDERR;
