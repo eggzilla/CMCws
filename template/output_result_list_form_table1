@@ -1,9 +1,10 @@
-<form action="cmcws.cgi" name="detailed-comparison"  method="get">
+<form action="cmcws.cgi" name="postprocessing"  method="get">
       <input id="page" type="hidden" name="page" value="1">
       <input id="mode" type="hidden" name="mode" value="2">	
       <input id="tempdir" type="hidden" name="tempdir" value="[% tempdir  %]">
       <input id="result_number" type="hidden" name="p0" value="[% inputid  %]">
-    <input type="submit" value="Detailed-Comparison"> Select covariance models from the list for detailed comparison <a href="#" onmouseover="XBT(this, {id:'4'})"><img style="vertical-align:text-bottom;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a>
+    <input type="submit" value="cm vs cm"> Select covariance models from
+      the list for comparison with each other <a href="#" onmouseover="XBT(this, {id:'4'})"><img style="vertical-align:text-bottom;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a>
     <div id='submission-error' style="color:#FF0000"></div>
     <table style="width:60%;" class="tablesorter" id="myTable">             
       <thead>
@@ -15,5 +16,5 @@
 	[% INSERT $filtered_table %]
       </tbody>
     </table>
-    <input type="submit" value="Detailed-Comparison">
+    <input type="submit" value="cm vs cm">
   </form>
