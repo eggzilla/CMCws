@@ -195,7 +195,7 @@ if(defined($input_model_2_name)){
 
 #input-file
 if(defined($input_filename)){
-    print STDERR "cmcws: Found upload /n";
+    #print STDERR "cmcws: Found upload /n";
     #if the file does not meet requirements we delete it before returning to page=0 for error
     my $name = Digest::MD5::md5_base64(rand);
     $name =~ s/\+/_/g;
@@ -207,6 +207,7 @@ if(defined($input_filename)){
     open ( UPLOADFILE, ">$upload_dir/$name" ) or die "$!"; binmode UPLOADFILE; while ( <$input_filehandle> ) { print UPLOADFILE; } close UPLOADFILE;
     my $check_size = -s "$upload_dir/$name";
     my $max_filesize =1000000;
+    #first level
     if($check_size < 1){
 	print STDERR "Uploaded Input file is empty\n";
 	push(@input_error,"Uploaded Input file is empty");
@@ -214,36 +215,49 @@ if(defined($input_filename)){
 	print STDERR "Uploaded Input file is too large\n";
 	push(@input_error,"Uploaded Input file is too large");
     }else{
-	#check input file
+	#2nd level
+	print STDERR "2nd level\n";
 	my $check_array_reference=&check_input($name);
 	my @check_array = @$check_array_reference;
-	print STDERR "Array checked: @check_array\n";
-	#get first element and look for error string
-	my $error_string = shift(@check_array);
-	#set input present to true if input is ok and include filename for further processing, set error message if not
-	if($error_string =~ /^error/){
-	    print STDERR "Input error detected: $error_string";
-	    my @error_string_split = split(/;/,$error_string);
-	    shift(@error_string_split);
-	    push(@input_error,@error_string_split);
-	    #check_input found errors in the input file, we add them to @input_error
+	my $number_of_models=((@check_array-1)/2);
+	print STDERR "Number of models: $number_of_models\n";
+	print STDERR "check-array: @check_array\n";
+	
+	if($number_of_models>10){
+	    print STDERR "Please provide 10 models or less\n";
+	    push(@input_error,"Please provide 10 models or less");
+	}elsif(($number_of_models==1)&&($mode==2)){
+	    print STDERR "Please provide at least 2 models\n";
+	    push(@input_error,"Please provide at least 2 models");
 	}else{
-	    $checked_input_present=1;
-	    my $number_of_models=((@check_array)/2)-1;
-	    my $counter=0;
-	    $provided_input.="<br>";
-	    if($number_of_models>5){
-		$provided_input.="$number_of_models models"
+	    #print STDERR "Array checked: @check_array\n";
+	    #get first element and look for error string
+	    my $error_string = shift(@check_array);
+	    #set input present to true if input is ok and include filename for further processing, set error message if not
+	    if($error_string =~ /^error/){
+		print STDERR "Input error detected: $error_string";
+		my @error_string_split = split(/;/,$error_string);
+		shift(@error_string_split);
+		push(@input_error,@error_string_split);
+	    #check_input found errors in the input file, we add them to @input_error
 	    }else{
-		for(0..$number_of_models){
-		    $counter++;
+		$checked_input_present=1;
+		$number_of_models=((@check_array)/2)-1;
+		my $counter=0;
+		$provided_input.="<br>";
+		if($number_of_models>5){
+		    $provided_input.="$number_of_models models"
+		}else{
+		    for(0..$number_of_models){
+			$counter++;
 		    #todo: continue here - each line should contain number, type of input, name (if present)
-		    my $type=shift(@check_array);
-		    my $name=shift(@check_array);
-		    $provided_input=$provided_input."$counter. $type"." $name<br>";
+			my $type=shift(@check_array);
+			my $name=shift(@check_array);
+			$provided_input=$provided_input."$counter. $type"." $name<br>";
 		}
 	    }
-	    $provided_input.="<br>";
+		$provided_input.="<br>";
+	    }
 	}
     }
     
@@ -271,7 +285,7 @@ if(defined($input_filtered_number)){
 #    $input_identifier=undef;
 #}
 $identifier= $input_identifier;
-
+print STDERR "$mode $page\n";
 #cutoff
 if(defined($input_cutoff)){
     if($input_cutoff =~ /^[0-9]+$/){
@@ -439,7 +453,6 @@ if($page==1){
     my $postprocess_selected_check=@postprocess_selected;
     #print STDERR "postprocess_selected_check $postprocess_selected_check\n";
     if(($query_number_file_present) && (!($postprocess_selected_check))){
-	print STDERR "Got here wrong\n";
 	open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
 	$query_number=<QUERYNUMBERFILE>;
 	close QUERYNUMBERFILE;
