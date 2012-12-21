@@ -435,9 +435,9 @@ if($page==1){
     }else{
 	$query_number_file_present=0;
     }
-    print STDERR "query_number_file_present $query_number_file_present\n";
+    #print STDERR "query_number_file_present $query_number_file_present\n";
     my $postprocess_selected_check=@postprocess_selected;
-    print STDERR "postprocess_selected_check $postprocess_selected_check\n";
+    #print STDERR "postprocess_selected_check $postprocess_selected_check\n";
     if(($query_number_file_present) && (!($postprocess_selected_check))){
 	print STDERR "Got here wrong\n";
 	open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
@@ -500,7 +500,7 @@ if($page==1){
 	    
 	}
     }else{
-	$processing_table_content=$processing_table_content."<tr><td>Loading..</td></tr>";
+	$processing_table_content=$processing_table_content."<tr><td>Loading</td></tr>";
     }
     
     my $covariance_dir_present;
@@ -552,7 +552,7 @@ if($page==1){
 	    exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /$base_dir/$tempdir/error -o /$base_dir/$tempdir/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
 	}
     }elsif(@postprocess_selected){
-	print STDERR "Got here right\n";
+	#print STDERR "Got here right\n";
 	#create new tempdir
 	my $oldtempdir=$tempdir;	    
 	$tempdir = tempdir ( DIR => $base_dir );
@@ -571,7 +571,7 @@ if($page==1){
 	    if($postprocess_counter==1){
 		copy("$base_dir/$oldtempdir/covariance_model/$postprocess_file","$base_dir/$tempdir/covariance_model/$postprocess_file") or die "Copy failed: $!";
 	    }else{
-		print STDERR "Copy: $rfam_model_dir/$postprocess_file $base_dir/$tempdir/covariance_model/$postprocess_file\n";
+		#print STDERR "Copy: $rfam_model_dir/$postprocess_file $base_dir/$tempdir/covariance_model/$postprocess_file\n";
 		copy("$rfam_model_dir/$postprocess_file.cm","$base_dir/$tempdir/covariance_model/input$postprocess_counter.cm") or die "Copy failed: $!";
 		}
 	    $postprocess_counter++;
@@ -661,8 +661,10 @@ if($page==2){
 	$total=$Rfam_types_occurence{$select_slice};
     }else{
 	 open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
-	 $total=<QUERYNUMBERFILE>;
+	 my $query_number=<QUERYNUMBERFILE>;
 	 close QUERYNUMBERFILE;
+	 #number of comparisons
+	 $total=(($query_number*$query_number)-$query_number)/2;
     }
     my $error_message="";
     my $vars;
@@ -678,7 +680,7 @@ if($page==2){
 	$inputid=$input_id_name_array[0];
 	$inputname=$input_id_name_array[1];
     }else{
-	print STDERR "cmcws: Error inputidname$result_number does not exist in tempdir $base_dir/$tempdir";
+	#print STDERR "cmcws: Error inputidname$result_number does not exist in tempdir $base_dir/$tempdir";
     }
     `executables/output_to_html.pl $server $base_dir $tempdir $result_number $mode $filtered_number $cutoff $model_1_name $model_2_name`==0 or die print STDERR "cmcws: could not execute\n";
 
