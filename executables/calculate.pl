@@ -3,8 +3,6 @@
 use warnings;
 use strict;
 use diagnostics;
-#print STDERR "cmcws: launched calculate.pl\n";
-
 #Input is path to file that should be split
 my $server=$ARGV[0];
 my $tempdir_folder=$ARGV[1];
@@ -54,7 +52,7 @@ if(defined($tempdir_path)){
     my $model_dir="$tempdir_path/covariance_model";
     my $executable_dir="$source_dir"."/executables";
     my $rfam_model_dir="$source_dir"."/data/Rfam11";
-    print "rfam_model_dir: $rfam_model_dir\n";
+    #print "rfam_model_dir: $rfam_model_dir\n";
     my $file;
     my $rfam_file;
     chdir($tempdir_path);
@@ -64,17 +62,21 @@ if(defined($tempdir_path)){
 	#print "Calculate with mode 1\n";
 	my %Rfam_type_slice;
 	unless($select_slice eq "All"){
-	    #load corresponding rfam type hash
-	    open (SLICEHASH, "<$source_dir/data/types/$select_slice") or die "Could not open : $!\n";
-	    #print STDERR "CMCWS - calculate.pl select_slice set to  $select_slice\n";
-	    while(<SLICEHASH>){
-		chomp;
-		my ($key, $value) = split /;/;
-		#print STDERR "CMCWS - before insertion in hash: $key,$value\n";
-		$Rfam_type_slice{$key}=$value;
-		my $testvalue=$Rfam_type_slice{$key};
-		#print STDERR "CMCWS - after insertion in hash: $key,$testvalue\n";
-		
+	    if($select_slice=~/postprocess/){
+		die "Postprocess should only be combined with mode2 never with mode 1\n";
+	    }else{
+		#load corresponding rfam type hash
+		open (SLICEHASH, "<$source_dir/data/types/$select_slice") or die "Could not open : $!\n";
+		#print STDERR "CMCWS - calculate.pl select_slice set to  $select_slice\n";
+		while(<SLICEHASH>){
+		    chomp;
+		    my ($key, $value) = split /;/;
+		    #print STDERR "CMCWS - before insertion in hash: $key,$value\n";
+		    $Rfam_type_slice{$key}=$value;
+		    my $testvalue=$Rfam_type_slice{$key};
+		    #print STDERR "CMCWS - after insertion in hash: $key,$testvalue\n";
+		    
+		}
 	    }
 	    close SLICEHASH;
 	}
@@ -123,18 +125,27 @@ if(defined($tempdir_path)){
 	#fill model array and compare the first model with all other model but itself
 	#compare all following models with all other models but itself and all models that have already been compared
 	#always remove model from array once it has been compared with the others
-	my @model_array;
-	while (defined($file = readdir(DIR))) {
-	    unless($file=~/^\./){
-		push(@model_array,$file);
-	    }
-	}
+
+	#if we see postprocess in $select_slice this is a resubmission of a finished mode 1 (comparison against) rfam
+	#directory
 	open(BEGIN,">$tempdir_path/begin$counter") or die "Can't create begin$counter: $!";
 	close(BEGIN);
 	#read in query_number
 	open (QUERYNUMBERFILE, "<$tempdir_path/query_number")or die "Could not open $tempdir_path/query_number: $!\n";
 	my $query_number=<QUERYNUMBERFILE>;
 	close QUERYNUMBERFILE;
+	
+	
+	    
+	
+	
+	#my @model_array;
+	#while (defined($file = readdir(DIR))) {
+	#    unless($file=~/^\./){
+	#	push(@model_array,$file);
+	#    }
+	#}
+	
 	my $query_counter=1;
 	for(1..$query_number){
 	    my $model="input"."$query_counter".".cm";
@@ -142,22 +153,23 @@ if(defined($tempdir_path)){
 	    my $column_counter=$query_counter+1;
 	    for($column_counter..$query_number){
 		my $compare_model="input"."$column_counter".".cm";
-		print "Foreach: 2Compare-Model $model\n";
+		#print "Foreach: 2Compare-Model $model\n";
 		#we do not increment $counter, because we only produce one result file for all comparisons
 		unless("$model" eq "$compare_model"){
-		    print STDERR "$executable_dir/CMCompare $model_dir/$model $model_dir/$compare_model \>\>$tempdir_path/result$counter";
-		    system("$executable_dir/CMCompare $model_dir/$model $model_dir/$compare_model \>\>$tempdir_path/result$counter")==0 or die print "cmcws: Execution failed: model $model with compare_model $compare_model - $!\n";
-		    print "done: $model, $compare_model\n";
+		    #print STDERR "$executable_dir/CMCompare $model_dir/$model $model_dir/$compare_model \>\>$tempdir_path/result$counter";
+		    system("$executable_dir/CMCompare $model_dir/$model $model_dir/$compare_model \>\>$tempdir_path/result$counter")==0 or die  "cmcws: Execution failed: model $model with compare_model $compare_model - $!\n";
+			#print "done: $model, $compare_model\n";
 		    $column_counter++;
-		}
-		
+		}		
 	    }
 	    $query_counter++;
-	    #shift(@model_array);
-	}      
-	my $number_of_displayed_comparisons=100;
+	}
+	
+	
+	#output stuff
+	my $number_of_displayed_comparisons=10;
 	my $cutoff="none";
-	system("$executable_dir/output_to_html.pl $server $base_dir $tempdir_folder $counter $mode $number_of_displayed_comparisons $cutoff")==0 or die "cmcws: Execution failed: tempdir $tempdir_folder mode $mode error  - $!";
+	system("$executable_dir/output_to_html.pl $server $base_dir $tempdir_folder $counter $mode $number_of_displayed_comparisons $cutoff")==0 or die  "cmcws: Execution failed: tempdir $tempdir_folder mode $mode error  - $!";
 	open(DONE,">$tempdir_path/done$counter") or die "Can't create $tempdir_path/done$file: $!";
 	close(DONE);
 	closedir(DIR);

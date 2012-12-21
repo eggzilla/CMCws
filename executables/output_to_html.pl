@@ -281,7 +281,7 @@ foreach(@filtered_sorted_entries){
 	if($name1=~/$model_name_1_string/g && $name2=~/$model_name_2_string/g){
 	    #print STDERR "\n A \n";
 	    if($mode eq "1"){
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
 		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }
@@ -295,7 +295,7 @@ foreach(@filtered_sorted_entries){
 	#we push matching entries on new array
 	if($name1=~/$model_name_1_string/g){
 	    if($mode eq "1"){
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
 		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }
@@ -309,7 +309,7 @@ foreach(@filtered_sorted_entries){
 	if($name2=~/$model_name_2_string/g){
 	    #print STDERR "\n cmcws: accepted name2 $name2: model_name2: $model_name_2_string\n";
 	    if($mode eq "1"){
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
 		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }
@@ -322,7 +322,7 @@ foreach(@filtered_sorted_entries){
 	}
     }else{
 	if($mode eq "1"){
-	    $output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+	    $output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	}else{
 	    $output_line = "\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	}

@@ -295,11 +295,13 @@ if(defined($input_cutoff)){
 my @postprocess_selected;
 my $postprocess_value;
 foreach my $name(@names){
-    if($name =~ m/p/){
+    if($name =~ m/^p[0-9]+/){
 	#check value
 	$postprocess_value = $query->param("$name");
-	if (($postprocess_value =~ m/[0-9]+\-[0-9]+/)&&(length($postprocess_value)<250)){
+	#print STDERR "Postprocess $postprocess_value\n";
+	if (($postprocess_value =~/\w+/)&&(length($postprocess_value)<250)){
 	    push(@postprocess_selected, $postprocess_value);
+	    print STDERR "Postprocess $postprocess_value\n";
 	}
     }
 }
@@ -326,11 +328,11 @@ if($page==0){
 	$select_slice=<SLICE>;
 	close SLICE;
     }
-
     unless($page==1){
 	print STDERR "Query - $now_string - Page $page Mode $mode\n";
     }
 }
+
 ################ INPUT #####################################
     
 if($page==0){
@@ -427,12 +429,22 @@ if($page==1){
 	print SLICE "$select_slice";
 	close SLICE;
     }
+    my $query_number_file_present;
     if(-e "$base_dir/$tempdir/query_number"){
+	$query_number_file_present=1;
+    }else{
+	$query_number_file_present=0;
+    }
+    print STDERR "query_number_file_present $query_number_file_present\n";
+    my $postprocess_selected_check=@postprocess_selected;
+    print STDERR "postprocess_selected_check $postprocess_selected_check\n";
+    if(($query_number_file_present) && (!($postprocess_selected_check))){
+	print STDERR "Got here wrong\n";
+	open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
+	$query_number=<QUERYNUMBERFILE>;
+	close QUERYNUMBERFILE;
 	if($mode eq "1"){
 	    #each submitted model is compared against rfam
-	    open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
-	    $query_number=<QUERYNUMBERFILE>;
-	    close QUERYNUMBERFILE;
 	    #assemble output
 	    my $counter=1;
 	    for(1..$query_number){
@@ -459,18 +471,9 @@ if($page==1){
 		$processing_table_content=$processing_table_content."<tr><td>$query_id</td><td>$queueing_status</td><td>$model_comparison</td><td>$parsing_output</td><td>$result_page_link</td></tr>";
 		$counter++;
 	    }
-	    
-	}elsif($mode eq "2"){
-	    #if @postprocess_selected is filled we get the results for the comparison between input
-	    #and rfam models from the result list of the old directory and the ones between rfam models
-	    #from the tabulated list
-	    if(@postprocess_selected){
-		#create new tempdir, set old tempdir as old
-	    }else{}
+	}elsif($mode eq "2"){	
 	    #the models are compared againsted each other
-	    open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
-	    $query_number=<QUERYNUMBERFILE>;
-	    close QUERYNUMBERFILE;
+	    #the progress counter must consider postprocessing .. then query number is an invalid measure   
 	    my $counter=1;
 	    my $query_id=1;
 	    my $queueing_status="";
@@ -494,11 +497,22 @@ if($page==1){
 	    if(-e "$base_dir/$tempdir/done$counter"){$result_page_link="<a href=\"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir&result_number=$counter\">Link</a>"; } 
 	    else{$result_page_link=""}
 	    $processing_table_content=$processing_table_content."<tr><td>$query_id</td><td>$queueing_status</td><td>$model_comparison</td><td>$parsing_output</td><td>$result_page_link</td></tr>";	    
+	    
 	}
     }else{
 	$processing_table_content=$processing_table_content."<tr><td>Loading..</td></tr>";
     }
-    unless(-e "$base_dir/$tempdir/covariance_model"){
+    
+    my $covariance_dir_present;
+    if(-e "$base_dir/$tempdir/covariance_model"){
+	$covariance_dir_present=1;
+    }else{
+	$covariance_dir_present=0;
+    }
+    unless($covariance_dir_present){
+	#if @postprocess_selected is filled we get the results for the comparison between input
+	#and rfam models from the array.
+
 	#add to path or taintcheck will complain
 	$ENV{PATH}="$base_dir/$tempdir/:/usr/bin/:$source_dir/:/bin/:$source_dir/executables";
 	mkdir("$base_dir/$tempdir/covariance_model",0744);
@@ -510,12 +524,64 @@ if($page==1){
 	print COMMANDS "$source_dir/executables/split_input.pl $base_dir/$tempdir/input_file $base_dir/$tempdir/;\n";
 	print COMMANDS "$source_dir/executables/convert_stockholmdir_to_cmdir.pl $base_dir/$tempdir $source_dir;\n";
 	print COMMANDS "$source_dir/executables/calculate.pl $server $tempdir $source_dir $mode $select_slice;\n";
-	#print COMMANDS ";\n";
-	if($mode eq "1"){
-	    #set stuff specific for mode 1
-	}elsif($mode eq "2"){
-	    #set stuff specific for mode 2
+	
+	#FORK here
+	if (my $pid = fork) {
+	    $query->delete_all();
+	    #send user to result page
+	    #redirect
+	    #print"<script type=\"text/javascript\">
+	    #                        window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=1&mode=$mode&tempdir=$tempdir\"\', 5000);
+	    #                        </script>";
+	    close COMMANDS; #close COMMANDS so child can reopen filehandle
+	}elsif (defined $pid){		
+	    close STDOUT;
+	    #open (COMMANDS, ">>$base_dir/$tempdir/commands.sh") or die "Could not create commands.sh";
+	    #print COMMANDS "touch $base_dir/$tempdir/done;\n";
+	    #close COMMANDS;
+	    my $ip_adress=$ENV{'REMOTE_ADDR'};
+	    $ip_adress=~s/\.//g;
+	    my ($sec,$min,$hour,$day,$month,$yr19,@rest) = localtime(time);
+	    my $timestamp=(($yr19+1900)."-".sprintf("%02d",++$month)."-".sprintf("%02d",$day)."-".sprintf("%02d",$hour).":".sprintf("%02d",$min).":".sprintf("%02d",$sec));
+	    #write report to accounting file
+	    open(ACCOUNTING, ">>$base_dir/accounting/accounting") or die "Could not write to accounting file: $!/n";
+	    #ipaddress tempdir timestamp mode querynumber
+	    print ACCOUNTING "$ip_adress $tempdir $timestamp $mode $query_number\n";
+	    close ACCOUNTING;
+	    chmod (0755,"$base_dir/$tempdir/commands.sh");
+	    exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /$base_dir/$tempdir/error -o /$base_dir/$tempdir/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
 	}
+    }elsif(@postprocess_selected){
+	print STDERR "Got here right\n";
+	#create new tempdir
+	my $oldtempdir=$tempdir;	    
+	$tempdir = tempdir ( DIR => $base_dir );
+	$tempdir =~ s/$base_dir\///;
+	chmod 0755, "$base_dir/$tempdir";
+	#add to path or taintcheck will complain
+	$ENV{PATH}="$base_dir/$tempdir/:/usr/bin/:$source_dir/:/bin/:$source_dir/executables";
+	mkdir("$base_dir/$tempdir/covariance_model",0744);
+	mkdir("$base_dir/$tempdir/stockholm_alignment",0744);
+	open (COMMANDS, ">$base_dir/$tempdir/commands.sh") or die "Could not create comments.sh";	
+	print COMMANDS "#!/bin/bash\n";
+	#copy the models of choice there and continue with normal mode 2 procedure
+	my $postprocess_counter=1;
+	my $rfam_model_dir="$source_dir"."/data/Rfam11";
+	foreach my $postprocess_file (@postprocess_selected){
+	    if($postprocess_counter==1){
+		copy("$base_dir/$oldtempdir/covariance_model/$postprocess_file","$base_dir/$tempdir/covariance_model/$postprocess_file") or die "Copy failed: $!";
+	    }else{
+		print STDERR "Copy: $rfam_model_dir/$postprocess_file $base_dir/$tempdir/covariance_model/$postprocess_file\n";
+		copy("$rfam_model_dir/$postprocess_file.cm","$base_dir/$tempdir/covariance_model/input$postprocess_counter.cm") or die "Copy failed: $!";
+		}
+	    $postprocess_counter++;
+	}
+	$postprocess_counter=$postprocess_counter-1;
+	#in the postprocessing case querynumber is created here, this is normally done by split input
+	open (QUERYNUMBER, ">$base_dir/$tempdir/query_number") or die "Could not create query_number";
+	print QUERYNUMBER "$postprocess_counter";
+	close QUERYNUMBER;
+	print COMMANDS "$source_dir/executables/calculate.pl $server $tempdir $source_dir $mode $select_slice;\n";
 	#FORK here
 	if (my $pid = fork) {
 	    $query->delete_all();
@@ -543,6 +609,8 @@ if($page==1){
 	    exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /$base_dir/$tempdir/error -o /$base_dir/$tempdir/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
 	}
     }
+    
+    
     my $progress_redirect="<script>
 	     window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=1&mode=$mode&tempdir=$tempdir\"\', 5000);    
           </script>";
@@ -602,7 +670,6 @@ if($page==2){
     my $inputid;
     my $inputname;
     #get input id and name
- 
     if(-e "$base_dir/$tempdir/inputidname$result_number"){
 	open (INPUTIDNAME, "<$base_dir/$tempdir/inputidname$result_number")or die "Could not open $base_dir/$tempdir/inputidname$result_number: $!\n";
 	my $input_id_name_string=<INPUTIDNAME>;
@@ -611,7 +678,7 @@ if($page==2){
 	$inputid=$input_id_name_array[0];
 	$inputname=$input_id_name_array[1];
     }else{
-	print  STDERR "cmcws: Error inputidname$result_number does not exist in tempdir $base_dir/$tempdir";
+	print STDERR "cmcws: Error inputidname$result_number does not exist in tempdir $base_dir/$tempdir";
     }
     `executables/output_to_html.pl $server $base_dir $tempdir $result_number $mode $filtered_number $cutoff $model_1_name $model_2_name`==0 or die print STDERR "cmcws: could not execute\n";
 
@@ -629,11 +696,12 @@ if($page==2){
 		scriptfile => "$output_script_file",
 		stylefile => "outputstylefile",
 		mode => "$mode",
-		filter_fields=>"output_filter_fields1",
-		table_header=> "output_table_header1",
-		output_title=>"Top $filtered_number results of $total total for $inputid - $inputname (cutoff = $cutoff):",	
+		filter_fields =>"output_filter_fields1",
+		table_header => "output_table_header1",
+		output_title =>"Top $filtered_number results of $total total for $inputid - $inputname (cutoff = $cutoff):",
+		inputid => "$inputid",
 		filtered_table => "./html/$tempdir/filtered_table$result_number",
-		cm_map=> "./html/$tempdir/graph"."$result_number".".svg",
+		cm_map => "./html/$tempdir/graph"."$result_number".".svg",
 		cm_output_file => "./html/$tempdir/result$result_number",
 		csv_file => "./html/$tempdir/csv$result_number",
 		csv_filtered_file => "./html/$tempdir/csv_filtered$result_number",
@@ -659,9 +727,6 @@ if($page==2){
 	    #each submitted model is compared against rfam
 	    $file = './template/output.html';
 	    $output_script_file="outputscriptfile";
-	    #open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
-	    #my $query_number=<QUERYNUMBERFILE>;
-	    #close QUERYNUMBERFILE;
 	    $vars = {
 		#define global variables for javascript defining the current host (e.g. linse) for redirection
 		serveraddress => "$server",
@@ -792,7 +857,6 @@ sub check_input{
 	    $covariance_model_detected=0;
 	}
     }
-    
     if(@input_elements>2){
 	#input 
 	my $input_element_count=@input_elements;
