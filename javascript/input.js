@@ -64,8 +64,8 @@ function step1_operation(ref){
     var operation1_selected=search.test(selected_operation);
     if(operation1_selected==true){
 	code ="<div id=\"validation_message\"></div>"+
-	    "Upload a covariance model<br>"+
-	    "or a multiple alignment <a href=\"#\" onmouseover=\"XBT(this, {id:'2'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"pictures/info.png\"></a>:<br>"+
+	    "Upload a file containing covariance models<br>"+
+	    "or multiple alignments <a href=\"#\" onmouseover=\"XBT(this, {id:'2'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"pictures/info.png\"></a>:<br>"+
 	    "<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">" +
             "<br><input name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
             "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\">" +
@@ -75,8 +75,8 @@ function step1_operation(ref){
             "</form>";
     }else{
 	code ="<div id=\"validation_message\"></div>"+
-	    "Upload a file containing a group of<br>"+
-	    "multiple alignments or covariance models <a href=\"#\" onmouseover=\"XBT(this, {id:'3'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"pictures/info.png\"></a>:<br>"+
+	    "Upload a file containing covariance models<br>"+
+	    "or multiple alignments <a href=\"#\" onmouseover=\"XBT(this, {id:'3'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"pictures/info.png\"></a>:<br>"+
 	    "<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">" +
             "<br><input name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
             "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\">" +
@@ -135,7 +135,7 @@ function sample_mode1(){
 		"<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">"+
 	"Which part of Rfam do you want to compare against?  "+
 	"<select id=\"select_slice\" size=\"3\" name=\"select_slice\">"+
-	"<option>All</option>"+
+	"<option selected>All</option>"+
 	"<option>Gene</option>"+
 	"<option>CRISPR</option>"+
 	"<option>antisense</option>"+
