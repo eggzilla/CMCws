@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta charset="UTF-8">
     <title>CMcompare - Webserver - Help</title>
     <style type="text/css">
       table {table-layout:fixed; text-align:center; overflow:auto; border:0px black solid; width:95%; word-wrap:break-word; }
@@ -13,7 +13,7 @@
     <div style="text-align:center">
       <table>
 	<tr>
-	  <td rowspan="2"><img alt="" src="./pictures/banner.png"></td>
+	  <td rowspan="2"><img alt="Banner" src="./pictures/banner.png"></td>
 	  <td style="width:5%;"></td>
           <td style="width:20%;"><a href="introduction.html"><img src="./pictures/introduction.png" alt="Introduction" style="border:0"></a></td>
           <td style="width:15%;"><a href="cmcws.cgi"><img src="./pictures/compare.png" alt="Target Search" style="border:0"></a></td>
@@ -38,9 +38,12 @@
 	    </p>
 	    <p>
 	      The information below is both a tutorial and a description of of the webserver.
-	      Tooltips <img style="vertical-align:middle;border:0;" src="pictures/info.png" alt="info"> are positioned at critical junctions in the workflow, please use them
-	      as well.
-
+	      Tooltips <img style="vertical-align:middle;border:0;" src="pictures/info.png" alt="info"> are positioned at critical junctions in the workflow, please use them as well.
+	    </p>
+	    <p>
+	      There are 2 sample buttons labeled <em>cm vs Rfam - demo</em> and <em>cm vs cm - demo</em>. The first button supplies the server with the tRNA-family covariance model, while the second button automatically submits the 6 covariance models representing the member families of the tRNA-clan. You can jump directly to the result pages: <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=2&amp;mode=1&amp;tempdir=XrqApnuTu_&amp;result_number=1">cm vs Rfam</a>, <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=2&amp;mode=2&amp;tempdir=lTXKfoRwCH&amp;result_number=1">cm vs cm</a>. These 2 examples will also be used in the text below.
+	    </p>
+	    <p>
 	      If you have additional suggestions, questions or comments please do not hesitate
 	      to <a href='mailto:egg@tbi.univie.ac.at'>contact</a> us. 
 	    </p>
@@ -56,40 +59,42 @@
 	    <p>
 	      Type 1: <b>covariance model vs Rfam</b> compares each of the provided
 	      covariance models against all covariance models in available
-	      in Rfam 11.<br>
+	      in <a href="http://rfam.sanger.ac.uk/">Rfam 11</a>.<br>
 	      Type 2: <b>covariance model vs covariance model</b>
 	      compare each of the provided covariance models with
 	      each other.<br>
 	    </p>
-	    <p>
-	      <table>
-		<tr>
-		  <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help1.png"></td>
-		  <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help1-1.png"></td>
-		</tr>
-		<tr>
-		  <td><em>Figure 1</em></td>
-		  <td><em>Figure 2</em></td>
-		</tr>
-	      </table>
-	    </p>
+	    
+	    <table>
+	      <tr>
+		<td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help1.png" alt="mode-selection"></td>
+		<td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help1-1.png" alt="upload-field"></td>
+	      </tr>
+	      <tr>
+		<td><em>Figure 1</em></td>
+		<td><em>Figure 2</em></td>
+	      </tr>
+	    </table>
 	    <p>
 	       Uploaded files (see Figure 2) can contain up to 10 covariance models or
 	       stockholm alignments and must not exeed 1 megabyte in size.
 	       covariance model vs covariance model comparison requires at
-	       least 2 models.
+	       least 2 models. Clicking <em>Submit</em> takes you to the next step
+	       or provides you with an error message if there is a problem with the
+	       input. You can review the two example input-files used for
+	       <a href="RF00005.cm">demo1</a> (tRNA-family) and <a href="mode2.cm">demo2</a> (members of the tRNA clan - CL00001).
 	     </p>
 	    <p>
 	      The second step lets you review your
 	      input before submission. If you want to compare your model
 	      against Rfam (Figure 3) you can additionally specify the entry type of model, e.g. miRNA (see <a href="ftp://ftp.sanger.ac.uk/pub/databases/Rfam/11.0/USERMAN">Rfam User-manual</a>).
-	      All other models will be omitted.<br> In case of comparing a set of models with each other
+	      All other models will be omitted which reduces processing time.<br> In case of comparing a set of models with each other
 	      just a summary of submitted models is displayed (Figure 4).
 	    </p>
 	    <table>
 		<tr>
-		  <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help2-1.png"></td>
-		  <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help2-2.png"></td>
+		  <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help2-1.png" alt="confirm1"></td>
+		  <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help2-2.png" alt="confirm2"></td>
 		</tr>
 		<tr>
 		  <td><em>Figure 3</em></td>
@@ -102,24 +107,118 @@
 	      <em><u>Processing</u></em>
 	    </p>
 	    <p>
-	      
-	    <p>
-	    <p>
-	      conversion of stockholm alignments<br>
-	      CMCversion
+	      The progress of your query is displayed during the whole processing step. You can save
+	      the URL of the processing page to retrieve your results later (see Figure 5).
 	    </p>
+	    <table>
+	      <tr>
+		<td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help3.png" alt="progress1"></td>
+	      </tr>
+	      <tr>
+		<td><em>Figure 5</em></td>
+	      </tr>
+	    </table>
+	    <p>
+	      If your upload contains stockholm-format alignments these are converted to covariance models
+	      by cmbuild (<a href="http://infernal.janelia.org/"> Infernal Version 1.1rc1</a>). In case of <em>covariance model vs Rfam</em> each
+	      of your submitted models will be compared against all 2208 models currently available in <a href="http://rfam.sanger.ac.uk/">Rfam 11</a> in <a href="ftp://ftp.sanger.ac.uk/pub/databases/Rfam/11.0/Rfam.cm.1_1.gz">Infernal 1.1rc1 format</a>. Using <em>covariance model vs covariance model</em> just yout uploaded set of models will be compared. CMcompare is computing the comparison results (<a href="http://www.tbi.univie.ac.at/software/cmcompare/">Homepage</a>, <a href="http://bioinformatics.oxfordjournals.org/content/26/18/i453.full">Paper</a>).
+	      
+	      The last step is production of the output. The covariance model graphs are produced with the <a href="http://www.graphviz.org/">graphviz libary</a>.
+	    </p>
+	    <p>
+	      Upon completion of your query, a link to the result page is displayed (see Figure 6).
+	    </p>
+	    <table>
+	      <tr>
+		<td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help3-2.png" alt="progress2"></td>
+	      </tr>
+	      <tr>
+		<td><em>Figure 6</em></td>
+	      </tr>
+	    </table>
 	    <hr>
 	    <p style="margin-top: 0.17in;">
 	      <em><u>Output</u></em>
 	    </p>
 	    <p>
+	      Output is based on the list of comparisons. Due to different filtering, processing options  for the two types of comparison will be described independently. 
+	    </p>
+	    <p>
+	      Output - <em>covariance model vs Rfam</em>:
+	    </p>
+	    <p>
+	      The title summarizes the current input model and the currently selected filtering criteria (see Figure 7). The number following Top, is the count of comparisons displayed on this page.  total number is the count of all comparison partners(all Rfam models, or just those with a special type, e.g. miRNA). All displayed interactions have a Linkscore that is greater or equal the cutoff.
+	    </p>
+	     <table> 
+	       <tr>
+		 <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help4-1.png" alt="titel"></td>
+	       </tr>
+	      <tr>
+		<td><em>Figure 7</em></td>
+	      </tr>
+	     </table>
+	     <p>
+	       The covariance model graph visualizes selected linked models as nodes an their comparison result (Linkscore) as edge (see Figure 8). Clicking the Linkscore close to the edge of interest shows the detailed results of that comparison (see below).
+	     </p>
+	     <table> 
+	       <tr>
+		 <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help4-3.png" alt="covraince-model-graph"></td>
+	       </tr>
+	      <tr>
+		<td><em>Figure 8</em></td>
+	      </tr>
+	     </table>
+	     <p>
+	       The downloads in the first line contain all comparison results as comma separated value file (.csv), or raw output from CMcompare (.output).<br>
+	       All other downloads are specific for the current filtering options (see Figure 9).
+	     </p>
+	      <table> 
+	       <tr>
+		 <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help4-4.png" alt="Downloads"></td>
+	       </tr>
+	      <tr>
+		<td><em>Figure 9</em></td>
+	      </tr>
+	      </table>
+	      <p>
+		Filtering options allow to set a maximum of total models that have a Linkscore greater or equal of the cutoff value and contain
+		the specified model name (see Figure 10). The covariance model graph and the filtered .csv file are based on the current filtering options.
+		Filtering is triggered by clicking the filter button.
+	      </p>
+	      <table> 
+		<tr>
+		  <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help4-5.png" alt="Filtering"></td>
+		</tr>
+		<tr>
+		  <td><em>Figure 10</em></td>
+		</tr>
+	      </table>
+	    <p>
+	      The list of comparisons provides only a part of details from CMcompare output, to simplify the identification of relevant links (see Figure 11).
+	      Sorting of the list is possible by clicking the header of the column to be sorted. Sortable columns are indicated by a triangle next to the
+	      column title. Magnifing glasses in each line show a detailed view of each comparison, and provide all output details of CMcompare.
+	      Optionally a set of interesting models can be compared versus each other by selecting the checkboxes at the beginning of those lines
+	      and clicking <em>cm vs cm</em>. 
+	    </p>
+	    <table> 
+		<tr>
+		  <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help4-6.png" alt="resultlist"></td>
+		</tr>
+		<tr>
+		  <td><em>Figure 11</em></td>
+		</tr>
+	      </table>
+	    <p>
+	      Output - <em>covariance model vs covariance model</em>:
+	    </p>
+	    <p>
 	      
 	    </p>
-	    </div>
+	  </div>
 	</td>
-	</tr>
-      </table>	
- 
+      </tr>
+    </table>	
+    
     <div class="copyright">
       <hr>
       2012  - <a href="http://www.tbi.univie.ac.at">TBI</a> - <a href="mailto:egg@tbi.univie.ac.at">Contact</a>
