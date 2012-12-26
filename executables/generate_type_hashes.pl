@@ -21,22 +21,25 @@ while(<INPUTFILE>){
 }
 close INPUTFILE;
 print @input;
+#all model counter tracks the total number of models
 my $all_models_counter=0;
 foreach my $line (@input){
     chomp($line);
     my @split_array = split(/,/,$line);
+    $all_models_counter++;
     my @types=split(/;/,$split_array[3]);
     foreach my $type (@types){
 	#we exclude the csv - header line 
 	if($type=~/\w+/ && $type ne "Type"){
 	    #we push everything on the type array and flatten it with uniqe afterwards
 	    $type=~s/\s+//;
-	    $all_models_counter++;
 	    push(@multiple_Rfam_types,$type);
 	}
     }   
 }
 my @unique_Rfam_types = uniq @multiple_Rfam_types;
+#substract 1 from the model counter to consider the header line
+$all_models_counter=$all_models_counter-1;
 open (OVERVIEW, ">>types/overview") or die "Cannot write output file";
 print OVERVIEW "All;$all_models_counter\n";
 close OVERVIEW;
