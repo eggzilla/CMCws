@@ -34,14 +34,24 @@
 	<td>
 	  <div style="text-align:left">
 	    <p style="margin-top: 0.17in;">
-	      <em><u>General Information</u></em>
+	      <a name="general_information" href="#general_information"><em><u>General Information</u></em></a>
 	    </p>
 	    <p>
 	      The information below is both a tutorial and a description of of the webserver.
-	      Tooltips <img style="vertical-align:middle;border:0;" src="pictures/info.png" alt="info"> are positioned at critical junctions in the workflow, please use them as well.
+	      Tooltips <img style="vertical-align:middle;border:0;" src="pictures/info.png" alt="info"> are positioned at critical junctions in the workflow, please use them as well. The purpose of the webserver is described on the <a href="introduction.html">introduction page</a>.
 	    </p>
 	    <p>
 	      There are 2 sample buttons labeled <em>cm vs Rfam - demo</em> and <em>cm vs cm - demo</em>. The first button supplies the server with the tRNA-family covariance model, while the second button automatically submits the 6 covariance models representing the member families of the tRNA-clan. You can jump directly to the result pages: <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=2&amp;mode=1&amp;tempdir=XrqApnuTu_&amp;result_number=1">cm vs Rfam</a>, <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=2&amp;mode=2&amp;tempdir=lTXKfoRwCH&amp;result_number=1">cm vs cm</a>. These 2 examples will also be used in the text below.
+	    </p>
+	    <p>
+	      <u>Content</u><br>
+	      &#160;<a href="#general_information">General Information</a><br>
+	      &#160;<a href="#input">Input</a><br>
+	      &#160;<a href="#processing">Processing</a><br>
+	      &#160;<a href="#output">Output</a><br>
+	      &#160;<a href="#cm_vs_Rfam">-cm vs Rfam</a><br>
+	      &#160;<a href="#cm_vs_cm">-cm vs cm</a><br>
+	      &#160;<a href="#detailed_comparison">-Detailed Comparison</a><br>
 	    </p>
 	    <p>
 	      If you have additional suggestions, questions or comments please do not hesitate
@@ -49,7 +59,7 @@
 	    </p>
 	    <hr>
 	    <p style="margin-top: 0.17in;">
-	      <em><u>Input</u></em>
+	      <a name="input" href="#input"><em><u>Input</u></em></a>
 	    </p>
 	    <p>
 	      The first step is to choose one of the 2 types of comparison
@@ -71,8 +81,8 @@
 		<td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help1-1.png" alt="upload-field"></td>
 	      </tr>
 	      <tr>
-		<td><em>Figure 1</em></td>
-		<td><em>Figure 2</em></td>
+		<td><em>Figure 1: Mode Selection</em></td>
+		<td><em>Figure 2: File Upload</em></td>
 	      </tr>
 	    </table>
 	    <p>
@@ -97,14 +107,14 @@
 		  <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help2-2.png" alt="confirm2"></td>
 		</tr>
 		<tr>
-		  <td><em>Figure 3</em></td>
-		  <td><em>Figure 4</em></td>
+		  <td><em>Figure 3: Confirmation - cm vs Rfam</em></td>
+		  <td><em>Figure 4: Confirmation - cm vs cm</em></td>
 		</tr>
 	      </table>
 	    Clicking <em>Compare</em> takes you to the processing step.
 	    <hr>
 	    <p style="margin-top: 0.17in;">
-	      <em><u>Processing</u></em>
+	      <a name="processing" href="#processing"><em><u>Processing</u></em></a>
 	    </p>
 	    <p>
 	      The progress of your query is displayed during the whole processing step. You can save
@@ -115,7 +125,7 @@
 		<td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help3.png" alt="progress1"></td>
 	      </tr>
 	      <tr>
-		<td><em>Figure 5</em></td>
+		<td><em>Figure 5: Progress</em></td>
 	      </tr>
 	    </table>
 	    <p>
@@ -133,18 +143,18 @@
 		<td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help3-2.png" alt="progress2"></td>
 	      </tr>
 	      <tr>
-		<td><em>Figure 6</em></td>
+		<td><em>Figure 6: Processing completed</em></td>
 	      </tr>
 	    </table>
 	    <hr>
 	    <p style="margin-top: 0.17in;">
-	      <em><u>Output</u></em>
+	       <a name="output" href="#output"><em><u>Output</u></em></a>
 	    </p>
 	    <p>
 	      Output is based on the list of comparisons. Due to different filtering, processing options  for the two types of comparison will be described independently. 
 	    </p>
 	    <p>
-	      Output - <em>covariance model vs Rfam</em>:
+	       <a name="cm_vs_Rfam" href="#cm_vs_Rfam">Output - <em>covariance model vs Rfam</em></a>:
 	    </p>
 	    <p>
 	      The title summarizes the current input model and the currently selected filtering criteria (see Figure 7). The number following Top, is the count of comparisons displayed on this page.  total number is the count of all comparison partners(all Rfam models, or just those with a special type, e.g. miRNA). All displayed interactions have a Linkscore that is greater or equal the cutoff.
@@ -154,18 +164,18 @@
 		 <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help4-1.png" alt="titel"></td>
 	       </tr>
 	      <tr>
-		<td><em>Figure 7</em></td>
+		<td><em>Figure 7: Title</em></td>
 	      </tr>
 	     </table>
 	     <p>
-	       The covariance model graph visualizes selected linked models as nodes an their comparison result (Linkscore) as edge (see Figure 8). Clicking the Linkscore close to the edge of interest shows the detailed results of that comparison (see below).
+	       The covariance model graph visualizes selected linked models as nodes an their comparison result (Linkscore) as edge (see Figure 8). Clicking the Linkscore close to the edge of interest shows the detailed results of that comparison (see Figure 16).
 	     </p>
 	     <table> 
 	       <tr>
-		 <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help4-3.png" alt="covraince-model-graph"></td>
+		 <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help4-3.png" alt="covariance-model-graph"></td>
 	       </tr>
 	      <tr>
-		<td><em>Figure 8</em></td>
+		<td><em>Figure 8: covariance-model-graph</em></td>
 	      </tr>
 	     </table>
 	     <p>
@@ -177,7 +187,7 @@
 		 <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help4-4.png" alt="Downloads"></td>
 	       </tr>
 	      <tr>
-		<td><em>Figure 9</em></td>
+		<td><em>Figure 9: Downloads</em></td>
 	      </tr>
 	      </table>
 	      <p>
@@ -190,7 +200,7 @@
 		  <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help4-5.png" alt="Filtering"></td>
 		</tr>
 		<tr>
-		  <td><em>Figure 10</em></td>
+		  <td><em>Figure 10: Filtering</em></td>
 		</tr>
 	      </table>
 	    <p>
@@ -202,23 +212,89 @@
 	    </p>
 	    <table> 
 		<tr>
-		  <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help4-6.png" alt="resultlist"></td>
+		  <td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help4-6.png" alt="results"></td>
 		</tr>
 		<tr>
-		  <td><em>Figure 11</em></td>
+		  <td><em>Figure 11: Results</em></td>
 		</tr>
 	      </table>
 	    <p>
-	      Output - <em>covariance model vs covariance model</em>:
+	      <a name="cm_vs_cm" href="#cm_vs_cm">Output - <em>covariance model vs covariance model</em></a>:
 	    </p>
 	    <p>
-	      
+	      Just the features distingishing this mode from the comparison with Rfam will be described here.
 	    </p>
+	    <p>
+	      This mode serves to explore the relationship of multiple models with each other. The result linkscore matrix represents each pairwise comparison and highlights strongly linked models by color (see Figure 12). 
+	      <li>
+		<ul>linkscore >20: red</ul>
+		<ul>linkscore <20 >10: orange </ul>
+		<ul>linkscore <10 >5: yellow</ul>
+		<ul>linkscore <5 >0: white</ul>
+		<ul>linkscore <0: blue</ul>
+	      </li>
+	      Comparisons of interest can be viewed in more detail by clicking the linkscore in the matrix.
+	    </p>
+	    <table> 
+	      <tr>
+		<td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help5-1.png" alt="Linkscore-matrix"></td>
+	      </tr>
+		<tr>
+		  <td><em>Figure 12: Linkscore-matrix</em></td>
+		</tr>
+	    </table>
+	    <p>
+	    Also the covariance model graph visualizes multiple links between models and is redrawn according to filtering.
+	    </p>
+	    <table> 
+	      <tr>
+		<td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help5-4.png" alt="covariance model graph - cm vs cm"></td>
+	      </tr>
+		<tr>
+		  <td><em>Figure 13: Covariance model graph - cm vs cm</em></td>
+		</tr>
+	    </table>
+	    <p>
+	      Filtering options allow to specify the names of both models used in the comparison.
+	    </p>
+	    <table> 
+	      <tr>
+		<td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help5-2.png" alt="Filtering - cm vs cm"></td>
+	      </tr>
+		<tr>
+		  <td><em>Figure 14: Filtering - cm vs cm</em></td>
+		</tr>
+	    </table>
+	    <p>
+	      The result table contains the names of both models used in the comparison.
+	    </p>
+	     <table> 
+	      <tr>
+		<td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help5-3.png" alt="Results - cm vs cm"></td>
+	      </tr>
+		<tr>
+		  <td><em>Figure 15: Results - cm vs cm</em></td>
+		</tr>
+	     </table>
+	    <p>
+	      <a name="detailed_comparison" href="#detailed_comparison">Output - <em>Detailed Comparison</em></a>:
+	    </p>
+	    <p>
+	      The detailed comparison table provides the full CMCompare output. Individual scores
+	      of both models, as well as the secondary structure shared between the models are contained. The matching nodes line maps the secondary structure to the nodes of the model.
+	    </p>
+	    <table> 
+	      <tr>
+		<td><img style="vertical-align:middle;border:1px solid #021a40;" src="pictures/help6-1.png" alt="Detailed Comparison"></td>
+	  </tr>
+	      <tr>
+		<td><em>Figure 16: Detailed Comparison</em></td>
+	      </tr>
+	    </table>
 	  </div>
 	</td>
       </tr>
     </table>	
-    
     <div class="copyright">
       <hr>
       2012  - <a href="http://www.tbi.univie.ac.at">TBI</a> - <a href="mailto:egg@tbi.univie.ac.at">Contact</a>
