@@ -41,7 +41,7 @@
 	      Tooltips <img style="vertical-align:middle;border:0;" src="pictures/info.png" alt="info"> are positioned at critical junctions in the workflow, please use them as well. The purpose of the webserver is described on the <a href="introduction.html">introduction page</a>.
 	    </p>
 	    <p>
-	      There are 2 sample buttons labeled <em>cm vs Rfam - demo</em> and <em>cm vs cm - demo</em>. The first button supplies the server with the tRNA-family covariance model, while the second button automatically submits the 6 covariance models representing the member families of the tRNA-clan. You can jump directly to the result pages: <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=2&amp;mode=1&amp;tempdir=XrqApnuTu_&amp;result_number=1">cm vs Rfam</a>, <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=2&amp;mode=2&amp;tempdir=lTXKfoRwCH&amp;result_number=1">cm vs cm</a>. These 2 examples will also be used in the text below.
+	      There are 2 sample buttons labeled <em>cm vs Rfam - demo</em> and <em>cm vs cm - demo</em>. The first button supplies the server with the tRNA-family covariance model (cm), while the second button automatically submits the 6 covariance models representing the member families of the tRNA-clan. You can jump directly to the result pages: <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=2&amp;mode=1&amp;tempdir=XrqApnuTu_&amp;result_number=1">cm vs Rfam</a>, <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=2&amp;mode=2&amp;tempdir=lTXKfoRwCH&amp;result_number=1">cm vs cm</a>. These 2 examples will also be used in the text below.
 	    </p>
 	    <p>
 	      <u>Content:</u><br>
@@ -74,10 +74,13 @@
 	    <p>
 	      Type 1: <b>covariance model vs Rfam</b> compares each of the provided
 	      covariance models against all covariance models in available
-	      in <a href="http://rfam.sanger.ac.uk/">Rfam 11</a>.<br>
+	      in <a href="http://rfam.sanger.ac.uk/">Rfam 11</a>. Already existing family models
+	      for the same non-coding RNA or related models can be identified in this manner.<br>
 	      Type 2: <b>covariance model vs covariance model</b>
-	      compare each of the provided covariance models with
-	      each other.<br>
+	      compares each of the provided covariance models with
+	      each other. This can be useful to identify potential members of a clan.
+	      Models of interest from <em>cm vs Rfam</em> can be reexamined with this mode.
+	      <br>
 	    </p>
 	    
 	    <table>
@@ -93,17 +96,17 @@
 	    <p>
 	       Uploaded files (see Figure 2) can contain up to 10 covariance models or
 	       stockholm alignments and must not exeed 1 megabyte in size.
-	       covariance model vs covariance model comparison requires at
+	       <em>cm vs cm</em> comparison requires at
 	       least 2 models. Clicking <em>Submit</em> takes you to the next step
 	       or provides you with an error message if there is a problem with the
 	       input. You can review the two example input-files used for
 	       <a href="RF00005.cm">demo1</a> (tRNA-family) and <a href="mode2.cm">demo2</a> (members of the tRNA clan - CL00001).
 	     </p>
 	    <p>
-	      The second step lets you review your
+	      The second step lets you check your
 	      input before submission. If you want to compare your model
 	      against Rfam (Figure 3) you can additionally specify the entry type of model, e.g. miRNA (see <a href="ftp://ftp.sanger.ac.uk/pub/databases/Rfam/11.0/USERMAN">Rfam User-manual</a>).
-	      All other models will be omitted which reduces processing time.<br> In case of comparing a set of models with each other
+	      All other models will be omitted, which reduces processing time.<br> In case of comparing a set of models with each other
 	      just a summary of submitted models is displayed (Figure 4).
 	    </p>
 	    <table>
@@ -136,9 +139,9 @@
 	    <p>
 	      If your upload contains stockholm-format alignments these are converted to covariance models
 	      by cmbuild (<a href="http://infernal.janelia.org/"> Infernal Version 1.1rc1</a>). In case of <em>covariance model vs Rfam</em> each
-	      of your submitted models will be compared against all 2208 models currently available in <a href="http://rfam.sanger.ac.uk/">Rfam 11</a> in <a href="ftp://ftp.sanger.ac.uk/pub/databases/Rfam/11.0/Rfam.cm.1_1.gz">Infernal 1.1rc1 format</a>. Using <em>covariance model vs covariance model</em> just yout uploaded set of models will be compared. CMcompare is computing the comparison results (<a href="http://www.tbi.univie.ac.at/software/cmcompare/">Homepage</a>, <a href="http://bioinformatics.oxfordjournals.org/content/26/18/i453.full">Paper</a>).
+	      of your submitted models will be compared against all 2208 models (<a href="http://rfam.sanger.ac.uk/">Rfam 11</a> currently available or against a subset specified by the entry type you defined. The used models are in <a href="ftp://ftp.sanger.ac.uk/pub/databases/Rfam/11.0/Rfam.cm.1_1.gz">Infernal 1.1rc1 format</a>. Using <em>covariance model vs covariance model</em> just yout uploaded set of models will be compared. CMcompare is computing the comparison results (<a href="http://www.tbi.univie.ac.at/software/cmcompare/">Homepage</a>, <a href="http://bioinformatics.oxfordjournals.org/content/26/18/i453.full">Paper</a>).
 	      
-	      The last step is production of the output. The covariance model graphs are produced with the <a href="http://www.graphviz.org/">graphviz libary</a>.
+	      The last step is parsing of the output. The covariance model graphs are produced with the <a href="http://www.graphviz.org/">graphviz libary</a>.
 	    </p>
 	    <p>
 	      Upon completion of your query, a link to the result page is displayed (see Figure 6).
@@ -156,13 +159,13 @@
 	       <a id="output" href="#output"><em><u>Output</u></em></a>
 	    </p>
 	    <p>
-	      Output is based on the list of comparisons. Due to different filtering, processing options  for the two types of comparison will be described independently. 
+	      Output is based on the list of comparisons. Due to different filtering and processing options for the two types of comparison, we will first describe the comparison vs Rfam. The additional features of the <em>cm vs cm</em> mode will be described below.
 	    </p>
 	    <p>
 	       <a id="cm_vs_Rfam" href="#cm_vs_Rfam">Output - <em>covariance model vs Rfam</em></a>:
 	    </p>
 	    <p>
-	      The title summarizes the current input model and the currently selected filtering criteria (see Figure 7). The number following Top, is the count of comparisons displayed on this page.  total number is the count of all comparison partners(all Rfam models, or just those with a special type, e.g. miRNA). All displayed interactions have a Linkscore that is greater or equal the cutoff.
+	      The title summarizes the current input model and the currently selected filtering criteria (see Figure 7). The number following <em>Top</em>, is the count of comparisons displayed on this page. Total number is the count of all comparison partners (all Rfam models, or just those with a special entry type, e.g. miRNA). All displayed interactions have a linkscore that is greater or equal the cutoff.
 	    </p>
 	     <table> 
 	       <tr>
@@ -173,7 +176,7 @@
 	      </tr>
 	     </table>
 	     <p>
-	       The covariance model graph visualizes selected linked models as nodes an their comparison result (Linkscore) as edge (see Figure 8). Clicking the Linkscore close to the edge of interest shows the detailed results of that comparison (see Figure 16).
+	       The covariance model graph visualizes selected linked models as nodes and their comparison result (linkscore) as edge (see Figure 8). Clicking the linkscore close to the edge of interest shows the detailed results of that comparison (see Figure 16).
 	     </p>
 	     <table> 
 	       <tr>
@@ -196,7 +199,7 @@
 	      </tr>
 	      </table>
 	      <p>
-		Filtering options allow to set a maximum of total models that have a Linkscore greater or equal of the cutoff value and contain
+		Filtering options allow to set a maximum of total models that have a linkscore greater or equal of the cutoff value and contain
 		the specified model name (see Figure 10). The covariance model graph and the filtered .csv file are based on the current filtering options.
 		Filtering is triggered by clicking the filter button.
 	      </p>
@@ -211,7 +214,7 @@
 	    <p>
 	      The list of comparisons provides only a part of details from CMcompare output, to simplify the identification of relevant links (see Figure 11).
 	      Sorting of the list is possible by clicking the header of the column to be sorted. Sortable columns are indicated by a triangle next to the
-	      column title. Magnifing glasses in each line show a detailed view of each comparison, and provide all output details of CMcompare.
+	      column title. Magnifing glasses in each line link to a detailed view of each comparison, and provide all output details of CMcompare.
 	      Optionally a set of interesting models can be compared versus each other by selecting the checkboxes at the beginning of those lines
 	      and clicking <em>cm vs cm</em>. 
 	    </p>
@@ -230,7 +233,7 @@
 	      Just the features distingishing this mode from the comparison with Rfam will be described here.
 	    </p>
 	    <p>
-	      This mode serves to explore the relationship of multiple models with each other. The result linkscore matrix represents each pairwise comparison and highlights strongly linked models by color (see Figure 12). 
+	      This mode serves to explore the relationship of multiple models with each other. The result linkscore matrix represents each pairwise comparison and highlights strongly linked models by color (see Figure 12). This step could be useful to identify possible members of a clan. This process is usually not automatic and based on expert knowledge.
 	    </p>
 	      <ul>
 		<li>linkscore >20: red</li>
