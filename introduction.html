@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta charset="UTF-8">
     <title>CMcompare - Webserver - Introduction</title>
     <style type="text/css">
       table {table-layout:fixed; text-align:center; overflow:auto; border:0px black solid; width:95%; word-wrap:break-word; }
@@ -32,9 +32,16 @@
 	<tr>
 	  <td><u>Welcome to the CMCompare Webserver!</u><br>
 	    <p style="text-align:left">
-	      The server allows you to either compare your covariance model against preexistent models from <a href="rfam.sanger.ac.uk">Rfam</a> or compare a set of provided covariance models among each other.</p> 
+	      If you have RNA-family models and want to compare them, CMCws can help you.
+	    </p>
+	    <p style="text-align:left">
+	      RNA-family models can be formulated as covariance models. You can either compare
+	      your own uploaded set of covariance models among themselves, or against preexistent
+	      ones from <a href="rfam.sanger.ac.uk">Rfam</a>. Rfam is a repository of curated RNA family models in covariance model
+	      (.cm) format.
+	    </p> 
 	    <p style="text-align:left"><em>ncRNA homology search:</em><br>
-	      Covariance models represent non-coding RNA families (miRNAs, tRNAs,..) and can be used to search for additional members of this family. You can use the model as input for cmsearch (part of the <a href="http://infernal.janelia.org/">Infernal</a> toolkit) to scan a genome of interest for possible new family members.<br> <img src="./pictures/search_procedure_multiple_genomes.png" style="border-width:1px;"><br> The better a stretch of sequence fits to the covariance model, the higher the score.</p>
+	      Covariance models represent non-coding RNA families (miRNAs, tRNAs,..) and can be used to search for additional members of this family. You can use the model as input for cmsearch (part of the <a href="http://infernal.janelia.org/">Infernal</a> toolkit) to scan a genome of interest for possible new family members.<br> <img src="./pictures/search_procedure_multiple_genomes.png" style="border-width:1px;" alt="nc_RNA_search"><br> The better a stretch of sequence fits to the covariance model, the higher the score.</p>
 	    <p style="text-align:left"><em>Covariance model comparison:</em><br>
 	      If you have built your own covariance model it is useful to check what other models are already available in Rfam.
 	      CMCompare Webserver is based on <a href="http://www.tbi.univie.ac.at/software/cmcompare/">CMCompare</a>, which returns a link-score for every pair of models checked.
@@ -48,7 +55,7 @@
 	  </td> 
 	</tr>
       </table>	
-      <h3><a name="history">= History =</a></h3>
+      <h3><a id="history">= History =</a></h3>
       <table style="border-width:1px;">
 	<tr>
 	  <td><b>Version</b></td>
@@ -57,9 +64,15 @@
 	  <td><b>Description</b></td>
 	</tr>
 	<tr>
+	  <td>1.00</td>
+	  <td>56</td>
+	  <td>Sun Jan 29 21:04:25 2012 +0100</td>
+	  <td>Release Version</td>
+	</tr>
+	<tr>
 	  <td>0.00</td>
 	  <td>1</td>
-	  <td>Date</td>
+	  <td>Sun Jan 29 21:04:25 2012</td>
 	  <td>Development Version</td>
 	</tr>
       </table>
