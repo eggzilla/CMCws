@@ -1,5 +1,5 @@
 	<form action="cmcws.cgi" id="submit-form"  method="post" enctype="multipart/form-data">
-	Select type of the Rfam entries you want to compare against:
+	Select type of the Rfam entries you want to compare against:<br>
 	<select id="select_slice" name="select_slice" size="3">
 	      <option selected>All</option>
 	      <option>Gene</option>
@@ -30,7 +30,9 @@
 	<br>
         <input id="page" value="1"  name="page" type="hidden">
 	<input id="mode" value="1"  name="mode" type="hidden">
-	<input id="uploaded_file" value="[% uploaded_file %]"  name="uploaded_file" type="hidden">
+	<input id="uploaded_file" value="[% uploaded_file %]"
+	name="uploaded_file" type="hidden">
+	Note: Comparison takes minutes to hours<br>
 	<input type="submit" value="Compare">
         <input type="button" value="Back" onclick="back(this)">
         </form>

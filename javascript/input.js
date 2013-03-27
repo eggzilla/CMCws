@@ -133,7 +133,7 @@ function sample_mode1(){
       "</td>"+
       "<td id=\"step2_2_content\" style=\"vertical-align:top\">"+
 		"<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">"+
-	"Which part of Rfam do you want to compare against?  "+
+	"Which part of Rfam do you want to compare against?<br>"+
 	"<select id=\"select_slice\" size=\"3\" name=\"select_slice\">"+
 	"<option selected>All</option>"+
 	"<option>Gene</option>"+
@@ -165,6 +165,7 @@ function sample_mode1(){
         "<input id=\"page\" value=\"1\"  name=\"page\" type=\"hidden\">"+
 	"<input id=\"mode\" value=\"1\"  name=\"mode\" type=\"hidden\">"+
 	"<input id=\"uploaded_file\" value=\"sample_mode_1\"  name=\"uploaded_file\" type=\"hidden\">"+
+	"Note: Comparison takes minutes to hours<br>"+
 	"<input type=\"submit\" value=\"Compare\">"+
         "<input type=\"button\" value=\"Back\" onclick=\"back(this)\">"+
         "</form>"+
@@ -223,7 +224,7 @@ function sample_mode2(){
       "</td>"+
       "<td id=\"step2_2_content\" style=\"vertical-align:top\">"+
 		"<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">"+
-	"Press Compare to proceed:"+
+	"Note: Comparison takes minutes to hours"+
 	"<br>"+
 	"<br>"+
         "<input id=\"page\" value=\"1\"  name=\"page\" type=\"hidden\">"+
