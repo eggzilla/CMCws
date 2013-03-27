@@ -1,9 +1,9 @@
-	  <th style="width:1%;"></th> 
-	  <th style="width:3%;">Rank</th>
+	  <th style="width:1%;"><a href="#" onmouseover="XBT(this, {id:'6'})"><img style="vertical-align:text-bottom;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a></th> 
+	  <th style="width:2%;">Rank</th>
           <th style="width:4%;">Link score</th>
 	  <th style="width:4%;">Id Model 1</th>	 
  	  <th style="width:5%;">Name Model 1</th>
           <th style="width:4%;">Id Model 2</th> 
  	  <th style="width:5%;">Name Model 2</th>
-	  <th style="width:4%;">Model 1 score</th>
-	  <th style="width:4%;">Model 2 score</th
+	  <th style="width:5%;">Model 1 score</th>
+	  <th style="width:5%;">Model 2 score</th
