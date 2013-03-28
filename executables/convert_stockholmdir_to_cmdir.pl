@@ -50,7 +50,7 @@ sub convert_stockholm_alignment_folder{
 	    print "Do nothing: $file \n";
 	}else{
 	    #print "$executable_dir/cmbuild $model_dir/$file $alignment_dir/$file\n";
-	    exec "$executable_dir/cmbuild $model_dir/input$file.cm $alignment_dir/$file;";
+	    `$executable_dir/cmbuild $model_dir/input$file.cm $alignment_dir/$file`;
 	}
     }
     closedir(DIR);
