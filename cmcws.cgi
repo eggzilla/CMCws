@@ -695,8 +695,12 @@ if($page==2){
     }else{
 	#print STDERR "cmcws: Error inputidname$result_number does not exist in tempdir $base_dir/$tempdir";
     }
+    
     `executables/output_to_html.pl $server $base_dir $tempdir $result_number $mode $filtered_number $cutoff $model_1_name $model_2_name`==0 or die print STDERR "cmcws: could not execute\n";
-
+    #number_of_hits_to_display_after_applying_filters read back in from file written by output_to_html.pl
+    open (NUMBEROFHITS, "<$base_dir/$tempdir/number_of_hits$result_number")or die "Could not open $tempdir/number_of_hits$result_number: $!\n";
+    my $number_of_hits_to_display=<NUMBEROFHITS>;
+    close NUMBEROFHITS;   
     #Check mode
     if($mode eq "1"){
 	if(-e "$base_dir/$tempdir/done$result_number"){	
@@ -713,7 +717,7 @@ if($page==2){
 		mode => "$mode",
 		filter_fields =>"output_filter_fields1",
 		table_header => "output_table_header1",
-		output_title =>"Top $filtered_number results of $total total for $inputid - $inputname (cutoff = $cutoff):",
+		output_title =>"Top $number_of_hits_to_display pairwise comparisons of $total total for $inputid - $inputname<br><h4>Current cutoffs (Max. hits: $filtered_number , Min. Link score: $cutoff , Rfam name containing: $model_1_name)</h4>",
 		inputid => "$inputid",
 		filtered_table => "./html/$tempdir/filtered_table$result_number",
 		cm_map => "./html/$tempdir/graph"."$result_number".".svg",
@@ -750,7 +754,7 @@ if($page==2){
 		scriptfile => "$output_script_file",
 		stylefile => "outputstylefile",
 		mode => "$mode",
-		output_title=> "Top $filtered_number results of total $total (cutoff = $cutoff):",
+		output_title=> "Top $number_of_hits_to_display pairwise comparisons of total $total <br><h4>Current cutoffs (Max. hits: $filtered_number , Min. Link score: $cutoff , Model Name 1 containing: $model_1_name , Model Name 2 containing: $model_1_name)</h4>",
 		filter_fields=>"output_filter_fields2",
 		table_header=> "output_table_header2",
 		filtered_table => "./html/$tempdir/filtered_table$result_number",

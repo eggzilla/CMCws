@@ -1,3 +1,5 @@
-<td colspan="2" style="border:solid 1px #000;text-align:left;">Show up to <input name="filtered_number" id="filtered_number_field" size="4">
-	  hits with cutoff <input name="cutoff" id="cutoff_field"  size="4" onchange="select(this)"> and Rfam name containing <input name="model_2_name" id="model_2_name_field"  size="10" onchange="select(this)"> - <input type="submit" value="Filter"></td>
+<td colspan="2" style="border:solid 1px #000;text-align:left;">Show max. <input name="filtered_number" id="filtered_number_field" size="4"
+	  value="10">
+	  hits with link score cutoff <input name="cutoff" id="cutoff_field"  size="4"
+	  onchange="select(this)" value="none"> AND Rfam name containing <input name="model_2_name" id="model_2_name_field"  size="10" onchange="select(this)" value="none"> - <input type="submit" value="Filter"></td>
 <td colspan="2" style="border:solid 1px #FFF;"></td>

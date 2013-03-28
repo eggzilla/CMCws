@@ -246,14 +246,14 @@ if(defined($model_name_1_string) && $model_name_1_string ne "none" && defined($m
 }
 
 #create output html with x-hits
-my $counter=1;
+my $counter=0;
 open (FILTEREDTABLE, ">$tempdir_path/filtered_table$result_file_number") or die "Cannot open filtered_table$result_file_number: $!";
 open (FILTEREDCSV, ">$tempdir_path/csv_filtered$result_file_number") or die "Cannot open csv_filtered$result_file_number: $!";
 my $graph_output="graph g {\n";
 foreach(@filtered_sorted_entries){
     my @filtered_sorted_entry=@$_;
     my $filtered_csv_output=join(" ",@filtered_sorted_entry);
-    print FILTEREDCSV "$filtered_csv_output";
+    #print FILTEREDCSV "$filtered_csv_output";
     my $link_score=$filtered_sorted_entry[0];
     my $id1=$filtered_sorted_entry[1];
     my $id1_truncated=$id1;
@@ -280,13 +280,14 @@ foreach(@filtered_sorted_entries){
 	#we push matching entries on new array
 	if($name1=~/$model_name_1_string/g && $name2=~/$model_name_2_string/g){
 	    #print STDERR "\n A \n";
+	    $counter++;
 	    if($mode eq "1"){
 		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
 		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }
 	    print FILTEREDTABLE "$output_line";
-	    $counter++;
+	    print FILTEREDCSV "$filtered_csv_output";
 	    #construct result graph
 	    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label=\"$rounded_link_score\",URL=\"$href\",fontcolor=\"blue\",target=\"_graphviz\"];\n"; 
 	}
@@ -294,19 +295,21 @@ foreach(@filtered_sorted_entries){
 	#print STDERR "\n B \n";
 	#we push matching entries on new array
 	if($name1=~/$model_name_1_string/g){
+	    $counter++;
 	    if($mode eq "1"){
 		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
 		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }
 	    print FILTEREDTABLE "$output_line";
-	    $counter++;
+	    print FILTEREDCSV "$filtered_csv_output";
 	    #construct result graph
 	    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label=\"$rounded_link_score\",URL=\"$href\",fontcolor=\"blue\",target=\"_graphviz\"];\n"; 
 	}
     }elsif($model_name_filter_type eq "C"){
 	#print STDERR "\n C \n";
 	if($name2=~/$model_name_2_string/g){
+	    $counter++;
 	    #print STDERR "\n cmcws: accepted name2 $name2: model_name2: $model_name_2_string\n";
 	    if($mode eq "1"){
 		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
@@ -314,20 +317,21 @@ foreach(@filtered_sorted_entries){
 		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }
 	    print FILTEREDTABLE "$output_line";
-	    $counter++;
+	    print FILTEREDCSV "$filtered_csv_output";
 	    #construct result graph
 	    $graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\"  [label=\"$rounded_link_score\",URL=\"$href\",fontcolor=\"blue\",target=\"_graphviz\"];\n"; 
 	}else{
 	    print STDERR "\n cmcws: rejected name2 $name2: model_name2: $model_name_2_string\n";
 	}
     }else{
+	$counter++;
 	if($mode eq "1"){
 	    $output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	}else{
 	    $output_line = "\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	}
 	print FILTEREDTABLE "$output_line";
-	$counter++;
+	print FILTEREDCSV "$filtered_csv_output";
 	#construct result graph
 	$graph_output.="\"$id2_truncated\\n$name2\" -- \"$id1_truncated\\n$name1\" [label=\"$rounded_link_score\",URL=\"$href\",fontcolor=\"blue\",target=\"_graphviz\"];\n";
     }
@@ -342,7 +346,13 @@ close GRAPHOUT;
 `cat $tempdir_path/graph_out$result_file_number.dot | circo -Tsvg > $tempdir_path/graph$result_file_number.svg`;
 #print "$graph_output";
 close GRAPHOUT;
-print "0";
+
+#number of pairwise comparisons to display after applying filters
+my $number_of_hits_to_display=$counter;
+open (NUMBEROFHITS, ">$tempdir_path/number_of_hits$result_file_number") or die "Cannot open number_of_hits$result_file_number: $!";
+print NUMBEROFHITS "$number_of_hits_to_display";
+close NUMBEROFHITS;
+
 
 #get model name
 sub model_name{
@@ -402,3 +412,5 @@ sub linkscore_to_rgb_color{
     return $return_string;
 }
 close STDERR;
+#print "$number_of_hits_to_display";
+print "0";
