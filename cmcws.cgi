@@ -420,6 +420,7 @@ if($page==1){
     my $error_message="";
     my $query_number="";
     my %Rfam_types_occurence;
+    my $progress_redirect;
     open (RFAMTYPES, "<$source_dir/data/types/overview")or die "Could not open : $!\n";
     while (<RFAMTYPES>){
 	chomp;
@@ -478,8 +479,14 @@ if($page==1){
 		if(-e "$base_dir/$tempdir/done$counter"){$parsing_output="done";}
 		elsif(-e "$base_dir/$tempdir/filtered_table$counter"){$parsing_output="processing..";}
 		else {$parsing_output="";}
-		if(-e "$base_dir/$tempdir/done$counter"){$result_page_link="<a href=\"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir&result_number=$counter\">Link</a>"; } 
-		else{$result_page_link=""}
+		if(-e "$base_dir/$tempdir/done$counter"){
+		    $result_page_link="<a href=\"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir&result_number=$counter\">Link</a>"; 
+		    if($query_number==1){
+			$progress_redirect="<script>
+	     window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir&result_number=$counter\"\', 5000);    
+          </script>";
+		    }
+		}else{$result_page_link=""}
 		
 		$processing_table_content=$processing_table_content."<tr><td>$query_id</td><td>$queueing_status</td><td>$model_comparison</td><td>$parsing_output</td><td>$result_page_link</td></tr>";
 		$counter++;
@@ -507,8 +514,12 @@ if($page==1){
 	    if(-e "$base_dir/$tempdir/done$counter"){$parsing_output="done";}
 	    elsif(-e "$base_dir/$tempdir/filtered_table$counter"){$parsing_output="processing..";}
 	    else {$parsing_output="";}
-	    if(-e "$base_dir/$tempdir/done$counter"){$result_page_link="<a href=\"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir&result_number=$counter\">Link</a>"; } 
-	    else{$result_page_link=""}
+	    if(-e "$base_dir/$tempdir/done$counter"){
+		$result_page_link="<a href=\"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir&result_number=$counter\">Link</a>"; 
+		$progress_redirect="<script>
+	     window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=2&mode=$mode&tempdir=$tempdir&result_number=$counter\"\', 5000);    
+          </script>";
+	    }else{$result_page_link=""}
 	    $processing_table_content=$processing_table_content."<tr><td>$query_id</td><td>$queueing_status</td><td>$model_comparison</td><td>$parsing_output</td><td>$result_page_link</td></tr>";	    
 	    
 	}
@@ -623,10 +634,11 @@ if($page==1){
 	}
     }
     
-    
-    my $progress_redirect="<script>
+    unless(defined($progress_redirect)){
+	$progress_redirect="<script>
 	     window.setTimeout (\'window.location = \"$server/cmcws.cgi?page=1&mode=$mode&tempdir=$tempdir\"\', 5000);    
           </script>";
+    }
     my $link="$server/cmcws.cgi?"."page=1"."&tempdir=$tempdir"."&mode=$mode";
     my $vars = {
 	#define global variables for javascript defining the current host (e.g. linse) for redirection
