@@ -73,7 +73,7 @@ if(defined($tempdir_path)){
 		    my ($key, $value) = split /;/;
 		    #print STDERR "CMCWS - before insertion in hash: $key,$value\n";
 		    $Rfam_type_slice{$key}=$value;
-		    my $testvalue=$Rfam_type_slice{$key};
+		    #my $testvalue=$Rfam_type_slice{$key};
 		    #print STDERR "CMCWS - after insertion in hash: $key,$testvalue\n";
 		    
 		}
@@ -105,7 +105,7 @@ if(defined($tempdir_path)){
 			    #my @test =keys %Rfam_type_slice;
 			    #print "test:\n @test\n";
 			    if($Rfam_type_slice{$model_id}){
-				print "Rfam_type_slice{model_id}: $Rfam_type_slice{$model_id}\n";
+				#print "Rfam_type_slice{model_id}: $Rfam_type_slice{$model_id}\n";
 				system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
 			    }
 			}
