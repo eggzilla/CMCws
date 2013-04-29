@@ -56,6 +56,19 @@ function reseter(ref){
 
 ///////////////////////////////////////////////////////////////////////////////////
 /////////////Process cm vs cm input///////////////////////////////////////////////
+function specify_slice(ref){
+    var select_slice=document.getElementById("select_slice").value;
+    var code="";
+    var search=/specify-selection/g;
+    var specify_selected=search.test(select_slice);
+    if(specify_selected==true){
+	code ="<br>Specify filter criteria: <a href=\"#\" onmouseover=\"XBT(this, {id:'6'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"pictures/info.png\"></a> <input name=\"select_slice_filter\" type=\text\" size=\"30\" maxlength=\"30\">";
+    }else{
+	code ="";
+    }
+        var myText=document.createTextNode(code);
+	document.getElementById("slice_filter_area").innerHTML=code;
+}
 
 function step1_operation(ref){
     var selected_operation=document.getElementById("select_operation").value;
@@ -89,7 +102,7 @@ function step1_operation(ref){
     //hide buttons from 1st step and disable eventhandlers
     document.getElementById("select_operation").disabled=true;
     //set new stuff
-    document.getElementById("step1_2_content").innerHTML=code
+    document.getElementById("step1_2_content").innerHTML=code;
 }
 
 ////////////////////Paste sample for mode 1//////////////////////////////////////

@@ -46,7 +46,6 @@ if(defined($mode_input)){
     $mode = 1;
 }
 
-#todo create progress indicators
 if(defined($tempdir_path)){
     my $alignment_dir="$tempdir_path/stockholm_alignment";
     my $model_dir="$tempdir_path/covariance_model";
@@ -60,27 +59,27 @@ if(defined($tempdir_path)){
     my $counter=1;
     if($mode eq "1"){
 	#print "Calculate with mode 1\n";
-	my %Rfam_type_slice;
+	#my %Rfam_type_slice;
+	my @Rfam_slice_models;
 	unless($select_slice eq "All"){
 	    if($select_slice=~/postprocess/){
 		die "Postprocess should only be combined with mode2 never with mode 1\n";
 	    }else{
 		#load corresponding rfam type hash
-		open (SLICEHASH, "<$source_dir/data/types/$select_slice") or die "Could not open : $!\n";
-		#print STDERR "CMCWS - calculate.pl select_slice set to  $select_slice\n";
-		while(<SLICEHASH>){
-		    chomp;
-		    my ($key, $value) = split /;/;
-		    #print STDERR "CMCWS - before insertion in hash: $key,$value\n";
-		    $Rfam_type_slice{$key}=$value;
-		    #my $testvalue=$Rfam_type_slice{$key};
-		    #print STDERR "CMCWS - after insertion in hash: $key,$testvalue\n";
-		    
+		if($select_slice=~/specify-selection/){
+		    open (SLICESPECIFICATION, "<$tempdir_path/slice_models") or die "Could not open $tempdir_path/slice_models : $!\n";
+		}else{
+		    open (SLICESPECIFICATION, "<$source_dir/data/types/$select_slice") or die "Could not open $source_dir/data/types/$select_slice : $!\n";
 		}
+		while(<SLICESPECIFICATION>){
+		    chomp;
+		    #TODO replace slicehash with array
+		    push(@Rfam_slice_models,$_);
+		}
+		close SLICESPECIFICATION;
 	    }
-	    close SLICEHASH;
 	}
-	while (defined($file = readdir(DIR))) {
+	while(defined($file = readdir(DIR))) {
 	    #print "While loop $file \n";
 	    unless($file=~/^\./){
 		#compute
@@ -100,11 +99,12 @@ if(defined($tempdir_path)){
 			    my $model_id=$rfam_file;
 			    $model_id=~s/.cm//;
 			    #print  STDERR "Model_id:$model_id\n";
-			    my $check = $Rfam_type_slice{$model_id};
+			    #my $check = $Rfam_type_slice{$model_id};
+			    my $model_present_check=grep (/$model_id/,@Rfam_slice_models);
 			    #print STDERR "Rfam_type_slice{model_id}: $check\n";
 			    #my @test =keys %Rfam_type_slice;
 			    #print "test:\n @test\n";
-			    if($Rfam_type_slice{$model_id}){
+			    if($model_present_check){
 				#print "Rfam_type_slice{model_id}: $Rfam_type_slice{$model_id}\n";
 				system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
 			    }

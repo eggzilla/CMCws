@@ -40,6 +40,30 @@
    </div>
 </div>
 
+<div id="6" class="tooltip2" style="width:400px;">
+  <div class="content">
+    <div class="head">Specify model selection</div>
+    You can either compare against:
+    <ul>
+      <li>All Rfam models (All)</li>
+      <li>Models with a certain Rfam type (e.g rRNA, lncRNA)</li>
+      <li>A specific selection of models (specify-selection)</li>
+    </ul>
+    How to define a model selection:<br>
+    You can either type single model
+    IDs or model ranges separated by
+    comma. Model id should contain the
+    leading RF.<br>
+    Model ranges consists of two model IDs
+    with a - in between.<br>
+    All Rfam ids between the 2 will be included.<br>
+    The definition is limited with a length of 30 characters.
+    Example: RF00005,RF00006-RF00009,RF00014<br>
+    --&gt; For more information see Help 
+  </div>
+</div>
+
+
 <div style="text-align:center">
   <h3>= Compare =</h3>
   <table id="input_table" class="borders" style="width:95%" >
@@ -77,7 +101,7 @@
       <td id="step1_3_content" style="vertical-align:top">
       </td>
       <td id="step2_3_content" style="vertical-align:top">
-	<div id="error_message"> </div>
+	<div id="error_message" style="color:red;">[% specify_selection_error_message %]</div>
       </td>
     </tr>
   </table>

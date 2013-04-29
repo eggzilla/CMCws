@@ -1,7 +1,8 @@
 	<form action="cmcws.cgi" id="submit-form"  method="post" enctype="multipart/form-data">
-	Select type of the Rfam entries you want to compare against:<br>
-	<select id="select_slice" name="select_slice" size="3">
+	<a href="#" onmouseover="XBT(this, {id:'6'})"><img style="vertical-align:middle;border:0;" alt="info" src="pictures/info.png"></a> Select type of the Rfam entries you want to compare against:<br>
+	<select id="select_slice" name="select_slice" size="3" onchange="specify_slice(this)">
 	      <option selected>All</option>
+	      <option>specify-selection</option>
 	      <option>Gene</option>
 	      <option>CRISPR</option>
 	      <option>antisense</option>
@@ -26,6 +27,7 @@
 	      <option>thermoregulator</option>
 	      <option>leader</option>
 	</select>
+	<div id="slice_filter_area"></div>
 	<br>
 	<br>
         <input id="page" value="1"  name="page" type="hidden">

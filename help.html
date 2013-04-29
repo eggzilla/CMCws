@@ -22,7 +22,7 @@
 	</tr>
 	<tr>
 	  <td style="width:5%;"></td>
-	  <td colspan="3" style="height:40%;background-color:#C0C0C0"><a href="introduction.html#history">History:</a> Development version online</td>
+	  <td colspan="3" style="height:40%;background-color:#C0C0C0"><a href="introduction.html#history">History:</a> Release version online</td>
 	  <td style="width:5%;"></td>
  	</tr> 
       </table>
@@ -119,8 +119,15 @@
 	    <p>
 	      The second step lets you check your
 	      input before submission. If you want to compare your model
-	      against Rfam (Figure 3) you can additionally specify the entry type of model, e.g. miRNA (see <a href="ftp://ftp.sanger.ac.uk/pub/databases/Rfam/11.0/USERMAN">Rfam User-manual</a>).
-	      All other models will be omitted, which reduces processing time.<br> In case of comparing a set of models with each other
+	      against Rfam (Figure 3) you can optionally set the entry type of model, e.g. miRNA (see <a href="ftp://ftp.sanger.ac.uk/pub/databases/Rfam/11.0/USERMAN">Rfam User-manual</a>) or define a specific group of models.	    
+    How to define a specific model group:<br>
+    You can either type single model  IDs or model ranges separated by
+    comma. Model ID should contain the leading RF. Model ranges consists of two model IDs with a - in between.<br>
+    All Rfam ids between the 2 will be included. Example:<br>
+    RF00005,RF00006-RF00009,RF00014<br>
+<br>
+    All other models will be omitted, which reduces processing time.
+<br> In case of comparing a set of models with each other
 	      just a summary of submitted models is displayed (Figure 4).
 	    </p>
 	    <table>

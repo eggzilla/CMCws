@@ -13,7 +13,8 @@ use Digest::MD5;
 use CGI::Carp qw(fatalsToBrowser);
 use File::Temp qw/tempdir tempfile/;
 use Sys::Hostname;
-
+use List::Util qw[min max];
+use List::MoreUtils qw[uniq];
 ######################### Webserver machine specific settings ############################################
 ##########################################################################################################
 my $host = hostname;
@@ -68,7 +69,6 @@ my $now_string = localtime;
 ######STATE - variables##########################################
 #determine the query state by retrieving CGI variables
 #$page 0 input, 1 process, 2 output
-
 my @names = $query->param;
 my $mode = $query->param('mode') || undef;
 my $page = $query->param('page') || undef;
@@ -84,10 +84,12 @@ my $input_model_2_name=$query->param('model_2_name')||undef;
 my $input_filehandle=$query->upload('file')||undef;
 my $input_identifier=$query->param('identifier')||undef;
 my $input_select_slice=$query->param('select_slice')||undef;
+my $input_select_slice_filter=$query->param('select_slice_filter')||undef;
 my $checked_input_present;
 my $provided_input="";
 my @input_error;
 my $error_message="";
+my $specify_selection_error_message;
 my $tempdir;
 my $result_number;
 my $filtered_number;
@@ -102,7 +104,7 @@ unless(-e "$upload_dir/RF00005.cm"){
 unless(-e "$upload_dir/mode2.cm"){
     print STDERR "CMCws: Covarinance model for demo mode 2 is missing. It consists of RF00005 RF00023 RF01849 RF01850 RF01851 RF01852 copy it from data/ to html/upload";
 }
-
+#TODO -add check for presence of stockholm sample files
 
 ######TAINT-CHECKS##############################################
 #get the current page number
@@ -286,6 +288,7 @@ if(defined($input_filtered_number)){
 #}
 $identifier= $input_identifier;
 print STDERR "$mode $page\n";
+
 #cutoff
 if(defined($input_cutoff)){
     if($input_cutoff =~ /^[0-9]+$/){
@@ -320,32 +323,146 @@ foreach my $name(@names){
     }
 }
 
+my @models;
+
 #sets the slice of rfam to compare against
+# if the slice is specified manually and wrong we return to the submit page
 my $select_slice;
-if($page==0){
+my @specify_selection_error;
+if($page==0){  
     $select_slice=undef;
+}elsif(defined($input_select_slice)){
+    my $Rfam_types="All antisense CRISPR Intron miRNA rRNA splicing antitoxin frameshift_element IRES overview scaRNA sRNA CD-box Gene leader riboswitch snoRNA thermoregulator Cis-reg HACA-box lncRNA ribozyme snRNA tRNA";
+    $input_select_slice=~s/\s//;
+    if($Rfam_types=~/$input_select_slice/){
+	print STDERR "CMCWS - cmcws.cgi - $input_select_slice seems valid\n";
+	$select_slice=$input_select_slice;
+    }elsif($input_select_slice=~/specify-selection/){
+	#the user has specified a filter for comparison models
+	#check if it is valid
+	print STDERR "Detected filter specification\n";
+	if(defined($input_select_slice_filter)){
+	    #should only contain RF-,[0-9] symbols
+	    print STDERR "Filter specification: $input_select_slice_filter\n";
+	    my $forbidden_characters = $input_select_slice_filter;
+	    $forbidden_characters =~ s/R|F|-|,|[0-9]+//g;
+	    if($forbidden_characters ne ""){ 
+		#string contains unwanted characters - return error #TODO check if unwanted charakters filter works
+		push(@specify_selection_error,"Filter contains forbidden characters $forbidden_characters");
+		print STDERR "Filter contains forbidden characters $forbidden_characters\n";
+	    }else{
+		#only allowed characters - parse filter
+		print STDERR "Filter specification only allowed characters - parsing filter specification\n";
+		if($input_select_slice_filter=~/,/){
+		    #we have several models or ranges
+		    print STDERR "Filter specification multiple models or ranges detected\n";
+		    #single models are just added to the models array, ranges are transformed into model lists and also added to the model list
+		    my @ranges = split (/,/,$input_select_slice_filter);
+		    foreach my $range (@ranges){
+			if($range=~/-/){
+			    #range of models - should contain only two delimiters
+			    my @delimiters=split (/-/,$range);
+			    if(@delimiters!=2){
+				#bigger than expected
+				push(@specify_selection_error,"Provide exactly 2 models in a range");
+				print STDERR "Provide exactly 2 models in a range\n";
+			    }else{		    
+				#check if delimiter 1 exists
+				my $model1_exists=Rfam_model_exists($delimiters[0]);
+				#check if delimiter 2 exists
+				my $model2_exists=Rfam_model_exists($delimiters[1]);
+				#get range of models between
+				my $range_models_array_reference=get_Rfam_model_range($delimiters[0],$delimiters[1]);
+				my @range_models_array=@$range_models_array_reference;
+				#add to @models
+				@models=(@models,@range_models_array);
+			    }
+			}else{
+			    #single model
+			    #check if model exits
+			    my $model1_exists=Rfam_model_exists($range);
+			    if($model1_exists){
+				#add to @models
+				push(@models,"$range");
+			    }else{
+				push(@specify_selection_error,"The specified model $range does not exist");
+				print STDERR "The specified model $range does not exist\n";
+			    }
+			}
+		    }
+		}else{
+		    #filter contains no , that means we have a range or a single model
+		    print STDERR "Filter specification single model or range detected\n";
+		    if($input_select_slice_filter=~/-/){
+			#range of models - should contain only two delimiters
+			my @delimiters=split (/-/,$input_select_slice_filter);
+			if(@delimiters!=2){
+			    #bigger than expected
+			    push(@specify_selection_error,"Provide exactly 2 models in a range");
+			    print STDERR "Provide exactly 2 models in a range\n";
+			}else{		    
+			    #check if delimiter 1 exists
+			    my $model1_exists=Rfam_model_exists($delimiters[0]);
+			    #check if delimiter 2 exists
+			    my $model2_exists=Rfam_model_exists($delimiters[1]);
+			    #get range of models between
+			    my $range_models_array_reference=get_Rfam_model_range($delimiters[0],$delimiters[1]);
+			    my @range_models_array=@$range_models_array_reference;
+			    #add to @models
+			    @models=(@models,@range_models_array);
+			}
+		    }else{
+			#single model
+			my $model1_exists=Rfam_model_exists($input_select_slice_filter);
+			if($model1_exists){
+			    #add to @models
+			    push(@models,"$input_select_slice_filter");
+			}else{
+			    push(@specify_selection_error,"The specified model $input_select_slice_filter does not exist");
+			    print STDERR "The specified model $input_select_slice_filter does not exist\n";
+			}
+		    }
+		}
+	    }
+	}	
+    }else{
+	#return error that filter has to be specified
+	push(@specify_selection_error,"Please specify a filter");
+    } 
+}elsif($mode==2){
+    $select_slice="All";
+}elsif(-e "$base_dir/$tempdir/slice"){
+    #read slice from file
+    open (SLICE, "<$base_dir/$tempdir/slice") or die "Could not open slice-file: $!\n";
+    $select_slice=<SLICE>;
+    close SLICE;
 }else{
-    if(defined($input_select_slice)){
-	my $Rfam_types="All antisense CRISPR Intron miRNA rRNA splicing antitoxin frameshift_element IRES overview scaRNA sRNA CD-box Gene leader riboswitch snoRNA thermoregulator Cis-reg HACA-box lncRNA ribozyme snRNA tRNA";
-	$input_select_slice=~s/\s//;
-	if($Rfam_types=~/$input_select_slice/){
-	    print STDERR "CMCWS - cmcws.cgi - $input_select_slice seems valid\n";
-	    $select_slice=$input_select_slice;
-	}else{
-	    $select_slice="All";
-	}
-    }elsif($mode==2){
-	$select_slice="All";
-    }elsif(-e "$base_dir/$tempdir/slice"){
-	#read slice from file
-	open (SLICE, "<$base_dir/$tempdir/slice") or die "Could not open slice-file: $!\n";
-	$select_slice=<SLICE>;
-	close SLICE;
-    }
-    unless($page==1){
-	print STDERR "Query - $now_string - Page $page Mode $mode\n";
-    }
+    $select_slice="All";
 }
+
+
+#upon submission of a wrongly defined slice we return users to the submit page with an error message
+if(@specify_selection_error && $input_select_slice=~/specify-selection/){
+    # There is a problem with the slice specification
+    $page=0;
+    #empty input error, it is already checked.
+    @input_error=undef;
+    print STDERR "specify selection error: @specify_selection_error\n";
+    $checked_input_present=1;
+}elsif($input_select_slice_filter){
+    print STDERR "No specify selection error\n";  
+    print STDERR "Models in filter @models\n";
+    #remove multiple models
+    @models=uniq @models;
+    $select_slice="specify-selection";
+}
+
+###########################################
+
+unless($page==1){
+    print STDERR "Query - $now_string - Page $page Mode $mode\n";
+}
+
 
 ################ INPUT #####################################
     
@@ -369,6 +486,7 @@ if($page==0){
 	    $input_script_file = "inputstep2scriptfile";
 	    $disabled_upload_form="inputstep2mode1disable";
 	    $submit_form="inputstep2mode1submit";
+	    $specify_selection_error_message=join('/n',@specify_selection_error);
 	    #print STDERR "Reached Page=0 step=2 mode=1\n";
 	}elsif($mode eq "2"){
 	    #comparison of multiple models with each other 
@@ -396,6 +514,7 @@ if($page==0){
 	stylefile => "inputstylefile",
 	mode => "$mode",
 	error_message => "$error_message",
+	specify_selection_error_message => "$specify_selection_error_message",
 	disabled_upload_form => "$disabled_upload_form",
 	submit_form => "$submit_form",
 	uploaded_file => "$uploaded_file",
@@ -429,7 +548,22 @@ if($page==1){
 	#print STDERR "CMCws - cmcws.cgi: Rfamtype-hash: $key : $Rfam_types_occurence{$key}\n";
     }
     close RFAMTYPES;
-    my $number_of_rfam_models = $Rfam_types_occurence{$select_slice};
+    my $number_of_rfam_models;
+    unless($select_slice eq "specify-selection"){
+	$number_of_rfam_models = $Rfam_types_occurence{$select_slice};
+    }elsif(defined($tempdir)){
+	if(-e "$base_dir/$tempdir/slice_models"){
+	    open (SLICEMODELS, "<$base_dir/$tempdir/slice_models") or die "Could not open slice-file_models: $!\n";
+	    my $slice_model_string=<SLICEMODELS>;
+	    my @slice_models=split(/\n/,$slice_model_string);
+	    $number_of_rfam_models=@slice_models;
+	    close (SLICEMODELS);
+	}else{
+	    print STDERR "No slice-selection model file present\n";
+	}
+    }else{
+	$number_of_rfam_models=@models;
+    }
     #print STDERR "CMCws - cmcws.cgi: Select_slice: $select_slice\n";
     #print STDERR "number of Rfam-Models: $number_of_rfam_models\n";
     my $processing_table_content="";
@@ -443,6 +577,12 @@ if($page==1){
 	open (SLICE, ">$base_dir/$tempdir/slice") or die "Could not open slice-file: $!\n";
 	print SLICE "$select_slice";
 	close SLICE;
+	if(@models){
+	    open (SLICEMODELS, ">$base_dir/$tempdir/slice_models") or die "Could not open slice-file_models: $!\n";
+	    my $model_string=join('\n',@models);
+	    print SLICEMODELS "$model_string";
+	    close SLICEMODELS;
+	}
     }
     my $query_number_file_present;
     if(-e "$base_dir/$tempdir/query_number"){
@@ -675,21 +815,31 @@ if($page==2){
     my $output_script_file="outputscriptfile";
     my $total;
     if($mode eq "1"){
-	my %Rfam_types_occurence;
-	open (RFAMTYPES, "<$source_dir/data/types/overview")or die "Could not open : $!\n";
-	while (<RFAMTYPES>){
-	    chomp;
-	    my ($key, $value) = split /;/;
-	    $Rfam_types_occurence{$key}=$value;
+	unless(-e "$base_dir/$tempdir/slice_models"){
+	    my %Rfam_types_occurence;
+	    #TODO add support for filter_slice
+	    open (RFAMTYPES, "<$source_dir/data/types/overview") or die "Could not open : $!\n";
+	    while (<RFAMTYPES>){
+		chomp;
+		my ($key, $value) = split /;/;
+		$Rfam_types_occurence{$key}=$value;
+	    }
+	    close RFAMTYPES;
+	    $total=$Rfam_types_occurence{$select_slice};
+	}else{
+	    #slices are specified
+	    open (SLICEMODELS, "<$base_dir/$tempdir/slice_models") or die "Could not open slice-file_models: $!\n";
+	    my $slice_model_string=<SLICEMODELS>;
+	    my @slice_models=split(/,/,$slice_model_string);
+	    $total=@slice_models;
+	    close (SLICEMODELS);
 	}
-	close RFAMTYPES;
-	$total=$Rfam_types_occurence{$select_slice};
     }else{
-	 open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number")or die "Could not open $tempdir/query_number: $!\n";
-	 my $query_number=<QUERYNUMBERFILE>;
-	 close QUERYNUMBERFILE;
-	 #number of comparisons
-	 $total=(($query_number*$query_number)-$query_number)/2;
+	open (QUERYNUMBERFILE, "<$base_dir/$tempdir/query_number") or die "Could not open $tempdir/query_number: $!\n";
+	my $query_number=<QUERYNUMBERFILE>;
+	close QUERYNUMBERFILE;
+	#number of comparisons
+	$total=(($query_number*$query_number)-$query_number)/2;
     }
     my $error_message="";
     my $vars;
@@ -967,3 +1117,55 @@ sub get_comparison_results{
     return $attribute_table;
 }
 close STDERR;
+
+sub Rfam_model_exists{
+    #checks if a Rfam model exists
+    my $model_identifier = shift;
+    my $lookup ="$source_dir/data/Rfam11/"."$model_identifier".".cm";
+    if(-e $lookup){
+	print STDERR "Performing model lookup - model $lookup - result 1\n";
+	return "1";
+    }else{
+	print STDERR "Performing model lookup - model $lookup - result 0\n";
+	return "0";
+    }
+}
+
+sub get_Rfam_model_range{
+    #returns all models that lie between
+    print STDERR "processing model range\n";
+    my $model_identifier1 = shift;
+    my $model_identifier2 = shift;
+    my @models;
+    #check delimiters
+    my $delimiter1_exists=&Rfam_model_exists($model_identifier1);
+    my $delimiter2_exists=&Rfam_model_exists($model_identifier2);
+    if($delimiter1_exists && $delimiter2_exists){
+	#get numbers from id
+	$model_identifier1=~/^RF(\d+)/;
+	my $model_number1 = $1;
+	print STDERR "model range delimiter 1: $model_identifier1 Number $model_number1\n";
+	$model_identifier2=~/^RF(\d+)/;
+	my $model_number2 = $1;
+	print STDERR "model range delimiter 2: $model_identifier2 Number $model_number2\n";
+	$model_number1=~s/^0+//;
+	$model_number2=~s/^0+//;
+	print STDERR "model range numbers wo leading zeros: $model_number1 $model_number2\n";
+	my $lower_boundry= min($model_number1,$model_number2);
+	my $upper_boundry= max($model_number1,$model_number2);
+	my $counter=$lower_boundry;
+	for($lower_boundry..$upper_boundry){
+	    my $current_id_number = sprintf("%05d", $counter);
+	    my $current_id="RF"."$current_id_number";
+	    my $current_id_exists=&Rfam_model_exists($current_id);
+	    if($current_id_exists){
+		push(@models,$current_id);
+	    }
+	    $counter++;
+	}
+    }else{
+	#one of our delimiters does not exist
+	push(@models,"Error: one of our delimiters does not exist");
+    }
+    return \@models;
+}
