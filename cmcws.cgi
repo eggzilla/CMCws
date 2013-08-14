@@ -49,7 +49,7 @@ my $sge_root_directory="/usr/share/gridengine";
 $|=1;
 #Control of the CGI Object remains with webserv.pl, additional functions are defined in the requirements below.
 use CGI;
-$CGI::POST_MAX=1000000; #max 100kbyte posts
+$CGI::POST_MAX=1500000; #max 100kbyte posts
 my $query = CGI->new;
 #using template toolkit to keep static stuff and logic in seperate files
 use Template;
@@ -208,7 +208,7 @@ if(defined($input_filename)){
     }
     open ( UPLOADFILE, ">$upload_dir/$name" ) or die "$!"; binmode UPLOADFILE; while ( <$input_filehandle> ) { print UPLOADFILE; } close UPLOADFILE;
     my $check_size = -s "$upload_dir/$name";
-    my $max_filesize =1000000;
+    my $max_filesize =1500000;
     #first level
     if($check_size < 1){
 	print STDERR "Uploaded Input file is empty\n";
@@ -478,6 +478,7 @@ if($page==0){
     my $input_script_file="inputscriptfile";
     my $disabled_upload_form="";
     my $submit_form="";
+    $specify_selection_error_message="";
     #Three different states of the input page
     if($checked_input_present){
 	$file = './template/input2.html';
@@ -493,6 +494,7 @@ if($page==0){
 	    $input_script_file = "inputstep2scriptfile";
 	    $disabled_upload_form="inputstep2mode2disable";
 	    $submit_form="inputstep2mode2submit";
+	    $specify_selection_error_message="";
 	    #print STDERR "Reached Page=0 step=2 mode=2\n";
 	}
     }elsif($mode=="0"){
@@ -503,6 +505,7 @@ if($page==0){
 	$error_message=join('/n',@input_error);
 	#print STDERR "Reached Page=0 step=1 mode=$mode\n";
 	print STDERR "Error: @input_error\n";
+	$specify_selection_error_message="";
     }
     
     my $vars = {
