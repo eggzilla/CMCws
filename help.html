@@ -43,7 +43,23 @@
 	    </p>
 	    <p>
 	      There are 2 sample buttons labeled <em>cm vs Rfam - demo</em> and <em>cm vs cm - demo</em>. The first button supplies the server with the tRNA-family covariance model (cm), while the second button automatically submits the 6 covariance models representing the member families of the tRNA-clan. You can jump directly to the result pages: <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=2&amp;mode=1&amp;tempdir=XrqApnuTu_&amp;result_number=1">cm vs Rfam</a>, <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=2&amp;mode=2&amp;tempdir=lTXKfoRwCH&amp;result_number=1">cm vs cm</a>. These 2 examples will also be used in the text below.</p>
-	    <p>Stockholm format alignments are converted to covariance models by CMbuild as first step. They are then compared as covariance models and all the steps of processing and output are similar. The results for the Rfam <a href="RF00005_seed.stockholm.txt">tRNA(RF00005)-seed alignment</a> and the set of <a href="sample.stockholm.txt">tRNA(RF00005), tRNA-Sec(RF01852), cyano_tmRNA(RF01851) - seed alignments</a> can be found here: <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=1&mode=1&tempdir=6obBESTL_H">RF00005</a>, <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=2&mode=2&tempdir=G2yCq1GCmM&result_number=1">RF00005,RF01852,RF01851</a>. As the procedure is the same as for covariance models, they are not discussed separately. It is possible to upload a file containing both covariance models and stockholm alignments. 
+	    <p>
+	      Stockholm format alignments are converted to covariance
+	      models by CMbuild as first step. They are then compared as
+	      covariance models and all the steps of processing and output
+	      are similar.  As the procedure is the same as for covariance models, they are
+	      not discussed separately. It is possible to upload a file
+	      containing both covariance models and stockholm
+	      alignments. Hidden Markov Models contained in the input are
+	      ignored. 
+	      
+	      The results for the
+	      Rfam <a href="RF00005_seed.stockholm.txt">tRNA(RF00005)-seed
+		alignment</a> and the set
+	      of <a href="sample.stockholm.txt">tRNA(RF00005),
+		tRNA-Sec(RF01852), cyano_tmRNA(RF01851) - seed alignments</a>
+	      can be found
+	      here: <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=1&mode=1&tempdir=6obBESTL_H">RF00005</a>, <a href="http://rna.tbi.univie.ac.at/cmcws2/cmcws.cgi?page=2&mode=2&tempdir=G2yCq1GCmM&result_number=1">RF00005,RF01852,RF01851</a>.  
 	    </p>
 	    <p>
 	      A score distribution,
@@ -110,7 +126,8 @@
 	    </table>
 	    <p>
 	      Uploaded files (see Figure 2) can contain up to 10 covariance models or
-	      stockholm alignments and must not exeed 1 megabyte in size.
+	      stockholm alignments and must not exeed 1.5 megabyte in size.
+	      Hidden Markov models contained in the input files are ignored.
 	      <em>cm vs cm</em> comparison requires at
 	      least 2 models. Clicking <em>Submit</em> takes you to the next step
 	      or provides you with an error message if there is a problem with the
@@ -336,7 +353,8 @@
     </table>	
     <div class="copyright">
       <hr>
-      2012-2013  - <a href="http://www.tbi.univie.ac.at">TBI</a> - <a href="mailto:egg@tbi.univie.ac.at">Contact</a>
+      2012-2013  - <a href="http://www.tbi.univie.ac.at">TBI</a>
+      - <a href="mailto:egg@tbi.univie.ac.at">Contact</a> - <a href="http://nar.oxfordjournals.org/content/early/2013/05/02/nar.gkt329">Publication</a>
     </div>
   </body>
 </html>
