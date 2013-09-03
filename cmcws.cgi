@@ -323,10 +323,9 @@ foreach my $name(@names){
     }
 }
 
-my @models;
-
 #sets the slice of rfam to compare against
 # if the slice is specified manually and wrong we return to the submit page
+my @models;
 my $select_slice;
 my @specify_selection_error;
 if($page==0){  
@@ -988,10 +987,12 @@ if($page==3){
 
 sub check_input{
     #Parameter is filename
-    #File can contain multiple cm or alignments in stockholm format
+    #File can contain multiple cm, alignments in stockholm format and HMMs
     #Begin of a stockholm-alignment is denoted by:  # STOCKHOLM 1.0
     #Begin of a cm is denoted by: INFERNAL-1 [1.0]
-    #End of a stockholm or cm file from rfam is denoted by: //
+    #Begin of a HMM is denoted by: HMMER
+    #End of a stockholm, cm, HMM entry is denoted by: //
+    #We want to ignore all contained HMMs at the moment
     my $input_filename=shift;
     open (INPUTFILE, "<$upload_dir/$input_filename") or die "Cannot open input-file";
     #include taintcheck later, now we just count the number of provided alignment and cm files
@@ -1001,6 +1002,7 @@ sub check_input{
     push(@input_elements,"error;");
     my $stockholm_alignment_detected=0;
     my $covariance_model_detected=0;
+    my $hidden_markov_model_detected=0;
     my $counter=0;
     while(<INPUTFILE>){
 	chomp;
@@ -1013,8 +1015,9 @@ sub check_input{
 	    $covariance_model_detected=1;
 	    push(@input_elements,"Covariance model -");
 	    $counter++;
+	}elsif(/HMMER/ && $hidden_markov_model_detected==0){
+	    $hidden_markov_model_detected=1;
 	}
-	
 	#look for name
 	#todo: set default name if we hit end of alignment/cm and do not detect name 
 	if(/^\#\=GF\sID/ && $stockholm_alignment_detected==1){
@@ -1036,9 +1039,10 @@ sub check_input{
 	    $stockholm_alignment_detected=0;
 	    $covariance_model_detected=0;
 	}
-	if(/^\/\// && ($stockholm_alignment_detected==2 || $covariance_model_detected==2 )){
+	if(/^\/\// && ($stockholm_alignment_detected==2 || $covariance_model_detected==2 || $hidden_markov_model_detected==1)){
 	    $stockholm_alignment_detected=0;
 	    $covariance_model_detected=0;
+	    $hidden_markov_model_detected=0;
 	}
     }
     if(@input_elements>2){

@@ -34,10 +34,11 @@ split_input($filename,$tempdir);
 #Array with split
 sub split_input{
     #Parameter is filename
-    #File can contain multiple cm or alignments in stockholm format
+    #File can contain multiple cm,alignments in stockholm format or hidden markov models
     #Begin of a stockholm-alignment is denoted by:  # STOCKHOLM 1.0
     #Begin of a cm is denoted by: INFERNAL-1 [1.0]
-    #End of a stockholm or cm file from rfam is denoted by: //
+    #Begin of a hmm is denoted by: HMMER
+    #End of a stockholm, cm or hmm entry is denoted by: //
     my $input_filename=shift;
     my $input_tempdir=shift;
     open (INPUTFILE, "<$input_filename") or die "Cannot open $input_filename: $!\n";
@@ -46,6 +47,7 @@ sub split_input{
     #We expect a error by default and set this return value to ok if the input fits
     my $stockholm_alignment_detected=0;
     my $covariance_model_detected=0;
+    my $hidden_markov_model_detected=0;
     my @model;
     #counts number of entries
     my $counter=0;
@@ -59,6 +61,9 @@ sub split_input{
 	    $covariance_model_detected=1;
 	    $counter++;
 	    push(@model,$_);
+	}elsif(/HMMER/ && $hidden_markov_model_detected==0){
+	    $hidden_markov_model_detected=1;
+	    #   
 	}elsif($covariance_model_detected==1 || $stockholm_alignment_detected==1){
 	    push(@model,$_);
 	}
@@ -81,6 +86,9 @@ sub split_input{
 	    }
 	    $covariance_model_detected=0;
 	    close OUTPUTFILE;
+	}elsif(/^\/\// && $hidden_markov_model_detected==1){
+	    #HMM input is ignored
+	    $hidden_markov_model_detected=0;
 	}
        #todo: error if we detected a header or a name but no end (//)
     }
@@ -89,49 +97,4 @@ sub split_input{
     print QUERYNUMBERFILE "$counter";
     close QUERYNUMBERFILE;
 }    
-    #if(@input_elements>2){
-    #input 
-#	my $input_element_count=@input_elements;
-#	my $unexpected_number_of_input_elements=($input_element_count-1)%2;
-#	print STDERR "cmcws: Number of input element: $input_element_count, Erwartete Anzahl an Elementen gefunden: $unexpected_number_of_input_elements";
-#	if((($input_element_count-1)%2)==0){
-#	    #contains models
-#	    $input_elements[0]="true";
-#	}
-#	print STDERR "cmcws: contains models\n";
-    #   }else{
-#	#No covariance models or alignments found in input
-#	$input_elements[0]=$input_elements[0]."No covariance models or alignments found in input<br>;";
-#    }   
-#    close INPUTFILE;
-#    return \@input_elements;
-
-
-#sub prepare_input{
-    #my @file_lines;
-    #include taintcheck later, now we just count the number of provided alignment and cm files
-    #while(<INPUTFILE>){
-    #    push(@file_lines,$_);
-    #}
-    #my $joined_file=join("",@file_lines);
-
-    #look for accession number
-    #=GF AC   RF00001
-    #=GF ID   5S_rRNA
-    #if(/^\#\=GF\sAC//^ACCESSION/ && $stockholm_alignment_detected==2){
-    #    $stockholm_alignment_detected=0;
-    #    my @split_array = split(/\s+/,$_);
-    #    my $last_element = @split_array - 1;
-    #    my $accession=$split_array[$last_element];
-    #    push(@input_elements,$accession);
-    #}elsif(/^ACCESSION/ && $covariance_model_detected==2){
-    #    $covariance_model_detected=0;
-    #    my @split_array = split(/\s+/,$_);
-    #    my $last_element = @split_array - 1;
-    #    my $accession=$split_array[$last_element];
-    #    push(@input_elements,$accession);
-    #}else{
-    #    
-    #}
-#}
 
