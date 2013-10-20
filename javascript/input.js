@@ -57,12 +57,13 @@ function reseter(ref){
 ///////////////////////////////////////////////////////////////////////////////////
 /////////////Process cm vs cm input///////////////////////////////////////////////
 function specify_slice(ref){
+    var static_content_address=document.getElementById("static_content_address").value;
     var select_slice=document.getElementById("select_slice").value;
     var code="";
     var search=/specify-selection/g;
     var specify_selected=search.test(select_slice);
     if(specify_selected==true){
-	code ="<br>Specify filter criteria: <a href=\"#\" onmouseover=\"XBT(this, {id:'6'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"pictures/info.png\"></a> <input name=\"select_slice_filter\" type=\text\" size=\"30\" maxlength=\"30\">";
+	code ="<br>Specify filter criteria: <a href=\"#\" onmouseover=\"XBT(this, {id:'6'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"" + static_content_address + "pictures/info.png\"></a> <input name=\"select_slice_filter\" type=\text\" size=\"30\" maxlength=\"30\">";
     }else{
 	code ="";
     }
@@ -71,6 +72,7 @@ function specify_slice(ref){
 }
 
 function step1_operation(ref){
+    var static_content_address=document.getElementById("static_content_address").value;
     var selected_operation=document.getElementById("select_operation").value;
     var code="";
     var search=/Rfam/g;
@@ -78,7 +80,7 @@ function step1_operation(ref){
     if(operation1_selected==true){
 	code ="<div id=\"validation_message\"></div>"+
 	    "Upload a file containing covariance models<br>"+
-	    "or multiple alignments <a href=\"#\" onmouseover=\"XBT(this, {id:'2'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"pictures/info.png\"></a>:<br>"+
+	    "or multiple alignments <a href=\"#\" onmouseover=\"XBT(this, {id:'2'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"" + static_content_address + "pictures/info.png\"></a>:<br>"+
 	    "<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">" +
             "<br><input name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
             "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\">" +
@@ -89,7 +91,7 @@ function step1_operation(ref){
     }else{
 	code ="<div id=\"validation_message\"></div>"+
 	    "Upload a file containing covariance models<br>"+
-	    "or multiple alignments <a href=\"#\" onmouseover=\"XBT(this, {id:'3'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"pictures/info.png\"></a>:<br>"+
+	    "or multiple alignments <a href=\"#\" onmouseover=\"XBT(this, {id:'3'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"" + static_content_address + "pictures/info.png\"></a>:<br>"+
 	    "<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">" +
             "<br><input name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
             "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\">" +
@@ -108,6 +110,7 @@ function step1_operation(ref){
 ////////////////////Paste sample for mode 1//////////////////////////////////////
 
 function sample_mode1(){
+    var static_content_address=document.getElementById("static_content_address").value;
     var code="<table style=\"border-width:0\">"+
 	"<tbody>"+
 	"<tr>"+
@@ -117,7 +120,7 @@ function sample_mode1(){
     "<tr>"+		
       "<td id=\"step1_content\" >"+
 	"<form action=\"/cgi-bin/cmcws.cgi\" method=\"post\" target=\"Daten\">"+
-	  "<p>Select type of comparison: <a href=\"#\" onmouseover=\"XBT(this, {id:'1'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a></p>"+
+	  "<p>Select type of comparison: <a href=\"#\" onmouseover=\"XBT(this, {id:'1'})\"><img style=\"vertical-align:middle\" src=\"" + static_content_address + "pictures/info.png\" border=\"0\"></a></p>"+
 	  "<p><select disabled id=\"select_operation\"  onchange=\"step1_operation(this)\">"+
 	      "<option>Please select</option>"+
 	      "<option>covariance model vs Rfam</option>"+
@@ -135,7 +138,7 @@ function sample_mode1(){
       "<td id=\"step1_2_content\" style=\"vertical-align:top\">"+
 		"<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">"+
 	"Upload a covariance model<br>"+
-	"or a multiple alignment <a href=\"#\" onmouseover=\"XBT(this, {id:'2'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a>:<br>"+
+	"or a multiple alignment <a href=\"#\" onmouseover=\"XBT(this, {id:'2'})\"><img style=\"vertical-align:middle\" src=\"" + static_content_address + "pictures/info.png\" border=\"0\"></a>:<br>"+
         "<br><input disabled name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
         "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\">"+
 	"<input id=\"mode\" value=\"1\"  name=\"mode\" type=\"hidden\">"+
@@ -198,6 +201,7 @@ function sample_mode1(){
 }
 
 function sample_mode2(){
+    var static_content_address=document.getElementById("static_content_address").value;
     var code="<table>"+
         "<tbody>"+
 	"<tr>"+
@@ -207,7 +211,7 @@ function sample_mode2(){
     "<tr>"+		
       "<td id=\"step1_content\">"+
 	"<form action=\"/cgi-bin/cmcws.cgi\" method=\"post\" target=\"Daten\">"+
-	  "<p>Select type of comparison: <a href=\"#\" onmouseover=\"XBT(this, {id:'1'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a></p>"+
+	  "<p>Select type of comparison: <a href=\"#\" onmouseover=\"XBT(this, {id:'1'})\"><img style=\"vertical-align:middle\" src=\"" + static_content_address + "pictures/info.png\" border=\"0\"></a></p>"+
 	  "<p><select disabled id=\"select_operation\"  onchange=\"step1_operation(this)\">"+
 	      "<option>Please select</option>"+
 	      "<option>covariance model vs Rfam</option>"+
@@ -226,7 +230,7 @@ function sample_mode2(){
 	"<form action=\"cmcws.cgi\" id=\"submit-form\"  method=\"post\" enctype=\"multipart/form-data\">"+
 	"Upload an archive containing a group of<br>"+
 	"multiple alignments or covariance models "+
-	"<a href=\"#\" onmouseover=\"XBT(this, {id:'3'})\"><img style=\"vertical-align:middle\" src=\"pictures/info.png\" border=\"0\"></a>:<br>"+
+	"<a href=\"#\" onmouseover=\"XBT(this, {id:'3'})\"><img style=\"vertical-align:middle\" src=\"" + static_content_address + "pictures/info.png\" border=\"0\"></a>:<br>"+
         "<br><input disabled name=\"file\" id=\"file\" size=\"30\" type=\"file\"><br>"+
         "<input id=\"page\" value=\"0\"  name=\"page\" type=\"hidden\">"+
 	"<input id=\"mode\" value=\"2\"  name=\"mode\" type=\"hidden\">"+

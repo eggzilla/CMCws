@@ -1,4 +1,4 @@
-	<form action="cmcws.cgi" id="submit-form"  method="post" enctype="multipart/form-data">
+	<form action="[% serveraddress %]" id="submit-form"  method="post" enctype="multipart/form-data">
 	Note: Comparison takes minutes to hours
 	<br>
 	<br>

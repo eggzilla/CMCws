@@ -1,5 +1,5 @@
-	<script type="text/javascript" src="./javascript/input.js"></script>
-	<script type="text/javascript" src="./javascript/jquery-1.4.4.min.js"></script> 
+	<script src="[% staticcontentaddress %]/javascript/input.js"></script>
+	<script src="[% staticcontentaddress %]/javascript/jquery-1.4.4.min.js"></script> 
 	<script type="text/javascript">
 	      $(window).load(function(){
 		    var mode =[% mode %];

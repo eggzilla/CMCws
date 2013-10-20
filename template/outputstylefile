@@ -1,5 +1,5 @@
-	<link rel="stylesheet" href="./css/jquerytablesortblue.css" type="text/css" media="print, projection, screen" />
- <style      type="text/css">
+ <link rel="stylesheet" href="[% staticcontentaddress %]/css/jquerytablesortblue.css" type="text/css" media="print, projection, screen" />
+ <style type="text/css">
     table {table-layout:fixed; text-align:center; overflow:auto; border:0px black solid; width:95%; word-wrap:break-word; }
     table.resources {
 	font-family:arial;

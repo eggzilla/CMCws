@@ -4,17 +4,17 @@
     <meta charset="UTF-8"> 
     <title> [% title %]</title>
     [% PROCESS $scriptfile %]
-    [% PROCESS $stylefile %]
+    [% PROCESS $stylefile %] 
   </head>
   <body>
     <div style="align:center">
       <table>
 	<tr>
-	  <td rowspan="2"><img alt="" src="[% banner %]"></td>
+	  <td rowspan="2"><img alt="Banner" src="[% banner %]"></td>
 	  <td style="width:5%;"></td>
-          <td style="width:20%;"><a href="introduction.html"><img src="./pictures/introduction.png" alt="Introduction" style="border:0"></a></td>
-          <td style="width:15%;"><a href="cmcws.cgi"><img src="./pictures/compare.png" alt="Target Search" style="border:0"></a></td>
-	  <td style="width:20%;"><a href="help.html"><img src="./pictures/help.png" alt="Help"  style="border:0"></a></td>
+          <td style="width:20%;"><a href="introduction.html"><img src="[% staticcontentaddress %]/pictures/introduction.png" alt="Introduction" style="border:0"></a></td>
+          <td style="width:15%;"><a href="cmcws.cgi"><img src="[% staticcontentaddress %]/pictures/compare.png" alt="Target Search" style="border:0"></a></td>
+	  <td style="width:20%;"><a href="help.html"><img src="[% staticcontentaddress %]/pictures/help.png" alt="Help"  style="border:0"></a></td>
 	  <td style="width:5%;"></td>
 	</tr>
 	<tr>
@@ -26,6 +26,7 @@
  	    </tr> 
       </table>
       <div style="display:none" id="server_address">[% serveraddress %]</div>
+      <div style="display:none" id="static_content_address">[% staticcontentaddress %]</div>
       <hr>
     </div>
     

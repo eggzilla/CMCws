@@ -1,7 +1,7 @@
-	<form action="cmcws.cgi" id="submit-form"  method="post" enctype="multipart/form-data">
+	<form action="[% serveradress %]" id="submit-form"  method="post" enctype="multipart/form-data">
 	Upload an archive containing a group of<br>
 	multiple alignments or covariance models 
-	<a href="#" onmouseover="XBT(this, {id:'3'})"><img style="vertical-align:middle" src="pictures/info.png" border="0"></a>:<br>
+	<a href="#" onmouseover="XBT(this, {id:'3'})"><img style="vertical-align:middle" src="[% staticcontentaddress %]/pictures/info.png" border="0"></a>:<br>
         <br><input disabled name="file" id="file" size="30" type="file"><br>
         <input id="page" value="0"  name="page" type="hidden">
 	<input id="mode" value="2"  name="mode" type="hidden">

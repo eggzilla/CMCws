@@ -19,31 +19,47 @@ use List::MoreUtils qw[uniq];
 ##########################################################################################################
 my $host = hostname;
 my $webserver_name = "cmcompare-webserver";
-my $source_dir=cwd();
+#my $source_dir=cwd();
+my $source_dir="/mnt/storage/progs/cmcws";
+#URL of cgi script
 my $server;
+#URL of static content
+my $server_static;
 #baseDIR points to the tempdir folder
 my $base_dir;
 if($host eq "erbse"){
-    $server="http://localhost/cmcws";
+    $server = "http://localhost/cmcws";
     #$server="http://131.130.44.243/cmcws";
-    $base_dir ="$source_dir/html";
+    $base_dir = "$source_dir/html";
 }elsif($host eq "linse"){
-    $server="http://rna.tbi.univie.ac.at/cmcws2";
+    $server = "http://rna.tbi.univie.ac.at/cmcws2";
     $base_dir ="/u/html/cmcws";
+}elsif($host eq "lingerie"){
+    $server="http://lingerie.tbi.univie.ac.at/cgi-bin/cmcws/cmcws.cgi";
+    $server_static = "http://lingerie.tbi.univie.ac.at/cmcws";
+    $source_dir = "/mnt/storage/progs/cmcws";
+    $base_dir = "$source_dir/html";
+}elsif($host eq "nylon"){
+    $server = "http://rna.tbi.univie.ac.at/cgi-bin/cmcws/cmcws.cgi";
+    $server_static = "http://rna.tbi.univie.ac.at/cmcws";
+    $source_dir = "/mnt/storage/progs/cmcws";
+    $base_dir = "$source_dir/html";
 }else{
 #if we are not on erbse or on linse we are propably on rna.tbi.univie.ac.at anyway
-    $server="http://rna.tbi.univie.ac.at/cmcws2";
-    $base_dir ="/u/html/cmcws";
+    $server = "http://rna.tbi.univie.ac.at/cmcws2";
+    $base_dir = "/u/html/cmcws";
 }
 
-my $upload_dir="$base_dir/upload";
+print STDERR "Hostname: $host\n";
+
+my $upload_dir = "$base_dir/upload";
 #sun grid engine settings
-my $qsub_location="/usr/bin/qsub";
-my $sge_queue_name="web_short_q";
-my $sge_error_dir="$base_dir/error";
-my $accounting_dir="$base_dir/accounting";
-my $sge_log_output_dir="$source_dir/error";
-my $sge_root_directory="/usr/share/gridengine";
+my $qsub_location = "/usr/bin/qsub";
+my $sge_queue_name = "web_short_q";
+my $sge_error_dir = "$base_dir/error";
+my $accounting_dir = "$base_dir/accounting";
+my $sge_log_output_dir = "$source_dir/error";
+my $sge_root_directory = "/usr/share/gridengine";
 ##########################################################################################################
 #Write all Output to file at once
 $|=1;
@@ -470,17 +486,17 @@ if($page==0){
     print "Content-type: text/html; charset=utf-8\n\n";
     my $template = Template->new({
 	# where to find template files
-	INCLUDE_PATH => ['./template'],
+	INCLUDE_PATH => ["$source_dir/template"],
 	RELATIVE=>1
 				 });
-    my $file = './template/input.html';
+    my $file = "input.html";
     my $input_script_file="inputscriptfile";
     my $disabled_upload_form="";
     my $submit_form="";
     $specify_selection_error_message="";
     #Three different states of the input page
     if($checked_input_present){
-	$file = './template/input2.html';
+	$file = "input2.html";
 	if($mode eq "1"){
 	    #comparison of one model vs rfam 
 	    $input_script_file = "inputstep2scriptfile";
@@ -510,8 +526,9 @@ if($page==0){
     my $vars = {
 	#define global variables for javascript defining the current host (e.g. linse) for redirection
 	serveraddress => "$server",
+        staticcontentaddress => "$server_static",
 	title => "CMcompare - Webserver - Input form",
-	banner => "./pictures/banner.png",
+	banner => "$server_static/pictures/banner.png",
 	scriptfile => "$input_script_file",
 	stylefile => "inputstylefile",
 	mode => "$mode",
@@ -533,10 +550,10 @@ if($page==0){
 if($page==1){
     my $template = Template->new({
 	# where to find template files
-	INCLUDE_PATH => ['./template'],
+	INCLUDE_PATH => ["$source_dir/template"],
 	RELATIVE=>1
 				 });
-    my $file = './template/processing.html';
+    my $file = "processing.html";
     my $processing_script_file="processingscriptfile";
     my $error_message="";
     my $query_number="";
@@ -785,8 +802,9 @@ if($page==1){
     my $vars = {
 	#define global variables for javascript defining the current host (e.g. linse) for redirection
 	serveraddress => "$server",
+	staticcontentaddress => "$server_static",
 	title => "CMcompare - Webserver - Processing",
-	banner => "./pictures/banner.png",
+	banner => "$server_static/pictures/banner.png",
 	scriptfile => "$processing_script_file",
 	stylefile => "inputstylefile",
 	mode => "$mode",
@@ -811,7 +829,7 @@ if($page==2){
     print "Content-type: text/html; charset=utf-8\n\n";
     my $template = Template->new({
 	# where to find template files
-	INCLUDE_PATH => ['./template'],
+	INCLUDE_PATH => ["$source_dir/template"],
 	RELATIVE=>1
 				 });
     my $output_script_file="outputscriptfile";
@@ -869,13 +887,14 @@ if($page==2){
     if($mode eq "1"){
 	if(-e "$base_dir/$tempdir/done$result_number"){	
 	    #each submitted model is compared against rfam
-	    $file = './template/output.html';
+	    $file = 'output.html';
 	    $output_script_file="outputscriptfile";
 	    $vars = {
 		#define global variables for javascript defining the current host (e.g. linse) for redirection
 		serveraddress => "$server",
+		staticcontentaddress => "$server_static",
 		title => "CMcompare - Webserver - Output - Comparison vs Rfam",
-		banner => "./pictures/banner.png",
+		banner => "$server_static/pictures/banner.png",
 		scriptfile => "$output_script_file",
 		stylefile => "outputstylefile",
 		mode => "$mode",
@@ -908,13 +927,14 @@ if($page==2){
 	#display the overview page
 	if(-e "$base_dir/$tempdir/done$result_number"){	
 	    #each submitted model is compared against rfam
-	    $file = './template/output.html';
+	    $file = 'output.html';
 	    $output_script_file="outputscriptfile";
 	    $vars = {
 		#define global variables for javascript defining the current host (e.g. linse) for redirection
 		serveraddress => "$server",
+		staticcontentaddress => "$server_static",
 		title => "CMcompare - Webserver - Output - Comparison of a model set",
-		banner => "./pictures/banner.png",
+		banner => "$server_static/pictures/banner.png",
 		scriptfile => "$output_script_file",
 		stylefile => "outputstylefile",
 		mode => "$mode",
@@ -952,10 +972,10 @@ if($page==2){
 if($page==3){
     my $template = Template->new({
 	# where to find template files
-	INCLUDE_PATH => ['./template'],
+	INCLUDE_PATH => ["$source_dir/template"],
 	RELATIVE=>1
 				 });
-    my $file = './template/detailed_comparison.html';
+    my $file = 'detailed_comparison.html';
     my $processing_script_file="processingscriptfile";
     my $error_message="";
     my $return_link;
@@ -970,8 +990,9 @@ if($page==3){
     my $vars = {
 	#define global variables for javascript defining the current host (e.g. linse) for redirection
 	serveraddress => "$server",
+	staticcontentaddress => "$server_static",
 	title => "CMcompare - Webserver - Detailed Comparison",
-	banner => "./pictures/banner.png",
+	banner => "$server_static/pictures/banner.png",
 	scriptfile => "$processing_script_file",
 	stylefile => "inputstylefile",
 	mode => "$mode",

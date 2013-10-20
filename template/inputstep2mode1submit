@@ -1,5 +1,5 @@
-	<form action="cmcws.cgi" id="submit-form"  method="post" enctype="multipart/form-data">
-	<a href="#" onmouseover="XBT(this, {id:'6'})"><img style="vertical-align:middle;border:0;" alt="info" src="pictures/info.png"></a> Select type of the Rfam entries you want to compare against:<br>
+	<form action="[% serveradress  %]" id="submit-form"  method="post" enctype="multipart/form-data">
+	<a href="#" onmouseover="XBT(this, {id:'6'})"><img style="vertical-align:middle;border:0;" alt="info" src="[% staticcontentaddress %]/pictures/info.png"></a> Select type of the Rfam entries you want to compare against:<br>
 	<select id="select_slice" name="select_slice" size="3" onchange="specify_slice(this)">
 	      <option selected>All</option>
 	      <option>specify-selection</option>

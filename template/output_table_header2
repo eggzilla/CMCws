@@ -1,4 +1,4 @@
-	  <th style="width:1%;"><a href="#" onmouseover="XBT(this, {id:'6'})"><img style="vertical-align:text-bottom;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a></th> 
+	  <th style="width:1%;"><a href="#" onmouseover="XBT(this, {id:'6'})"><img style="vertical-align:text-bottom;border:solid 0px #000;" src="[% staticcontentaddress %]/pictures/info.png" alt="Info"></a></th> 
 	  <th style="width:2%;">Rank</th>
           <th style="width:4%;">Link score</th>
 	  <th style="width:4%;">Id Model 1</th>	 

@@ -83,7 +83,7 @@
 
 <div style="text-align:left">
   <h2>[% output_title %]</h2>
-  <form name="filter" action="cmcws.cgi" method="get">
+  <form name="filter" action="[% serveradress %]" method="get">
     <input id="page"  value="2" name="page" type="hidden">
     <input id="mode"  value="[% mode %]" name="mode" type="hidden">
     <input id="tempdir"  value="[% tempdir %]" name="tempdir" type="hidden">
@@ -91,7 +91,7 @@
     <table class="resources">
       [% INSERT $result_matrix %]
       <tr>
-	<td style="text-align:left;">Covariance model graph: <a href="#" onmouseover="XBT(this, {id:'2'})"><img style="vertical-align:middle;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a></td>
+	<td style="text-align:left;">Covariance model graph: <a href="#" onmouseover="XBT(this, {id:'2'})"><img style="vertical-align:middle;border:solid 0px #000;" src="[% staticcontentaddress %]/pictures/info.png" alt="Info"></a></td>
 	<td colspan="2"> </td>
 	<td> </td>
       </tr>
@@ -115,7 +115,7 @@
 	<td colspan="2"> </td>
       </tr>
       <tr>
-	<td style="text-align:left;">Filtering: <a href="#" onmouseover="XBT(this, {id:'3'})"><img style="vertical-align:middle;border:solid 0px #000;" src="pictures/info.png" alt="Info"></a> </td>
+	<td style="text-align:left;">Filtering: <a href="#" onmouseover="XBT(this, {id:'3'})"><img style="vertical-align:middle;border:solid 0px #000;" src="[% staticcontentaddress %]/pictures/info.png" alt="Info"></a> </td>
 	<td colspan="3"  style="border:solid 1px #FFF;"></td>
       </tr>
       <tr>

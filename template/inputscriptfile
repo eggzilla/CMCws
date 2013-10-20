@@ -1,2 +1,2 @@
-	<script src="./javascript/input.js"></script>
-	<script src="./javascript/google-analytics.js"></script>
+	<script src="[% staticcontentaddress %]/javascript/input.js"></script>
+	<script src="[% staticcontentaddress %]/javascript/google-analytics.js"></script>

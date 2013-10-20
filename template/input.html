@@ -48,8 +48,8 @@
     </tr>
     <tr>		
       <td id="step1_content" >	
-	<form action="/cgi-bin/cmcws.cgi" method="post" target="Daten">
-	  <p>Select type of comparison: <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle;border:0;" src="pictures/info.png" alt="info"></a></p>
+	<form action="[% serveraddress %]" method="post" target="Daten">
+	  <p>Select type of comparison: <a href="#" onmouseover="XBT(this, {id:'1'})"><img style="vertical-align:middle;border:0;" src="[% staticcontentaddress %]/pictures/info.png" alt="info"></a></p>
 	  <p><select id="select_operation"  onchange="step1_operation(this)">
 	      <option>Please select</option>
 	      <option>covariance model vs Rfam</option>
