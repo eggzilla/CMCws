@@ -5,6 +5,7 @@
     <title> [% title %]</title>
     [% PROCESS $scriptfile %]
     [% PROCESS $stylefile %] 
+    <link rel="icon" href="http://www.tbi.univie.ac.at/images/tbi.png" type="image/x-icon">
   </head>
   <body>
     <div style="align:center">
