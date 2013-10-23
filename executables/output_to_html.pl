@@ -3,9 +3,8 @@
 use warnings;
 use strict;
 use diagnostics;
-use Math::Round;
 use List::Util qw[min max];
-#use Data::Dumper;
+use Math::Round;
 #invocation from tempdir: ../../executables/output_to_html.pl /srv/http/cmcws/html/J_KsXXLTAK 1 1 10 20
 #get input and assemble it into datastructure, return list of x best interactions
 my $server=$ARGV[0];
@@ -20,6 +19,7 @@ my $model_name_1_string=$ARGV[7];
 my $model_name_2_string=$ARGV[8];
 my $file_input;
 my $result_file_number;
+
 #redirect error from httpd log to basedir
 open (STDERR, ">>$base_dir/Log" ) or die "$!";
 #print STDERR "cmcws: output - parameters: tempdir: $tempdir_path, mode: $mode, number_of_hits: $number_of_hits, cutoff: $cutoff , model_name_1: $model_name_1_string , model_name_2: $model_name_2_string";

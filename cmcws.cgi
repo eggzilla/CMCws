@@ -732,7 +732,10 @@ if($page==1){
 	    print ACCOUNTING "$ip_adress $tempdir $timestamp $mode $query_number\n";
 	    close ACCOUNTING;
 	    chmod (0755,"$base_dir/$tempdir/commands.sh");
-	    exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /$base_dir/$tempdir/error -o /$base_dir/$tempdir/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
+            #print STDERR "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e $base_dir/$tempdir/error -o $base_dir/$tempdir/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid";
+	    #exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e $base_dir/$tempdir/error -o $base_dir/$tempdir/error $base_dir/$tempdir/commands.sh > $base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
+	    print STDERR "$qsub_location -N IP$ip_adress -q web_short_q -e $base_dir/$tempdir/error -o $base_dir/$tempdir/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid";
+            exec "$qsub_location -N IP$ip_adress -q web_short_q -e $base_dir/$tempdir/error -o $base_dir/$tempdir/error $base_dir/$tempdir/commands.sh > $base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
 	}
     }elsif(@postprocess_selected){
 	#print STDERR "Got here right\n";
@@ -878,7 +881,7 @@ if($page==2){
 	#print STDERR "cmcws: Error inputidname$result_number does not exist in tempdir $base_dir/$tempdir";
     }
     
-    `executables/output_to_html.pl $server $base_dir $tempdir $result_number $mode $filtered_number $cutoff $model_1_name $model_2_name`==0 or die print STDERR "cmcws: could not execute\n";
+    `$source_dir/executables/output_to_html.pl $server $base_dir $tempdir $result_number $mode $filtered_number $cutoff $model_1_name $model_2_name`==0 or die print STDERR "cmcws: could not execute\n";
     #number_of_hits_to_display_after_applying_filters read back in from file written by output_to_html.pl
     open (NUMBEROFHITS, "<$base_dir/$tempdir/number_of_hits$result_number")or die "Could not open $tempdir/number_of_hits$result_number: $!\n";
     my $number_of_hits_to_display=<NUMBEROFHITS>;
