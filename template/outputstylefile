@@ -49,19 +49,19 @@ h4{
 }
 .expArrow{
 	padding-left: 20px;
-	background: url(pictures/arrow-down.png) no-repeat 0px 4px;
+	background: url([% staticcontentaddress %]/pictures/arrow-down.png) no-repeat 0px 4px;
 }
 .collArrow{
 	padding-left: 20px;
-	background: url(pictures/arrow-up.png) no-repeat 0px 4px;
+	background: url([% staticcontentaddress %]/pictures/arrow-up.png) no-repeat 0px 4px;
 }
 .expIco{
 	padding-left: 26px;
-	background: url(pictures/eggarrowdown.png) no-repeat 0px 0px;
+	background: url([% staticcontentaddress %]/pictures/eggarrowdown.png) no-repeat 0px 0px;
 }
 .collIco{
 	padding-left: 26px;
-	background: url(pictures/eggarrowup.png) no-repeat 0px 0px;
+	background: url([% staticcontentaddress %]/pictures/eggarrowup.png) no-repeat 0px 0px;
 }
 .demo6{
 	border: 1px solid #B9E3FF;
