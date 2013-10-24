@@ -1,4 +1,4 @@
-<form action="[% serveradress %]" name="postprocessing"  method="get">
+<form action="[% serveraddress %]" name="postprocessing"  method="get">
       <input id="page" type="hidden" name="page" value="1">
       <input id="mode" type="hidden" name="mode" value="2">	
       <input id="tempdir" type="hidden" name="tempdir" value="[% tempdir  %]">
@@ -9,7 +9,7 @@
     <table style="width:60%;" class="tablesorter" id="myTable">             
       <thead>
         <tr>
-	  [% INSERT $table_header %]
+	  [% PROCESS $table_header %]
         </tr> 
       </thead>
       <tbody>

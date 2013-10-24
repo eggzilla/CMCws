@@ -46,8 +46,10 @@ if($host eq "erbse"){
     $base_dir = "$source_dir/html";
 }else{
 #if we are not on erbse or on linse we are propably on rna.tbi.univie.ac.at anyway
-    $server = "http://rna.tbi.univie.ac.at/cmcws2";
+    $server = "http://rna.tbi.univie.ac.at/cgi-bin/cmcws/cmcws.cgi";
     $base_dir = "/u/html/cmcws";
+    $source_dir = "/mnt/storage/progs/cmcws";
+    $server_static = "http://rna.tbi.univie.ac.at/cmcws";
 }
 
 print STDERR "Hostname: $host\n";
@@ -706,7 +708,7 @@ if($page==1){
 	print COMMANDS "cd $base_dir/$tempdir/;\n";
 	print COMMANDS "$source_dir/executables/split_input.pl $base_dir/$tempdir/input_file $base_dir/$tempdir/;\n";
 	print COMMANDS "$source_dir/executables/convert_stockholmdir_to_cmdir.pl $base_dir/$tempdir $source_dir;\n";
-	print COMMANDS "$source_dir/executables/calculate.pl $server $tempdir $source_dir $mode $select_slice;\n";
+	print COMMANDS "$source_dir/executables/calculate.pl $server $server_static $tempdir $source_dir $mode $select_slice;\n";
 	
 	#FORK here
 	if (my $pid = fork) {
@@ -767,7 +769,7 @@ if($page==1){
 	open (QUERYNUMBER, ">$base_dir/$tempdir/query_number") or die "Could not create query_number";
 	print QUERYNUMBER "$postprocess_counter";
 	close QUERYNUMBER;
-	print COMMANDS "$source_dir/executables/calculate.pl $server $tempdir $source_dir $mode $select_slice;\n";
+	print COMMANDS "$source_dir/executables/calculate.pl $server $server_static $tempdir $source_dir $mode $select_slice;\n";
 	#FORK here
 	if (my $pid = fork) {
 	    $query->delete_all();
@@ -832,10 +834,10 @@ if($page==2){
     print "Content-type: text/html; charset=utf-8\n\n";
     my $template = Template->new({
 	# where to find template files
-	INCLUDE_PATH => ["$source_dir/template"],
+	INCLUDE_PATH => ["$source_dir"],
 	RELATIVE=>1
 				 });
-    my $output_script_file="outputscriptfile";
+    my $output_script_file="template/outputscriptfile";
     my $total;
     if($mode eq "1"){
 	unless(-e "$base_dir/$tempdir/slice_models"){
@@ -880,8 +882,8 @@ if($page==2){
     }else{
 	#print STDERR "cmcws: Error inputidname$result_number does not exist in tempdir $base_dir/$tempdir";
     }
-    
-    `$source_dir/executables/output_to_html.pl $server $base_dir $tempdir $result_number $mode $filtered_number $cutoff $model_1_name $model_2_name`==0 or die print STDERR "cmcws: could not execute\n";
+    `$source_dir/executables/output_to_html.pl $server $server_static $base_dir $tempdir $result_number $mode $filtered_number $cutoff $model_1_name $model_2_name`==0 or die print STDERR "cmcws: could not execute\n";
+    #close STDERR;
     #number_of_hits_to_display_after_applying_filters read back in from file written by output_to_html.pl
     open (NUMBEROFHITS, "<$base_dir/$tempdir/number_of_hits$result_number")or die "Could not open $tempdir/number_of_hits$result_number: $!\n";
     my $number_of_hits_to_display=<NUMBEROFHITS>;
@@ -890,8 +892,8 @@ if($page==2){
     if($mode eq "1"){
 	if(-e "$base_dir/$tempdir/done$result_number"){	
 	    #each submitted model is compared against rfam
-	    $file = 'output.html';
-	    $output_script_file="outputscriptfile";
+	    $file = 'template/output.html';
+	    $output_script_file="template/outputscriptfile";
 	    $vars = {
 		#define global variables for javascript defining the current host (e.g. linse) for redirection
 		serveraddress => "$server",
@@ -899,21 +901,21 @@ if($page==2){
 		title => "CMcompare - Webserver - Output - Comparison vs Rfam",
 		banner => "$server_static/pictures/banner.png",
 		scriptfile => "$output_script_file",
-		stylefile => "outputstylefile",
+		stylefile => "template/outputstylefile",
 		mode => "$mode",
-		filter_fields =>"output_filter_fields1",
-		table_header => "output_table_header1",
+		filter_fields =>"template/output_filter_fields1",
+		table_header => "template/output_table_header1",
 		output_title =>"Top $number_of_hits_to_display pairwise comparisons of $total total for $inputid - $inputname<br><h4>Current cutoffs (Max. hits: $filtered_number , Min. Link score: $cutoff , Rfam name containing: $model_1_name)</h4>",
 		inputid => "$inputid",
-		filtered_table => "./html/$tempdir/filtered_table$result_number",
-		cm_map => "./html/$tempdir/graph"."$result_number".".svg",
-		cm_output_file => "./html/$tempdir/result$result_number",
-		csv_file => "./html/$tempdir/csv$result_number",
-		csv_filtered_file => "./html/$tempdir/csv_filtered$result_number",
-		dot_file => "./html/$tempdir/graph_out$result_number.dot",
-		svg_file => "./html/$tempdir/graph"."$result_number".".svg",
-		result_list_form_and_table => "output_result_list_form_table1",
-		result_matrix =>"output_result_matrix1",
+		filtered_table => "html/$tempdir/filtered_table$result_number",
+		cm_map => "$server_static/tmp/$tempdir/graph"."$result_number".".svg",
+		cm_output_file => "$server_static/tmp/$tempdir/result$result_number",
+		csv_file => "$server_static/tmp/$tempdir/csv$result_number",
+		csv_filtered_file => "$server_static/tmp/$tempdir/csv_filtered$result_number",
+		dot_file => "$server_static/tmp/$tempdir/graph_out$result_number.dot",
+		svg_file => "$server_static/tmp/$tempdir/graph"."$result_number".".svg",
+		result_list_form_and_table => "template/output_result_list_form_table1",
+		result_matrix =>"template/output_result_matrix1",
 		result_number =>"$result_number",
 		tempdir => "$tempdir",
 		error_message => "$error_message"
@@ -930,8 +932,8 @@ if($page==2){
 	#display the overview page
 	if(-e "$base_dir/$tempdir/done$result_number"){	
 	    #each submitted model is compared against rfam
-	    $file = 'output.html';
-	    $output_script_file="outputscriptfile";
+	    $file = 'template/output.html';
+	    $output_script_file="template/outputscriptfile";
 	    $vars = {
 		#define global variables for javascript defining the current host (e.g. linse) for redirection
 		serveraddress => "$server",
@@ -939,20 +941,20 @@ if($page==2){
 		title => "CMcompare - Webserver - Output - Comparison of a model set",
 		banner => "$server_static/pictures/banner.png",
 		scriptfile => "$output_script_file",
-		stylefile => "outputstylefile",
+		stylefile => "template/outputstylefile",
 		mode => "$mode",
 		output_title=> "Top $number_of_hits_to_display pairwise comparisons of total $total <br><h4>Current cutoffs (Max. hits: $filtered_number , Min. Link score: $cutoff , Model Name 1 containing: $model_1_name , Model Name 2 containing: $model_1_name)</h4>",
-		filter_fields=>"output_filter_fields2",
-		table_header=> "output_table_header2",
-		filtered_table => "./html/$tempdir/filtered_table$result_number",
-		cm_map=> "./html/$tempdir/graph$result_number.svg",
-		cm_output_file => "./html/$tempdir/result$result_number",
-		csv_file => "./html/$tempdir/csv$result_number",
-		csv_filtered_file => "./html/$tempdir/csv_filtered$result_number",
-		dot_file => "./html/$tempdir/graph_out$result_number.dot",
-		svg_file => "./html/$tempdir/graph$result_number.svg",
-		result_list_form_and_table => "output_result_list_form_table2",
-		result_matrix =>"./html/$tempdir/result_matrix",
+		filter_fields=>"template/output_filter_fields2",
+		table_header=> "template/output_table_header2",
+		filtered_table => "html/$tempdir/filtered_table$result_number",
+		cm_map=> "$server_static/tmp/$tempdir/graph$result_number.svg",
+		cm_output_file => "$server_static/tmp/$tempdir/result$result_number",
+		csv_file => "$server_static/tmp/$tempdir/csv$result_number",
+		csv_filtered_file => "$server_static/tmp/$tempdir/csv_filtered$result_number",
+		dot_file => "$server_static/tmp/$tempdir/graph_out$result_number.dot",
+		svg_file => "$server_static/tmp/$tempdir/graph$result_number.svg",
+		result_list_form_and_table => "./template/output_result_list_form_table2",
+		result_matrix =>"html/$tempdir/result_matrix",
 		result_number =>"$result_number",
 		tempdir => "$tempdir",
 		error_message => "$error_message"

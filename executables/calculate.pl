@@ -5,10 +5,11 @@ use strict;
 use diagnostics;
 #Input is path to file that should be split
 my $server=$ARGV[0];
-my $tempdir_folder=$ARGV[1];
-my $input_source_dir=$ARGV[2];
-my $mode_input=$ARGV[3];
-my $select_slice=$ARGV[4];
+my $server_static=$ARGV[1]; 
+my $tempdir_folder=$ARGV[2];
+my $input_source_dir=$ARGV[3];
+my $mode_input=$ARGV[4];
+my $select_slice=$ARGV[5];
 my $base_dir="$input_source_dir"."/html/";
 #complete path to tempdir
 my $tempdir_path_input="$base_dir"."$tempdir_folder";
@@ -112,7 +113,7 @@ if(defined($tempdir_path)){
 		    }
 		}
 		#compute output 
-		system("$executable_dir/output_to_html.pl $server $base_dir $tempdir_folder $mode $counter 20")==0 or die "cmcws: Execution failed: File $file - $!";
+		system("$executable_dir/output_to_html.pl $server $server_static $base_dir $tempdir_folder $mode $counter 20")==0 or die "cmcws: Execution failed: File $file - $!";
 		open(DONE,">$tempdir_path/done$counter") or die "Can't create $tempdir_path/done$file: $!";
 		close(DONE);
 		$counter++;
@@ -169,7 +170,7 @@ if(defined($tempdir_path)){
 	#output stuff
 	my $number_of_displayed_comparisons=10;
 	my $cutoff="none";
-	system("$executable_dir/output_to_html.pl $server $base_dir $tempdir_folder $counter $mode $number_of_displayed_comparisons $cutoff")==0 or die  "cmcws: Execution failed: tempdir $tempdir_folder mode $mode error  - $!";
+	system("$executable_dir/output_to_html.pl $server $server_static $base_dir $tempdir_folder $counter $mode $number_of_displayed_comparisons $cutoff")==0 or die  "cmcws: Execution failed: tempdir $tempdir_folder mode $mode error  - $!";
 	open(DONE,">$tempdir_path/done$counter") or die "Can't create $tempdir_path/done$file: $!";
 	close(DONE);
 	closedir(DIR);

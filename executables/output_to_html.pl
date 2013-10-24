@@ -8,20 +8,23 @@ use Math::Round;
 #invocation from tempdir: ../../executables/output_to_html.pl /srv/http/cmcws/html/J_KsXXLTAK 1 1 10 20
 #get input and assemble it into datastructure, return list of x best interactions
 my $server=$ARGV[0];
-my $base_dir=$ARGV[1];
-my $tempdir_folder=$ARGV[2];
+my $server_static=$ARGV[1];
+my $base_dir=$ARGV[2];
+my $tempdir_folder=$ARGV[3];
 my $tempdir_path="$base_dir"."/$tempdir_folder";
-my $result_file_number_input=$ARGV[3];
-my $mode=$ARGV[4];
-my $number_of_hits=$ARGV[5];
-my $cutoff=$ARGV[6];
-my $model_name_1_string=$ARGV[7];
-my $model_name_2_string=$ARGV[8];
+my $result_file_number_input=$ARGV[4];
+my $mode=$ARGV[5];
+my $number_of_hits=$ARGV[6];
+my $cutoff=$ARGV[7];
+my $model_name_1_string=$ARGV[8];
+my $model_name_2_string=$ARGV[9];
 my $file_input;
 my $result_file_number;
 
+
+
 #redirect error from httpd log to basedir
-open (STDERR, ">>$base_dir/Log" ) or die "$!";
+open (STDERR, ">>$base_dir/Log" ) or die "Could not open logfile - Basedir: $base_dir Server-static: $server_static Server: $server Reason: $!";
 #print STDERR "cmcws: output - parameters: tempdir: $tempdir_path, mode: $mode, number_of_hits: $number_of_hits, cutoff: $cutoff , model_name_1: $model_name_1_string , model_name_2: $model_name_2_string";
 if(defined($result_file_number_input)){
     if(-e "$tempdir_path/result$result_file_number_input"){
@@ -124,7 +127,7 @@ unless(-e "$tempdir_path/csv$result_file_number"){
 	#print STDERR "Lines i: $i , Columns j: $j\n";
 	#prepare relative link score computation in percent
 	my $result_matrix_string="<tr>
-	<td style=\"text-align:left;\">Matrix of result linkscores for all models: <a href=\"#\" onmouseover=\"XBT(this, {id:'1'})\"><img style=\"vertical-align:middle;border:solid 0px #000;\" src=\"pictures/info.png\" alt=\"Info\"></a></td>
+	<td style=\"text-align:left;\">Matrix of result linkscores for all models: <a href=\"#\" onmouseover=\"XBT(this, {id:'1'})\"><img style=\"vertical-align:middle;border:solid 0px #000;\" src=\"$server_static/pictures/info.png\" alt=\"Info\"></a></td>
 	<td colspan=\"2\"> </td>
 	<td> </td>
 	</tr>
@@ -282,9 +285,9 @@ foreach(@filtered_sorted_entries){
 	    #print STDERR "\n A \n";
 	    $counter++;
 	    if($mode eq "1"){
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"$server_static/pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"$server_static/pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }
 	    print FILTEREDTABLE "$output_line";
 	    print FILTEREDCSV "$filtered_csv_output";
@@ -297,9 +300,9 @@ foreach(@filtered_sorted_entries){
 	if($name1=~/$model_name_1_string/g){
 	    $counter++;
 	    if($mode eq "1"){
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"$server_static/pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"$server_static/pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }
 	    print FILTEREDTABLE "$output_line";
 	    print FILTEREDCSV "$filtered_csv_output";
@@ -312,9 +315,9 @@ foreach(@filtered_sorted_entries){
 	    $counter++;
 	    #print STDERR "\n cmcws: accepted name2 $name2: model_name2: $model_name_2_string\n";
 	    if($mode eq "1"){
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"$server_static/pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }else{
-		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+		$output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"$server_static/pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	    }
 	    print FILTEREDTABLE "$output_line";
 	    print FILTEREDCSV "$filtered_csv_output";
@@ -326,9 +329,9 @@ foreach(@filtered_sorted_entries){
     }else{
 	$counter++;
 	if($mode eq "1"){
-	    $output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+	    $output_line ="\<tr id\=\"t"."$counter\"\>"."<td>"."<input type=\"checkbox\" id=\"p"."$counter\" name=\"p"."$counter"."\" value=\"$id2_truncated\">"."</td>"."<td>"."<a href=\"$href\"><img src=\"$server_static/pictures/magnifying_glass.png\"></a>"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	}else{
-	    $output_line = "\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"./pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
+	    $output_line = "\<tr id\=\"t"."$counter\"\>"."<td>"."<a href=\"$href\"><img src=\"$server_static/pictures/magnifying_glass.png\">"."</td>"."<td>"."$counter."."</td>"."<td>"."$link_score"."</td>"."<td>"."$id1_truncated"."</td>"."<td>"."$name1"."</td>"."<td>"."$id2_truncated"."</td>"."<td>"."$name2"."</td>"."<td>"."$score1"."</td>"."<td>"."$score2"."</td>"."</tr>\n";
 	}
 	print FILTEREDTABLE "$output_line";
 	print FILTEREDCSV "$filtered_csv_output";
