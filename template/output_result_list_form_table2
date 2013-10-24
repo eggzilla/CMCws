@@ -2,7 +2,7 @@
     <table style="width:60%;" class="tablesorter" id="myTable">             
       <thead>
         <tr>
-	  [% INSERT $table_header %]
+	  [% PROCESS $table_header %]
         </tr> 
       </thead>
       <tbody>

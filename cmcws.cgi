@@ -953,7 +953,7 @@ if($page==2){
 		csv_filtered_file => "$server_static/tmp/$tempdir/csv_filtered$result_number",
 		dot_file => "$server_static/tmp/$tempdir/graph_out$result_number.dot",
 		svg_file => "$server_static/tmp/$tempdir/graph$result_number.svg",
-		result_list_form_and_table => "./template/output_result_list_form_table2",
+		result_list_form_and_table => "template/output_result_list_form_table2",
 		result_matrix =>"html/$tempdir/result_matrix",
 		result_number =>"$result_number",
 		tempdir => "$tempdir",
