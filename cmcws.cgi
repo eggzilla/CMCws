@@ -305,7 +305,8 @@ if(defined($input_filtered_number)){
 #    $input_identifier=undef;
 #}
 $identifier= $input_identifier;
-print STDERR "$mode $page\n";
+
+#print STDERR "$mode $page\n";
 
 #cutoff
 if(defined($input_cutoff)){
