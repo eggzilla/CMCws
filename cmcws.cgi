@@ -39,15 +39,15 @@ if($host eq "erbse"){
     $server_static = "http://lingerie.tbi.univie.ac.at/cmcws";
     $source_dir = "/mnt/storage/progs/cmcws";
     $base_dir = "$source_dir/html";
-}elsif($host eq "nylon"){
-    $server = "http://rna.tbi.univie.ac.at/cgi-bin/cmcws/cmcws.cgi";
-    $server_static = "http://rna.tbi.univie.ac.at/cmcws";
+}elsif($host eq "nibiru"){
+    $server = "http://nibiru.tbi.univie.ac.at/cgi-bin/cmcws/cmcws.cgi";
+    $server_static = "http://nibiru.tbi.univie.ac.at/cmcws";
     $source_dir = "/mnt/storage/progs/cmcws";
     $base_dir = "$source_dir/html";
 }else{
 #if we are not on erbse or on linse we are propably on rna.tbi.univie.ac.at anyway
     $server = "http://rna.tbi.univie.ac.at/cgi-bin/cmcws/cmcws.cgi";
-    $base_dir = "/u/html/cmcws";
+    $base_dir = "$source_dir/html";
     $source_dir = "/mnt/storage/progs/cmcws";
     $server_static = "http://rna.tbi.univie.ac.at/cmcws";
 }
