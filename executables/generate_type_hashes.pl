@@ -54,12 +54,13 @@ foreach my $unique_Rfam_type (@unique_Rfam_types){
 	my $rfam_id=$split_array[2];
 	$rfam_id=~s/\s//;
 	if($line=~/$unique_Rfam_type/){
-	    my $output="$rfam_id;1\n";
+            my $output="$rfam_id\n";
+	    #my $output="$rfam_id;1\n";
 	    $count++;
 	    print OUTPUTFILE "$output";
 	}else{
-	    my $output="$rfam_id;0\n";
-	    print OUTPUTFILE "$output";
+	    #my $output="$rfam_id;0\n";
+	    #print OUTPUTFILE "$output";
 	}
 	
     }
