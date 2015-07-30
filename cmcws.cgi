@@ -57,7 +57,7 @@ print STDERR "Hostname: $host\n";
 my $upload_dir = "$base_dir/upload";
 #sun grid engine settings
 my $qsub_location = "/usr/bin/qsub";
-my $sge_queue_name = "web_short_q";
+my $sge_queue_name = "web_long_q";
 my $sge_error_dir = "$base_dir/error";
 my $accounting_dir = "$base_dir/accounting";
 my $sge_log_output_dir = "$source_dir/error";
@@ -737,8 +737,8 @@ if($page==1){
 	    chmod (0755,"$base_dir/$tempdir/commands.sh");
             #print STDERR "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e $base_dir/$tempdir/error -o $base_dir/$tempdir/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid";
 	    #exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e $base_dir/$tempdir/error -o $base_dir/$tempdir/error $base_dir/$tempdir/commands.sh > $base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
-	    print STDERR "$qsub_location -N IP$ip_adress -q web_short_q -e $base_dir/$tempdir/error -o $base_dir/$tempdir/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid";
-            exec "$qsub_location -N IP$ip_adress -q web_short_q -e $base_dir/$tempdir/error -o $base_dir/$tempdir/error $base_dir/$tempdir/commands.sh > $base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
+	    print STDERR "$qsub_location -N IP$ip_adress -q $sge_queue_name -e $base_dir/$tempdir/error -o $base_dir/$tempdir/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid";
+            exec "$qsub_location -N IP$ip_adress -q $sge_queue_name -e $base_dir/$tempdir/error -o $base_dir/$tempdir/error $base_dir/$tempdir/commands.sh > $base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
 	}
     }elsif(@postprocess_selected){
 	#print STDERR "Got here right\n";
@@ -795,7 +795,7 @@ if($page==1){
 	    print ACCOUNTING "$ip_adress $tempdir $timestamp $mode $query_number\n";
 	    close ACCOUNTING;
 	    chmod (0755,"$base_dir/$tempdir/commands.sh");
-	    exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q web_short_q -e /$base_dir/$tempdir/error -o /$base_dir/$tempdir/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
+	    exec "export SGE_ROOT=$sge_root_directory; $qsub_location -N IP$ip_adress -q $sge_queue_name -e /$base_dir/$tempdir/error -o /$base_dir/$tempdir/error $base_dir/$tempdir/commands.sh >$base_dir/$tempdir/Jobid" or die "Could not execute sge submit: $! /n";
 	}
     }
     
