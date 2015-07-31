@@ -14,7 +14,7 @@
 	  <td rowspan="2"><img alt="Banner" src="[% banner %]"></td>
 	  <td style="width:5%;"></td>
           <td style="width:20%;"><a href="[% staticcontentaddress %]/introduction.html"><img src="[% staticcontentaddress %]/pictures/introduction.png" alt="Introduction" style="border:0"></a></td>
-          <td style="width:15%;"><a href="[% staticcontentaddress %]/cgi-bin/cmcws/cmcws.cgi"><img src="[% staticcontentaddress %]/pictures/compare.png" alt="Target Search" style="border:0"></a></td>
+          <td style="width:15%;"><a href="[% serveraddress %]"><img src="[% staticcontentaddress %]/pictures/compare.png" alt="Target Search" style="border:0"></a></td>
 	  <td style="width:20%;"><a href="[% staticcontentaddress %]/help.html"><img src="[% staticcontentaddress %]/pictures/help.png" alt="Help"  style="border:0"></a></td>
 	  <td style="width:5%;"></td>
 	</tr>
@@ -22,7 +22,7 @@
 	      <td style="width:5%;"></td>
 	      <td colspan="3"
 	      style="height:40%;background-color:#C0C0C0"><a href="[% staticcontentaddress %]/introduction.html#history">History:</a>
-	      Version 1.10 online</td>
+	      Version 1.11 online - Updated models to Rfam 12.0</td>
 	      <td style="width:5%;"></td>
  	    </tr> 
       </table>
