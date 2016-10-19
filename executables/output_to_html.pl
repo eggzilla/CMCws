@@ -25,7 +25,7 @@ my $result_file_number;
 
 #redirect error from httpd log to basedir
 open (STDERR, ">>$base_dir/Log" ) or die "Could not open logfile - Basedir: $base_dir Server-static: $server_static Server: $server Reason: $!";
-#print STDERR "cmcws: output - parameters: tempdir: $tempdir_path, mode: $mode, number_of_hits: $number_of_hits, cutoff: $cutoff , model_name_1: $model_name_1_string , model_name_2: $model_name_2_string";
+print STDERR "cmcws: output - parameters: tempdir: $tempdir_path, mode: $mode, number_of_hits: $number_of_hits, cutoff: $cutoff , model_name_1: $model_name_1_string , model_name_2: $model_name_2_string";
 if(defined($result_file_number_input)){
     if(-e "$tempdir_path/result$result_file_number_input"){
 	$result_file_number=$result_file_number_input;
@@ -278,7 +278,7 @@ foreach(@filtered_sorted_entries){
     my $rounded_link_score=nearest(1, $link_score);
     #Filter 3 show only hit containing rfamname in rfam name
     my $output_line;    
-    my $href="$server/cmcws.cgi?page=3&mode=$mode&tempdir=$tempdir_folder&result_number=$result_file_number_input&identifier="."$id1_truncated"."_"."$id2_truncated";
+    my $href="$server/cmcws.cgi?page=3&amp;mode=$mode&amp;tempdir=$tempdir_folder&amp;result_number=$result_file_number_input&amp;identifier="."$id1_truncated"."_"."$id2_truncated";
     if($model_name_filter_type eq "A"){
 	#we push matching entries on new array
 	if($name1=~/$model_name_1_string/g && $name2=~/$model_name_2_string/g){
