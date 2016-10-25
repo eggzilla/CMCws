@@ -27,6 +27,7 @@ my $server;
 my $server_static;
 #baseDIR points to the tempdir folder
 my $base_dir;
+my $rnalien_tmp_dir ="";
 if($host eq "erbse"){
     $server = "http://localhost/cmcws";
     #$server="http://131.130.44.243/cmcws";
@@ -44,6 +45,7 @@ if($host eq "erbse"){
     $server_static = "http://nibiru.tbi.univie.ac.at/cmcws";
     $source_dir = "/mnt/storage/progs/cmcws";
     $base_dir = "$source_dir/html";
+    $rnalien_tmp_dir = "/mnt/storage/tmp/rnalien/";
 }else{
 #if we are not on erbse or on linse we are propably on rna.tbi.univie.ac.at anyway
     $server = "http://rna.tbi.univie.ac.at/cgi-bin/cmcws/cmcws.cgi";
@@ -161,6 +163,8 @@ if(defined($uploaded_file)){
 	$uploaded_file="mode2.cm"
     }elsif(-e "$upload_dir/$uploaded_file"){
 	#file exists
+    }elsif(-e "$rnalien_tmp_dir/$uploaded_file/result.cm"){
+        #file exists
     }else{
 	print STDERR "cmcws: nonexistent uploaded file has been supplied as parameter\n";
 	$uploaded_file="";
@@ -282,8 +286,10 @@ if(defined($input_filename)){
     }
     
 }else{
-    #Submit without file, set error message and request file
-    push(@input_error,"No Input file provided");
+   #Submit without file, set error message and request file
+   unless(defined($uploaded_file)){
+   	push(@input_error,"No input file provided");
+   }
 }
 #filtered_number
 if(defined($input_filtered_number)){
@@ -705,7 +711,12 @@ if($page==1){
 	mkdir("$base_dir/$tempdir/stockholm_alignment",0744);
 	open (COMMANDS, ">$base_dir/$tempdir/commands.sh") or die "Could not create comments.sh";	
 	print COMMANDS "#!/bin/bash\n";
-	print COMMANDS "cp $upload_dir/$uploaded_file $base_dir/$tempdir/input_file;\n";
+        #Include case of passing result file from RNAlien
+        if(-e "$rnalien_tmp_dir/$uploaded_file/result.cm"){
+		print COMMANDS "cp $rnalien_tmp_dir/$uploaded_file/result.cm $base_dir/$tempdir/input_file;\n";
+        }else{
+		print COMMANDS "cp $upload_dir/$uploaded_file $base_dir/$tempdir/input_file;\n";
+        }
 	print COMMANDS "cd $base_dir/$tempdir/;\n";
 	print COMMANDS "$source_dir/executables/split_input.pl $base_dir/$tempdir/input_file $base_dir/$tempdir/;\n";
 	print COMMANDS "$source_dir/executables/convert_stockholmdir_to_cmdir.pl $base_dir/$tempdir $source_dir;\n";
