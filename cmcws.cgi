@@ -963,7 +963,7 @@ if($page==2){
 		cm_map=> "$server_static/tmp/$tempdir/graph$result_number.svg",
 		cm_output_file => "$server_static/tmp/$tempdir/result$result_number",
 		csv_file => "$server_static/tmp/$tempdir/csv$result_number",
-                cmvs_file => "$server_static/tmp/$tempdir/cmvs.result",
+                cmvs_file => "$server_static/tmp/$tempdir/cmcv.result",
                 cmvs_field => "template/cmvslink",
 		csv_filtered_file => "$server_static/tmp/$tempdir/csv_filtered$result_number",
 		dot_file => "$server_static/tmp/$tempdir/graph_out$result_number.dot",
