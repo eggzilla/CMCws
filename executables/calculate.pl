@@ -51,7 +51,7 @@ if(defined($tempdir_path)){
     my $alignment_dir="$tempdir_path/stockholm_alignment";
     my $model_dir="$tempdir_path/covariance_model";
     my $executable_dir="$source_dir"."/executables";
-    my $rfam_model_dir="$source_dir"."/data/Rfam11";
+    my $rfam_model_dir="$source_dir"."/data/Rfam12";
     #print "rfam_model_dir: $rfam_model_dir\n";
     my $file;
     my $rfam_file;
@@ -90,8 +90,8 @@ if(defined($tempdir_path)){
 		#print "Written begin\n";
 		while (defined($rfam_file = readdir(RFAMDIR))) {
 		    unless($rfam_file=~/^\./){  
-			#print "cmcws: exec file $file, rfam-file $rfam_file\n";
-			#print "$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter/n";
+			print "cmcws: exec file $file, rfam-file $rfam_file\n"; ##
+			print "$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter/n";
 			if($select_slice eq "All"){
 			    system("$executable_dir/CMCompare $model_dir/$file $rfam_model_dir/$rfam_file \>\>$tempdir_path/result$counter")==0 or die "cmcws: Execution failed:  File $file - $!";
 			}else{
@@ -158,14 +158,14 @@ if(defined($tempdir_path)){
 		#we do not increment $counter, because we only produce one result file for all comparisons
 		unless("$model" eq "$compare_model"){
 		    #print STDERR "$executable_dir/CMCompare $model_dir/$model $model_dir/$compare_model \>\>$tempdir_path/result$counter";
-		    system("$executable_dir/CMCompare $model_dir/$model $model_dir/$compare_model \>\>$tempdir_path/result$counter")==0 or die  "cmcws: Execution failed: model $model with compare_model $compare_model - $!\n";
+		    system("$executable_dir/CMCompare $model_dir/$model $model_dir/$compare_model \>\>$tempdir_path/result$counter")==0 or die  "cmcws: Execution failed: model $model with compare_model $compare_model - $!\n";     
 			#print "done: $model, $compare_model\n";
 		    $column_counter++;
 		}		
 	    }
 	    $query_counter++;
 	}
-	
+        system("$executable_dir/CMCWStoCMCV -m $tempdir_path/input_file -r $tempdir_path/result$counter > $tempdir_path/cmcv.result"); 	
 	
 	#output stuff
 	my $number_of_displayed_comparisons=10;

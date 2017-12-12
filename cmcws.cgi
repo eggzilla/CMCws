@@ -247,9 +247,9 @@ if(defined($input_filename)){
 	print STDERR "Number of models: $number_of_models\n";
 	print STDERR "check-array: @check_array\n";
 	
-	if($number_of_models>10){
-	    print STDERR "Please provide 10 models or less\n";
-	    push(@input_error,"Please provide 10 models or less");
+	if($number_of_models>50){
+	    print STDERR "Please provide 50 models or less\n";
+	    push(@input_error,"Please provide 50 models or less");
 	}elsif(($number_of_models==1)&&($mode==2)){
 	    print STDERR "Please provide at least 2 models\n";
 	    push(@input_error,"Please provide at least 2 models");
@@ -922,6 +922,7 @@ if($page==2){
 		filtered_table => "html/$tempdir/filtered_table$result_number",
 		cm_map => "$server_static/tmp/$tempdir/graph"."$result_number".".svg",
 		cm_output_file => "$server_static/tmp/$tempdir/result$result_number",
+                cmvs_field => "template/cmvslink",
 		csv_file => "$server_static/tmp/$tempdir/csv$result_number",
 		csv_filtered_file => "$server_static/tmp/$tempdir/csv_filtered$result_number",
 		dot_file => "$server_static/tmp/$tempdir/graph_out$result_number.dot",
@@ -962,6 +963,8 @@ if($page==2){
 		cm_map=> "$server_static/tmp/$tempdir/graph$result_number.svg",
 		cm_output_file => "$server_static/tmp/$tempdir/result$result_number",
 		csv_file => "$server_static/tmp/$tempdir/csv$result_number",
+                cmvs_file => "$server_static/tmp/$tempdir/cmvs.result",
+                cmvs_field => "template/cmvslink",
 		csv_filtered_file => "$server_static/tmp/$tempdir/csv_filtered$result_number",
 		dot_file => "$server_static/tmp/$tempdir/graph_out$result_number.dot",
 		svg_file => "$server_static/tmp/$tempdir/graph$result_number.svg",
