@@ -63,7 +63,7 @@ function specify_slice(ref){
     var search=/specify-selection/g;
     var specify_selected=search.test(select_slice);
     if(specify_selected==true){
-	code ="<br>Specify filter criteria: <a href=\"#\" onmouseover=\"XBT(this, {id:'6'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"" + static_content_address + "/pictures/info.png\"></a> <input name=\"select_slice_filter\" type=\text\" size=\"30\" maxlength=\"30\">";
+	code ="<br>Specify filter criteria: <a href=\"#\" onmouseover=\"XBT(this, {id:'6'})\"><img style=\"vertical-align:middle;border:0;\" alt=\"info\" src=\"" + static_content_address +"/pictures/info.png\"></a> <input name=\"select_slice_filter\" type=\text\" size=\"30\" maxlength=\"30\">";
     }else{
 	code ="";
     }
