@@ -1,4 +1,4 @@
-#![CMCompare Webserver](http://www.tbi.univie.ac.at/~egg/cmcws.png "CMCompare webserver") 
+![CMCompare Webserver](http://www.tbi.univie.ac.at/~egg/cmcws.png "CMCompare webserver") 
 =========
 If you have RNA-family models and want to compare them, the CMCompare webserver can help you.
 
